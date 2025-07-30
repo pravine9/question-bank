@@ -54,6 +54,11 @@ function renderQuestion(q) {
   feedback.textContent = '';
   feedback.className = '';
   document.getElementById('explanation').style.display = 'none';
+  const ans = document.getElementById('answer');
+  if (ans) {
+    ans.textContent = '';
+    ans.style.display = 'none';
+  }
 }
 
 document.getElementById('checkBtn').onclick = function() {
@@ -73,6 +78,21 @@ document.getElementById('checkBtn').onclick = function() {
 
 document.getElementById('revealBtn').onclick = function() {
   if (!currentQuestion) return;
+  let answerText = '';
+  if (currentQuestion.answers && currentQuestion.answers.length) {
+    const obj = currentQuestion.answers.find(a => a.answer_number == currentQuestion.correct_answer_number);
+    answerText = obj ? obj.text : '';
+  } else {
+    answerText = currentQuestion.correct_answer || '';
+    if (currentQuestion.answer_unit) {
+      answerText += ' ' + currentQuestion.answer_unit;
+    }
+  }
+  const ans = document.getElementById('answer');
+  if (ans) {
+    ans.textContent = answerText ? `Answer: ${answerText}` : '';
+    ans.style.display = 'block';
+  }
   const ex = document.getElementById('explanation');
   const why = (currentQuestion.why || '')
     .replace(/\u2028/g, '\n')

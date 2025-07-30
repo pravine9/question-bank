@@ -83,6 +83,12 @@ button:hover {
   margin-top: 10px;
 }
 
+#answer {
+  display: none;
+  margin-top: 10px;
+  font-style: italic;
+}
+
 #feedback {
   margin-top: 10px;
   font-weight: bold;
