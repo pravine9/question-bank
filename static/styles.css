@@ -1,5 +1,5 @@
 body {
-  font-family: 'Nunito', Arial, sans-serif;
+  font-family: 'Nunito', 'Noto Color Emoji', Arial, sans-serif;
   margin: 20px;
   background-color: #f4f6f8;
   color: #333;
@@ -38,6 +38,10 @@ button:hover {
   border-radius: 5px;
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#qText {
+  white-space: pre-line;
 }
 
 #qImg {

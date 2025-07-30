@@ -15,7 +15,12 @@ function renderQuestion(q) {
   selected = null;
   document.getElementById('questionArea').style.display = 'block';
   document.getElementById('qTitle').innerHTML = q.title || '';
-  document.getElementById('qText').textContent = q.text || '';
+  const text = (q.text || '')
+    .replace(/\u2028/g, '\n')
+    .replace(/\u00a0/g, ' ')
+    .replace(/\u200b/g, '');
+  document.getElementById('qText').innerHTML =
+    DOMPurify.sanitize(marked.parse(text));
   const img = document.getElementById('qImg');
   if (q.resource_image) { img.src = q.resource_image; img.style.display='block'; } else { img.style.display='none'; }
   const options = document.getElementById('answerOptions');
@@ -69,7 +74,11 @@ document.getElementById('checkBtn').onclick = function() {
 document.getElementById('revealBtn').onclick = function() {
   if (!currentQuestion) return;
   const ex = document.getElementById('explanation');
-  ex.textContent = currentQuestion.why || 'No explanation';
+  const why = (currentQuestion.why || '')
+    .replace(/\u2028/g, '\n')
+    .replace(/\u00a0/g, ' ')
+    .replace(/\u200b/g, '');
+  ex.innerHTML = DOMPurify.sanitize(marked.parse(why || 'No explanation'));
   ex.style.display = 'block';
 };
 
