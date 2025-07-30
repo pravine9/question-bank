@@ -20,7 +20,7 @@
     <label for="numInput">Number of questions:</label>
     <input type="number" id="numInput" value="1" min="1">
     <div class="button-row">
-      <button id="loadBtn">Load Question</button>
+      <button id="loadBtn">Load Random Question</button>
       <button id="practiceBtn">Start Practice</button>
     </div>
 
@@ -41,13 +41,34 @@
       </div>
 
       <div id="statsArea">
-        <h2>Check Question Stats</h2>
-        <form id="statsForm">
-          <label for="statsId">Question ID:</label>
-          <input type="text" id="statsId" required>
-          <button type="submit">View</button>
-        </form>
-        <div id="statsResult"></div>
+        <h2>Question Statistics</h2>
+        <label for="statsBankSelect">Select Bank:</label>
+        <select id="statsBankSelect">
+          <option value="">-- Choose --</option>
+          {% for bank in banks %}
+            <option value="{{ bank }}">{{ bank }}</option>
+          {% endfor %}
+        </select>
+        <button id="loadStatsBtn">Load Stats</button>
+        <table id="statsTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Attempts</th>
+              <th>Right</th>
+              <th>Wrong</th>
+              <th>View</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div id="statsQuestionArea" style="display:none;">
+          <h3 id="sqTitle"></h3>
+          <p id="sqText"></p>
+          <button id="sqRevealBtn">Reveal Answer</button>
+          <div id="sqAnswer"></div>
+          <div id="sqExplanation"></div>
+        </div>
       </div>
     </div>
 

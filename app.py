@@ -77,6 +77,18 @@ def question():
     return jsonify(q)
 
 
+@app.route("/bank_questions")
+def bank_questions():
+    """Return all questions for a given bank."""
+    bank = request.args.get("bank")
+    if bank not in BANKS:
+        return jsonify({"error": "unknown bank"}), 404
+    questions = []
+    for p in BANKS[bank]:
+        questions.extend(_load(p))
+    return jsonify(questions)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
 
