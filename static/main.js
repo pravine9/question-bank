@@ -14,12 +14,12 @@ function renderQuestion(q) {
   currentQuestion = q;
   selected = null;
   document.getElementById('questionArea').style.display = 'block';
-  document.getElementById('qTitle').innerHTML = q.title || '';
+  document.getElementById('qTitle').textContent = q.title || '';
   document.getElementById('qText').textContent = q.text || '';
   const img = document.getElementById('qImg');
   if (q.resource_image) { img.src = q.resource_image; img.style.display='block'; } else { img.style.display='none'; }
   const options = document.getElementById('answerOptions');
-  options.innerHTML = '';
+  options.textContent = '';
   document.getElementById('calcInput').style.display='none';
   if (q.answers && q.answers.length) {
     q.answers.forEach(a => {
