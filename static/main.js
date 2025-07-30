@@ -40,51 +40,27 @@ function renderQuestion(q) {
   currentQuestion = q;
   selected = null;
   document.getElementById('questionArea').style.display = 'block';
-  document.getElementById('qTitle').textContent = q.title || '';
-  const text = (q.text || '')
-    .replace(/\u2028/g, '\n')
-    .replace(/\u00a0/g, ' ')
-    .replace(/\u200b/g, '');
-  document.getElementById('qText').innerHTML =
-    DOMPurify.sanitize(marked.parse(text));
-  const img = document.getElementById('qImg');
-  if (q.resource_image) { img.src = q.resource_image; img.style.display='block'; } else { img.style.display='none'; }
+  const result = questionRenderer.renderQuestion(q, {
+    text: '#qText',
+    title: '#qTitle',
+    img: '#qImg',
+    options: '#answerOptions',
+    input: '#calcInput',
+    unit: '#answerUnit',
+    feedback: '#feedback',
+    answer: '#answer',
+    explanation: '#explanation',
+    showInput: true
+  });
   const options = document.getElementById('answerOptions');
-  options.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
-  options.textContent = '';
-  const calcInput = document.getElementById('calcInput');
-  const answerUnit = document.getElementById('answerUnit');
-  calcInput.style.display = 'none';
-  answerUnit.style.display = 'none';
   if (q.answers && q.answers.length) {
-    q.answers.forEach(a => {
-      const btn = document.createElement('button');
-      btn.textContent = a.text;
-      btn.dataset.num = a.answer_number;
+    result.buttons.forEach(btn => {
       btn.onclick = () => {
         options.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
-        selected = a.answer_number;
+        selected = btn.dataset.num;
       };
-      options.appendChild(btn);
     });
-  } else {
-    calcInput.style.display = 'block';
-    if (q.answer_unit) {
-      answerUnit.textContent = q.answer_unit;
-      answerUnit.style.display = 'inline';
-    } else {
-      answerUnit.style.display = 'none';
-    }
-  }
-  const feedback = document.getElementById('feedback');
-  feedback.textContent = '';
-  feedback.className = '';
-  document.getElementById('explanation').style.display = 'none';
-  const ans = document.getElementById('answer');
-  if (ans) {
-    ans.textContent = '';
-    ans.style.display = 'none';
   }
 }
 
@@ -181,19 +157,14 @@ function showStatsQuestion(id) {
   if (!q) return;
   const overlay = document.getElementById('statsModal');
   overlay.style.display = 'flex';
-  document.getElementById('sqTitle').textContent = q.title || '';
-  const text = (q.text || '')
-    .replace(/\u2028/g, '\n')
-    .replace(/\u00a0/g, ' ')
-    .replace(/\u200b/g, '');
-  document.getElementById('sqText').innerHTML = DOMPurify.sanitize(marked.parse(text));
-  const img = document.getElementById('sqImg');
-  if (q.resource_image) { img.src = q.resource_image; img.style.display = 'block'; }
-  else { img.style.display = 'none'; }
-  document.getElementById('sqAnswer').style.display = 'none';
-  document.getElementById('sqExplanation').style.display = 'none';
-  document.getElementById('sqAnswer').textContent = '';
-  document.getElementById('sqExplanation').textContent = '';
+  questionRenderer.renderQuestion(q, {
+    text: '#sqText',
+    title: '#sqTitle',
+    img: '#sqImg',
+    answer: '#sqAnswer',
+    explanation: '#sqExplanation',
+    showInput: false
+  });
   const revealBtn = document.getElementById('sqRevealBtn');
   revealBtn.textContent = 'Reveal Answer';
   revealBtn.onclick = () => revealStatsQuestion(q);
