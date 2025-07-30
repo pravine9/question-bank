@@ -35,6 +35,8 @@ function renderQuestion(q) {
   feedback.textContent = '';
   feedback.className = '';
   document.getElementById('explanation').style.display = 'none';
+  const ans = document.getElementById('answer');
+  if (ans) { ans.style.display = 'none'; ans.textContent = ''; }
 }
 
 document.getElementById('checkBtn').onclick = function() {
@@ -54,6 +56,19 @@ document.getElementById('checkBtn').onclick = function() {
 
 document.getElementById('revealBtn').onclick = function() {
   if (!currentQuestion) return;
+  const ansEl = document.getElementById('answer');
+  if (ansEl) {
+    let ansText = '';
+    if (currentQuestion.answers && currentQuestion.answers.length) {
+      const obj = currentQuestion.answers.find(a => a.answer_number == currentQuestion.correct_answer_number);
+      ansText = obj ? obj.text : '';
+    } else {
+      ansText = currentQuestion.correct_answer || '';
+      if (currentQuestion.answer_unit) ansText += ' ' + currentQuestion.answer_unit;
+    }
+    ansEl.textContent = ansText ? `Answer: ${ansText}` : 'Answer unavailable';
+    ansEl.style.display = 'block';
+  }
   const ex = document.getElementById('explanation');
   ex.textContent = currentQuestion.why || 'No explanation';
   ex.style.display = 'block';

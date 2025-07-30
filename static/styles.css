@@ -64,6 +64,12 @@ button:hover {
   display: none;
 }
 
+#answer {
+  display: none;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
 #explanation {
   display: none;
   margin-top: 10px;
