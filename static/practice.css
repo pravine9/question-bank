@@ -138,3 +138,21 @@ body {
   background: #007bff;
   color: #fff;
 }
+
+.feedback {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.correct {
+  color: #2e7d32;
+}
+
+.incorrect {
+  color: #c62828;
+}
+
+.selected {
+  background-color: #ffe082;
+  color: #000;
+}
