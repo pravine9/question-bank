@@ -13,6 +13,8 @@
     <span class="test-title">Test: 2025 example questions Part 1</span>
     <div class="progress"><div class="bar" style="width:0%"></div></div>
     <div class="header-right">
+      <button class="summary-btn" style="display:none">Back to Summary</button>
+      <button class="home-top-btn" style="display:none">Home</button>
       <button class="finish-btn">Finish Test</button>
       <span class="candidate">Candidate Name</span>
     </div>
@@ -71,6 +73,12 @@
     let selected = null;
     const responses = Array(questions.length).fill(null);
     let reviewing = false;
+    const backSummaryBtn = document.querySelector('.summary-btn');
+    const homeTopBtn = document.querySelector('.home-top-btn');
+
+    // Ensure buttons start hidden
+    backSummaryBtn.style.display = 'none';
+    homeTopBtn.style.display = 'none';
 
     function initNav() {
       const nav = document.querySelector('.nav');
@@ -283,6 +291,8 @@
     function showSummary(){
       recordAnswer();
       reviewing = false;
+      backSummaryBtn.style.display = 'none';
+      homeTopBtn.style.display = 'none';
       document.querySelector('.main').style.display = 'none';
       document.querySelector('.footer').style.display = 'none';
       const summary = document.querySelector('.summary');
@@ -307,6 +317,8 @@
         btn.onclick = () => {
           index = parseInt(btn.getAttribute('data-idx'), 10);
           reviewing = true;
+          backSummaryBtn.style.display = 'inline-block';
+          homeTopBtn.style.display = 'inline-block';
           summary.style.display = 'none';
           document.querySelector('.main').style.display = 'flex';
           document.querySelector('.footer').style.display = 'flex';
@@ -319,6 +331,16 @@
       if (confirm('Are you sure you want to finish the test?')) {
         showSummary();
       }
+    };
+
+    // Back to summary from review mode
+    backSummaryBtn.onclick = () => {
+      showSummary();
+    };
+
+    // Quick exit to home
+    homeTopBtn.onclick = () => {
+      window.location.href = '/';
     };
   </script>
 </body>
