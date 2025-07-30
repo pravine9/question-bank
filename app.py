@@ -86,6 +86,7 @@ def bank_questions():
     questions = []
     for p in BANKS[bank]:
         questions.extend(_load(p))
+    questions.sort(key=lambda q: q.get("id", 0))
     return jsonify(questions)
 
 
