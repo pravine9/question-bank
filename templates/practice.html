@@ -18,25 +18,17 @@
 
   <div class="main">
     <aside class="sidebar">
-      <ul class="nav">
-        {% for n in range(1,16) %}
-        <li class="{% if n==1 %}active{% endif %}">{{ n }}</li>
-        {% endfor %}
-      </ul>
+      <ul class="nav"></ul>
     </aside>
 
     <section class="question-area">
-      <p class="scenario">A mother brings her child to the pharmacy looking for paracetamol. The following dosing schedule is provided.</p>
-      <table class="dose-table">
-        <tr><th>Age</th><th>Dose</th><th>Frequency</th></tr>
-        <tr><td>6–12 years</td><td>500 mg</td><td>Up to four times daily</td></tr>
-      </table>
-      <p class="prompt"><strong>How many tablets should be supplied for a 5‑day course?</strong></p>
-      <div class="calculator">
+      <p class="scenario"></p>
+      <div class="options"></div>
+      <div class="calculator" style="display:none">
         <span class="icon">&#128425;</span>
-        <label>Basic Calculator</label>
+        <label>Answer</label>
         <input type="number">
-        <span class="unit">tablet(s)</span>
+        <span class="unit"></span>
       </div>
     </section>
   </div>
@@ -49,5 +41,70 @@
       <button class="next-btn">Next ❯</button>
     </div>
   </footer>
+
+  <script>
+    const questions = {{ questions|tojson|safe }};
+    let index = 0;
+
+    function initNav() {
+      const nav = document.querySelector('.nav');
+      nav.innerHTML = '';
+      questions.forEach((q,i) => {
+        const li = document.createElement('li');
+        li.textContent = i+1;
+        if(i===0) li.classList.add('active');
+        li.onclick = () => { index = i; renderQuestion(); };
+        nav.appendChild(li);
+      });
+    }
+
+    function updateProgress() {
+      const pct = ((index + 1) / questions.length) * 100;
+      document.querySelector('.bar').style.width = pct + '%';
+    }
+
+    function updateNav() {
+      document.querySelectorAll('.nav li').forEach((li,i) => {
+        li.classList.toggle('active', i === index);
+      });
+    }
+
+    function renderQuestion() {
+      const q = questions[index];
+      document.querySelector('.scenario').textContent = q.text || q.title || '';
+      const opts = document.querySelector('.options');
+      const calc = document.querySelector('.calculator');
+      const input = calc.querySelector('input');
+      const unit = calc.querySelector('.unit');
+      opts.innerHTML = '';
+      if(q.answers && q.answers.length){
+        calc.style.display = 'none';
+        q.answers.forEach(a => {
+          const btn = document.createElement('button');
+          btn.textContent = a.text;
+          opts.appendChild(btn);
+        });
+      } else {
+        calc.style.display = 'block';
+        input.value = '';
+        unit.textContent = q.answer_unit || '';
+      }
+      updateProgress();
+      updateNav();
+    }
+
+    document.querySelector('.next-btn').onclick = () => {
+      if(index < questions.length - 1){ index++; renderQuestion(); }
+    };
+    document.querySelector('.back-btn').onclick = () => {
+      if(index > 0){ index--; renderQuestion(); }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if(!questions.length) return;
+      initNav();
+      renderQuestion();
+    });
+  </script>
 </body>
 </html>

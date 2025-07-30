@@ -38,10 +38,26 @@ def launch():
     return render_template("launch.html")
 
 
+def get_questions(bank: str, num: int):
+    """Return ``num`` random questions from the files for ``bank``."""
+    if bank not in BANKS:
+        return []
+    questions = []
+    for p in BANKS[bank]:
+        questions.extend(_load(p))
+    random.shuffle(questions)
+    return questions[:num]
+
+
 @app.route("/practice")
 def practice_page():
-    """Simple static page replicating the exam practice layout."""
-    return render_template("practice.html")
+    """Serve the practice interface with a set of questions."""
+    bank = request.args.get("bank")
+    num = request.args.get("num", default=10, type=int)
+    if bank not in BANKS:
+        return render_template("practice.html", questions=[], bank=None)
+    questions = get_questions(bank, num)
+    return render_template("practice.html", questions=questions, bank=bank)
 
 
 @app.route("/htmlDelivery/index.html")
