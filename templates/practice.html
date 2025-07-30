@@ -30,6 +30,8 @@
         <input type="number">
         <span class="unit"></span>
       </div>
+      <button class="check-btn">Check</button>
+      <div class="feedback"></div>
     </section>
   </div>
 
@@ -45,6 +47,7 @@
   <script>
     const questions = {{ questions|tojson|safe }};
     let index = 0;
+    let selected = null;
 
     function initNav() {
       const nav = document.querySelector('.nav');
@@ -71,17 +74,26 @@
 
     function renderQuestion() {
       const q = questions[index];
+      selected = null;
       document.querySelector('.scenario').textContent = q.text || q.title || '';
       const opts = document.querySelector('.options');
       const calc = document.querySelector('.calculator');
       const input = calc.querySelector('input');
       const unit = calc.querySelector('.unit');
+      const feedback = document.querySelector('.feedback');
+      feedback.textContent = '';
+      feedback.className = 'feedback';
       opts.textContent = '';
       if(q.answers && q.answers.length){
         calc.style.display = 'none';
         q.answers.forEach(a => {
           const btn = document.createElement('button');
           btn.textContent = a.text;
+          btn.onclick = () => {
+            opts.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selected = a.answer_number;
+          };
           opts.appendChild(btn);
         });
       } else {
@@ -93,11 +105,35 @@
       updateNav();
     }
 
+    function updateStats(id, correct) {
+      const data = JSON.parse(localStorage.getItem('questionStats') || '{}');
+      if (!data[id]) data[id] = {right:0, wrong:0, saved:false};
+      if (correct) data[id].right++; else data[id].wrong++;
+      localStorage.setItem('questionStats', JSON.stringify(data));
+    }
+
     document.querySelector('.next-btn').onclick = () => {
       if(index < questions.length - 1){ index++; renderQuestion(); }
     };
     document.querySelector('.back-btn').onclick = () => {
       if(index > 0){ index--; renderQuestion(); }
+    };
+
+    document.querySelector('.check-btn').onclick = () => {
+      const q = questions[index];
+      const calc = document.querySelector('.calculator');
+      const input = calc.querySelector('input');
+      let correct = false;
+      if(q.answers && q.answers.length){
+        correct = selected == q.correct_answer_number;
+      } else {
+        const value = input.value.trim();
+        correct = value === (q.correct_answer || '');
+      }
+      const fb = document.querySelector('.feedback');
+      fb.textContent = correct ? 'Correct!' : 'Incorrect';
+      fb.className = 'feedback ' + (correct ? 'correct' : 'incorrect');
+      updateStats(q.id, correct);
     };
 
     document.addEventListener('DOMContentLoaded', () => {
