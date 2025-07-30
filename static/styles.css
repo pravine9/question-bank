@@ -54,7 +54,8 @@ button:hover {
 }
 
 #qImg {
-  max-width: 400px;
+  max-width: 100%;
+  height: auto;
   display: none;
 }
 
