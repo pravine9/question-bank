@@ -64,6 +64,16 @@ button:hover {
   display: none;
 }
 
+#calcInput,
+#answerUnit {
+  vertical-align: middle;
+}
+
+#answerUnit {
+  display: none;
+  margin-left: 4px;
+}
+
 #explanation {
   display: none;
   margin-top: 10px;

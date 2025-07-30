@@ -20,7 +20,10 @@ function renderQuestion(q) {
   if (q.resource_image) { img.src = q.resource_image; img.style.display='block'; } else { img.style.display='none'; }
   const options = document.getElementById('answerOptions');
   options.innerHTML = '';
-  document.getElementById('calcInput').style.display='none';
+  const calcInput = document.getElementById('calcInput');
+  const answerUnit = document.getElementById('answerUnit');
+  calcInput.style.display = 'none';
+  answerUnit.style.display = 'none';
   if (q.answers && q.answers.length) {
     q.answers.forEach(a => {
       const btn = document.createElement('button');
@@ -29,7 +32,13 @@ function renderQuestion(q) {
       options.appendChild(btn);
     });
   } else {
-    document.getElementById('calcInput').style.display = 'block';
+    calcInput.style.display = 'block';
+    if (q.answer_unit) {
+      answerUnit.textContent = q.answer_unit;
+      answerUnit.style.display = 'inline';
+    } else {
+      answerUnit.style.display = 'none';
+    }
   }
   const feedback = document.getElementById('feedback');
   feedback.textContent = '';
