@@ -153,7 +153,12 @@
             btn.classList.add('selected');
             selected = a.answer_number;
           }
-          if(reviewing) btn.disabled = true;
+          if(reviewing){
+            btn.disabled = true;
+            if(a.answer_number == q.correct_answer_number){
+              btn.classList.add('correct');
+            }
+          }
           opts.appendChild(btn);
         });
       } else {
@@ -232,11 +237,15 @@
 
   document.querySelector('.check-btn').onclick = () => {
       const q = questions[index];
+      const opts = document.querySelector('.options');
       const calc = document.querySelector('.calculator');
       const input = calc.querySelector('input');
       let correct = false;
       if(q.answers && q.answers.length){
         correct = selected == q.correct_answer_number;
+        opts.querySelectorAll('button').forEach(b => b.disabled = true);
+        const correctBtn = opts.querySelector(`button[data-num='${q.correct_answer_number}']`);
+        if(correctBtn) correctBtn.classList.add('correct');
       } else {
         const value = input.value.trim();
         correct = value === (q.correct_answer || '');
