@@ -1,0 +1,50 @@
+[
+  {
+    "id": 790,
+    "bank": "calculations",
+    "title": "**How much oral solution should the patient take to achieve the same therapeutic effect? Give your answer to the nearest whole number.**",
+    "text": "An 18-year-old male has been prescribed emtricitabine 200 mg once daily in capsule form for HIV-1 infection. The patient has difficulty swallowing the capsules and requests to switch to the oral solution form. Emtricitabine is available as a 10mg/mL oral solution. \r\n\r\nAn extract has been provided for this question:",
+    "why": "**Step 1: Calculate equivalent dose** \r\n200 x 93% / 75% = 248mg \r\n\r\n**Step 2: Calculate the volume of oral solution by dividing the dose of oral solution (248 mg) by the concentration of oral solution (10 mg/mL):**\r\n\r\n 248 mg / 10 mg/mL = 24.8 mL`\r\n\r\n**Step 3: Round the volume of oral solution to the nearest whole number:**\r\n24.8 mL ~ 25 mL`",
+    "resource_image": "https://bucketeer-e785e884-c4af-45ab-9a36-63a60ccc6444.s3.amazonaws.com/bucketeer-e785e884-c4af-45ab-9a36-63a60ccc6444/media/public/1361eddd-bc39-4841-9bf4-1e89cabe0ad2.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIARVGPJVYVHK6QIBWU%2F20250729%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20250729T215919Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=400ff355acce88f980c2c2cda1970553d5d4195b7dec6c3ae39cf64baccee9b7",
+    "visible": true,
+    "is_calculation": true,
+    "correct_answer": "25",
+    "answer_unit": "mL",
+    "correct_answer_number": null,
+    "weighting": null,
+    "answers": [],
+    "is_free": false
+  },
+  {
+    "id": 2741,
+    "bank": "calculations",
+    "title": "**Calculate the duration of the infusion, in minutes. Give your answer as a whole number**.",
+    "text": "A 15 year old female patient has been prescribed 500mL of a glucose 5% infusion for the treatment of hypoglycemia. The drop rate of the infusion is set to 35 drops/min.",
+    "why": "**Step 1: Know the general rule… 20 drops in 1mL**\r\n500ml x 20 drops = 10,000 drops \r\n\r\n**Step 2: Calculate duration of infusion** \r\n10,000 drops/35 drops = 285.71428 mins → 286 mins\r\n\r\nNote: you need to learn that 20 drops = 1ml",
+    "resource_image": null,
+    "visible": true,
+    "is_calculation": true,
+    "correct_answer": "286",
+    "answer_unit": "minutes",
+    "correct_answer_number": null,
+    "weighting": null,
+    "answers": [],
+    "is_free": false
+  },
+  {
+    "id": 788,
+    "bank": "calculations",
+    "title": "**Using the resource pack provided, calculate how many inhalers are needed to provide her with a 56 day supply of treatment.**",
+    "text": "A 20-year-old female with asthma has been prescribed Flutiform 125/5mcg inhaler with aerochamber plus Flow-Vu spacer device \r\nHer dose is “Two inhalations each morning and evening” \r\n\r\nAn extract has been provided for this question",
+    "why": "**Step 1: calculate the total number of puffs for a 56 day treatment** \r\nTwo puffs twice a day → this is a total of 4 puffs each day ( 2 x 2 = 4). \r\n4 puffs each day x 56 days = 224 puffs. \r\n\r\n**Step 2: In the resource pack find out the number of doses in each inhaler** \r\nFlutiform 125micrograms/dose / 5micrograms/dose inhaler Napp Pharmaceuticals Ltd\r\nActive ingredients\r\nFluticasone propionate 125 microgram per 1 dose, Formoterol fumarate dihydrate 5 microgram per 1 dose\r\nSize: 120\r\nUnit: dose\r\nNHS indicative price\r\n£28.00\r\n\r\n\r\nEach inhaler has 120 doses, \r\n**Step 3: divide total amount of puffs by the puffs available in inhaler** \r\nThe patient will need a total of 224 puffs. Each inhaler has 120 puffs. \r\n224/120 = 1.86666 \r\nYou cannot get 0.8666 of an inhaler so you would need to round up to 2.",
+    "resource_image": "https://bucketeer-e785e884-c4af-45ab-9a36-63a60ccc6444.s3.amazonaws.com/bucketeer-e785e884-c4af-45ab-9a36-63a60ccc6444/media/public/2f73f423-af59-4cb0-b423-9e87d08c9e13.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIARVGPJVYVHK6QIBWU%2F20250729%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20250729T215919Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=0f3151c41bcb7cef45a4b3ff0ff8181030708c33da8e85f89589b8b8a6013a25",
+    "visible": true,
+    "is_calculation": true,
+    "correct_answer": "2",
+    "answer_unit": "Inhalers",
+    "correct_answer_number": null,
+    "weighting": null,
+    "answers": [],
+    "is_free": false
+  }
+]
