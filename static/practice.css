@@ -57,6 +57,7 @@ body {
 }
 
 .nav li {
+  position: relative;
   width: 40px;
   height: 40px;
   line-height: 40px;
@@ -66,6 +67,19 @@ body {
   border: 1px solid #ccc;
   background: #fff;
   cursor: pointer;
+}
+
+.nav li .flag-icon {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.nav li.flagged {
+  background: #fff8dc;
+  border-color: #f6c71a;
 }
 
 .nav li.active {
