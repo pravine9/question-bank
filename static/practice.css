@@ -48,6 +48,8 @@ body {
   padding: 20px;
   background: #f0f2f5;
   box-sizing: border-box;
+  height: 100%;
+  overflow-y: auto;
 }
 
 .nav {
