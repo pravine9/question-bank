@@ -42,69 +42,7 @@
     </div>
   </footer>
 
-  <script>
-    const questions = {{ questions|tojson|safe }};
-    let index = 0;
-
-    function initNav() {
-      const nav = document.querySelector('.nav');
-      nav.innerHTML = '';
-      questions.forEach((q,i) => {
-        const li = document.createElement('li');
-        li.textContent = i+1;
-        if(i===0) li.classList.add('active');
-        li.onclick = () => { index = i; renderQuestion(); };
-        nav.appendChild(li);
-      });
-    }
-
-    function updateProgress() {
-      const pct = ((index + 1) / questions.length) * 100;
-      document.querySelector('.bar').style.width = pct + '%';
-    }
-
-    function updateNav() {
-      document.querySelectorAll('.nav li').forEach((li,i) => {
-        li.classList.toggle('active', i === index);
-      });
-    }
-
-    function renderQuestion() {
-      const q = questions[index];
-      document.querySelector('.scenario').textContent = q.text || q.title || '';
-      const opts = document.querySelector('.options');
-      const calc = document.querySelector('.calculator');
-      const input = calc.querySelector('input');
-      const unit = calc.querySelector('.unit');
-      opts.innerHTML = '';
-      if(q.answers && q.answers.length){
-        calc.style.display = 'none';
-        q.answers.forEach(a => {
-          const btn = document.createElement('button');
-          btn.textContent = a.text;
-          opts.appendChild(btn);
-        });
-      } else {
-        calc.style.display = 'block';
-        input.value = '';
-        unit.textContent = q.answer_unit || '';
-      }
-      updateProgress();
-      updateNav();
-    }
-
-    document.querySelector('.next-btn').onclick = () => {
-      if(index < questions.length - 1){ index++; renderQuestion(); }
-    };
-    document.querySelector('.back-btn').onclick = () => {
-      if(index > 0){ index--; renderQuestion(); }
-    };
-
-    document.addEventListener('DOMContentLoaded', () => {
-      if(!questions.length) return;
-      initNav();
-      renderQuestion();
-    });
-  </script>
+  <script id="questions-data" type="application/json">{{ questions|tojson|safe }}</script>
+  <script src="{{ url_for('static', filename='practice.js') }}"></script>
 </body>
 </html>
