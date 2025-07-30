@@ -107,9 +107,10 @@ body {
 .options button {
   display: block;
   width: 100%;
-  padding: 0.4em 0.8em;
+  padding: 0.6em 1em;
   margin: 5px 0;
   text-align: left;
+  font-size: 1.1rem;
 }
 
 .dose-table {
