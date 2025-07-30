@@ -43,6 +43,17 @@ body {
   margin-right: 10px;
 }
 
+.summary-btn,
+.home-top-btn {
+  background: #f6c71a;
+  color: #000;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
 .main {
   display: flex;
   height: calc(100vh - 120px);
