@@ -22,6 +22,7 @@
     </aside>
 
     <section class="question-area">
+      <h2 class="q-number"></h2>
       <p class="scenario"></p>
       <div class="options"></div>
       <div class="calculator" style="display:none">
@@ -75,6 +76,7 @@
     function renderQuestion() {
       const q = questions[index];
       selected = null;
+      document.querySelector('.q-number').textContent = `Question ${index + 1}`;
       document.querySelector('.scenario').textContent = q.text || q.title || '';
       const opts = document.querySelector('.options');
       const calc = document.querySelector('.calculator');
