@@ -68,11 +68,33 @@ body {
   border: 1px solid #ccc;
   background: #fff;
   cursor: pointer;
+  position: relative;
 }
 
 .nav li.active {
   background: #007bff;
   color: #fff;
+}
+
+.nav li.flagged {
+  background: #fff3cd;
+  border-color: #ff9800;
+}
+
+.nav li.flagged .flag-btn {
+  color: #d32f2f;
+}
+
+.flag-btn {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
 }
 
 .question-area {
