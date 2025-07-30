@@ -57,6 +57,7 @@
     <div class="nav-btns">
       <button class="back-btn">Back</button>
       <button class="next-btn">Next ❯</button>
+      <button class="flag-current-btn">Flag</button>
     </div>
   </footer>
 
@@ -208,16 +209,20 @@
       responses[index] = {answer: userAns, text: userText, correctAnswer: correctText, correct};
     }
 
-    document.querySelector('.next-btn').onclick = () => {
-      recordAnswer();
-      if(index < questions.length - 1){ index++; renderQuestion(); }
-    };
-    document.querySelector('.back-btn').onclick = () => {
-      recordAnswer();
-      if(index > 0){ index--; renderQuestion(); }
-    };
+  document.querySelector('.next-btn').onclick = () => {
+    recordAnswer();
+    if(index < questions.length - 1){ index++; renderQuestion(); }
+  };
+  document.querySelector('.back-btn').onclick = () => {
+    recordAnswer();
+    if(index > 0){ index--; renderQuestion(); }
+  };
+  document.querySelector('.flag-current-btn').onclick = () => {
+    const li = document.querySelectorAll('.nav li')[index];
+    toggleFlag(questions[index].id, li);
+  };
 
-    document.querySelector('.check-btn').onclick = () => {
+  document.querySelector('.check-btn').onclick = () => {
       const q = questions[index];
       const calc = document.querySelector('.calculator');
       const input = calc.querySelector('input');
