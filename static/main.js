@@ -158,7 +158,7 @@ function loadStats() {
   if (!bank) return;
   fetch(`/bank_questions?bank=${bank}`)
     .then(r => r.json())
-    .then(qs => { statsQuestions = qs; renderStats(); });
+    .then(qs => { statsQuestions = qs.sort((a,b) => (a.id||0) - (b.id||0)); renderStats(); });
 }
 
 function renderStats() {
