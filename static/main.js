@@ -143,3 +143,18 @@ function updateStats(id, correct) {
   if (correct) data[id].right++; else data[id].wrong++;
   localStorage.setItem('questionStats', JSON.stringify(data));
 }
+
+const statsForm = document.getElementById('statsForm');
+if (statsForm) {
+  statsForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const id = document.getElementById('statsId').value.trim();
+    if (!id) return;
+    const data = JSON.parse(localStorage.getItem('questionStats') || '{}');
+    const stats = data[id] || {right:0, wrong:0, saved:false};
+    const res = document.getElementById('statsResult');
+    if (res) {
+      res.textContent = `Right: ${stats.right}, Wrong: ${stats.wrong}, Saved: ${stats.saved ? 'Yes' : 'No'}`;
+    }
+  });
+}

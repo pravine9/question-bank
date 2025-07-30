@@ -24,22 +24,32 @@
       <button id="practiceBtn">Start Practice</button>
     </div>
 
-    <div id="questionArea">
-      <h2 id="qTitle"></h2>
-      <p id="qText"></p>
-      <img id="qImg" alt="Question image">
-      <div id="answerOptions"></div>
-      <input type="text" id="calcInput"><span id="answerUnit"></span>
-      <div class="button-row">
-        <button id="checkBtn">Check</button>
-        <button id="revealBtn">Reveal</button>
-        <button id="saveBtn">Save for review</button>
+      <div id="questionArea">
+        <h2 id="qTitle"></h2>
+        <p id="qText"></p>
+        <img id="qImg" alt="Question image">
+        <div id="answerOptions"></div>
+        <input type="text" id="calcInput"><span id="answerUnit"></span>
+        <div class="button-row">
+          <button id="checkBtn">Check</button>
+          <button id="revealBtn">Reveal</button>
+          <button id="saveBtn">Save for review</button>
+        </div>
+        <div id="feedback"></div>
+        <div id="answer"></div>
+        <div id="explanation"></div>
       </div>
-      <div id="feedback"></div>
-      <div id="answer"></div>
-      <div id="explanation"></div>
+
+      <div id="statsArea">
+        <h2>Check Question Stats</h2>
+        <form id="statsForm">
+          <label for="statsId">Question ID:</label>
+          <input type="text" id="statsId" required>
+          <button type="submit">View</button>
+        </form>
+        <div id="statsResult"></div>
+      </div>
     </div>
-  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify@2.3.10/dist/purify.min.js"></script>
