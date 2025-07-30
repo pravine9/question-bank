@@ -1,3 +1,5 @@
+import { updateStats } from './question_renderer.js';
+
 document.getElementById('loadBtn').addEventListener('click', loadQuestion);
 const practiceBtn = document.getElementById('practiceBtn');
 if (practiceBtn) practiceBtn.addEventListener('click', startPractice);
@@ -141,13 +143,6 @@ document.getElementById('saveBtn').onclick = function() {
   localStorage.setItem('questionStats', JSON.stringify(data));
   alert(data[currentQuestion.id].saved ? 'Saved!' : 'Removed!');
 };
-
-function updateStats(id, correct) {
-  const data = JSON.parse(localStorage.getItem('questionStats') || '{}');
-  if (!data[id]) data[id] = {right:0, wrong:0, saved:false};
-  if (correct) data[id].right++; else data[id].wrong++;
-  localStorage.setItem('questionStats', JSON.stringify(data));
-}
 
 let statsQuestions = [];
 const loadStatsBtn = document.getElementById('loadStatsBtn');

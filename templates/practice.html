@@ -63,7 +63,9 @@
   </footer>
   </div>
 
-  <script>
+  <script type="module">
+    import { updateStats } from "{{ url_for('static', filename='question_renderer.js') }}";
+
     const questions = {{ questions|tojson|safe }};
     let index = 0;
     let selected = null;
@@ -210,13 +212,6 @@
       }
       updateProgress();
       updateNav();
-    }
-
-    function updateStats(id, correct) {
-      const data = JSON.parse(localStorage.getItem('questionStats') || '{}');
-      if (!data[id]) data[id] = {right:0, wrong:0, saved:false};
-      if (correct) data[id].right++; else data[id].wrong++;
-      localStorage.setItem('questionStats', JSON.stringify(data));
     }
 
     function recordAnswer(){
