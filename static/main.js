@@ -40,7 +40,7 @@ function renderQuestion(q) {
   currentQuestion = q;
   selected = null;
   document.getElementById('questionArea').style.display = 'block';
-  document.getElementById('qTitle').innerHTML = q.title || '';
+  document.getElementById('qTitle').textContent = q.title || '';
   const text = (q.text || '')
     .replace(/\u2028/g, '\n')
     .replace(/\u00a0/g, ' ')
@@ -51,7 +51,7 @@ function renderQuestion(q) {
   if (q.resource_image) { img.src = q.resource_image; img.style.display='block'; } else { img.style.display='none'; }
   const options = document.getElementById('answerOptions');
   options.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
-  options.innerHTML = '';
+  options.textContent = '';
   const calcInput = document.getElementById('calcInput');
   const answerUnit = document.getElementById('answerUnit');
   calcInput.style.display = 'none';
