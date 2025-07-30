@@ -48,7 +48,7 @@
 
     function initNav() {
       const nav = document.querySelector('.nav');
-      nav.innerHTML = '';
+      nav.textContent = '';
       questions.forEach((q,i) => {
         const li = document.createElement('li');
         li.textContent = i+1;
@@ -76,7 +76,7 @@
       const calc = document.querySelector('.calculator');
       const input = calc.querySelector('input');
       const unit = calc.querySelector('.unit');
-      opts.innerHTML = '';
+      opts.textContent = '';
       if(q.answers && q.answers.length){
         calc.style.display = 'none';
         q.answers.forEach(a => {
