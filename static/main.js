@@ -31,7 +31,9 @@ function renderQuestion(q) {
   } else {
     document.getElementById('calcInput').style.display = 'block';
   }
-  document.getElementById('feedback').textContent = '';
+  const feedback = document.getElementById('feedback');
+  feedback.textContent = '';
+  feedback.className = '';
   document.getElementById('explanation').style.display = 'none';
 }
 
@@ -44,7 +46,9 @@ document.getElementById('checkBtn').onclick = function() {
     const value = document.getElementById('calcInput').value.trim();
     correct = value === (currentQuestion.correct_answer || '');
   }
-  document.getElementById('feedback').textContent = correct ? 'Correct!' : 'Incorrect';
+  const feedback = document.getElementById('feedback');
+  feedback.textContent = correct ? 'Correct!' : 'Incorrect';
+  feedback.className = correct ? 'correct' : 'incorrect';
   updateStats(currentQuestion.id, correct);
 };
 
