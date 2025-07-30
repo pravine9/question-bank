@@ -44,10 +44,11 @@
     <h2>Test Summary</h2>
     <table class="summary-table">
       <thead>
-        <tr><th>#</th><th>Your Answer</th><th>Correct Answer</th><th>Review</th></tr>
+        <tr><th>#</th><th>Your Answer</th><th>Correct Answer</th><th>Result</th><th>Review</th></tr>
       </thead>
       <tbody></tbody>
     </table>
+    <p class="score"></p>
     <a href="/">Return Home</a>
   </section>
 
@@ -270,14 +271,20 @@
       document.querySelector('.footer').style.display = 'none';
       const summary = document.querySelector('.summary');
       const tbody = summary.querySelector('tbody');
+      const score = summary.querySelector('.score');
       tbody.textContent = '';
+      let correctCount = 0;
       responses.forEach((r,i) => {
         const tr = document.createElement('tr');
         const ua = r ? r.text || '' : '';
         const ca = r ? r.correctAnswer || '' : '';
-        tr.innerHTML = `<td>${i+1}</td><td>${ua}</td><td>${ca}</td><td><button data-idx='${i}'>Review</button></td>`;
+        const correct = r ? r.correct : false;
+        if(correct) correctCount++;
+        const icon = correct ? '✔' : '✘';
+        tr.innerHTML = `<td>${i+1}</td><td>${ua}</td><td>${ca}</td><td class="result-icon ${correct ? 'correct' : 'incorrect'}">${icon}</td><td><button data-idx='${i}'>Review</button></td>`;
         tbody.appendChild(tr);
       });
+      score.textContent = `You answered ${correctCount} of ${questions.length} correctly.`;
       summary.style.display = 'block';
       document.querySelector('.finish-btn').style.display = 'none';
       summary.querySelectorAll('button[data-idx]').forEach(btn => {

@@ -236,6 +236,18 @@ body {
   text-align: left;
 }
 
+.summary-table .result-icon {
+  text-align: center;
+  font-weight: bold;
+  width: 60px;
+}
+.summary-table .correct {
+  color: #2e7d32;
+}
+.summary-table .incorrect {
+  color: #c62828;
+}
+
 .details {
   margin-top: 10px;
   padding: 10px;
