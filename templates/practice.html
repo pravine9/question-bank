@@ -25,6 +25,17 @@
       <ul class="nav"></ul>
     </aside>
 
+    <div class="pdf-pane" id="pdfPane" style="display:none">
+      <div class="pdf-controls">
+        <button class="pdf-zoom-in">+</button>
+        <button class="pdf-zoom-out">-</button>
+        <button class="pdf-close">&times;</button>
+      </div>
+      <div class="pdf-wrapper">
+        <iframe id="pdfFrame" src="" title="PDF viewer"></iframe>
+      </div>
+    </div>
+
     <section class="question-area">
       <h2 class="q-number"></h2>
       <p class="scenario"></p>
@@ -135,9 +146,47 @@
       });
     }
 
-    function renderQuestion() {
+    let pdfZoom = 1;
+    const pdfPane = document.getElementById('pdfPane');
+    const pdfFrame = document.getElementById('pdfFrame');
+
+    function openPdf(url){
+      pdfFrame.src = url;
+      pdfZoom = 1;
+      pdfFrame.style.transform = 'scale(1)';
+      pdfPane.style.display = 'flex';
+    }
+
+    function closePdf(){
+      pdfPane.style.display = 'none';
+      pdfFrame.src = '';
+    }
+
+    document.querySelector('.pdf-close').onclick = closePdf;
+    document.querySelector('.pdf-zoom-in').onclick = () => {
+      pdfZoom += 0.1;
+      pdfFrame.style.transform = `scale(${pdfZoom})`;
+    };
+    document.querySelector('.pdf-zoom-out').onclick = () => {
+      pdfZoom = Math.max(0.1, pdfZoom - 0.1);
+      pdfFrame.style.transform = `scale(${pdfZoom})`;
+    };
+
+    function convertPdfLinks(el){
+      if(!el) return;
+      el.querySelectorAll('a[href$=".pdf"]').forEach(a => {
+        const btn = document.createElement('button');
+        btn.textContent = 'Open PDF';
+        btn.className = 'pdf-btn';
+        btn.onclick = (e) => { e.preventDefault(); openPdf(a.href); };
+        a.replaceWith(btn);
+      });
+    }
+
+   function renderQuestion() {
       const q = questions[index];
       selected = null;
+      closePdf();
       document.querySelector('.q-number').textContent = `Question ${index + 1}`;
       const result = questionRenderer.renderQuestion(q, {
         text: '.scenario',
@@ -150,6 +199,8 @@
         explanation: '.explanation',
         showInput: true
       });
+      convertPdfLinks(document.querySelector('.scenario'));
+      convertPdfLinks(document.querySelector('.prompt'));
       const opts = document.querySelector('.options');
       const calc = document.querySelector('.calculator');
       const input = calc.querySelector('input');
@@ -209,6 +260,7 @@
         } else {
           expl.textContent = expText;
         }
+        convertPdfLinks(expl);
         details.style.display = 'block';
       } else {
         const fb = document.querySelector('.feedback');
@@ -291,6 +343,7 @@
     function showSummary(){
       recordAnswer();
       reviewing = false;
+      closePdf();
       backSummaryBtn.style.display = 'none';
       homeTopBtn.style.display = 'none';
       document.querySelector('.main').style.display = 'none';
