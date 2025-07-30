@@ -48,7 +48,7 @@
       </thead>
       <tbody></tbody>
     </table>
-    <a href="/">Return Home</a>
+    <button class="home-btn">Return Home</button>
   </section>
 
   <footer class="footer">
@@ -297,6 +297,11 @@
         showSummary();
       }
     };
+
+    const homeBtn = document.querySelector('.home-btn');
+    if (homeBtn) {
+      homeBtn.onclick = () => { window.location.href = '/'; };
+    }
   </script>
 </body>
 </html>
