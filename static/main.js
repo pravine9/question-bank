@@ -194,7 +194,9 @@ function showStatsQuestion(id) {
   document.getElementById('sqExplanation').style.display = 'none';
   document.getElementById('sqAnswer').textContent = '';
   document.getElementById('sqExplanation').textContent = '';
-  document.getElementById('sqRevealBtn').onclick = () => revealStatsQuestion(q);
+  const revealBtn = document.getElementById('sqRevealBtn');
+  revealBtn.textContent = 'Reveal Answer';
+  revealBtn.onclick = () => revealStatsQuestion(q);
 }
 
 document.getElementById('sqCloseBtn').onclick = function() {
@@ -202,6 +204,17 @@ document.getElementById('sqCloseBtn').onclick = function() {
 };
 
 function revealStatsQuestion(q) {
+  const ans = document.getElementById('sqAnswer');
+  const ex = document.getElementById('sqExplanation');
+  const btn = document.getElementById('sqRevealBtn');
+
+  if (ans.style.display === 'block') {
+    ans.style.display = 'none';
+    ex.style.display = 'none';
+    btn.textContent = 'Reveal Answer';
+    return;
+  }
+
   let answerText = '';
   if (q.answers && q.answers.length) {
     const obj = q.answers.find(a => a.answer_number == q.correct_answer_number);
@@ -210,13 +223,13 @@ function revealStatsQuestion(q) {
     answerText = q.correct_answer || '';
     if (q.answer_unit) answerText += ' ' + q.answer_unit;
   }
-  const ans = document.getElementById('sqAnswer');
   ans.textContent = answerText ? `Answer: ${answerText}` : '';
   const why = (q.why || '')
     .replace(/\u2028/g, '\n')
     .replace(/\u00a0/g, ' ')
     .replace(/\u200b/g, '');
-  document.getElementById('sqExplanation').innerHTML = DOMPurify.sanitize(marked.parse(why || 'No explanation'));
+  ex.innerHTML = DOMPurify.sanitize(marked.parse(why || 'No explanation'));
   ans.style.display = 'block';
-  document.getElementById('sqExplanation').style.display = 'block';
+  ex.style.display = 'block';
+  btn.textContent = 'Hide Answer';
 }
