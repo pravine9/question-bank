@@ -44,6 +44,7 @@
       </thead>
       <tbody></tbody>
     </table>
+    <a href="/">Return Home</a>
   </section>
 
   <footer class="footer">
@@ -236,6 +237,7 @@
         tbody.appendChild(tr);
       });
       summary.style.display = 'block';
+      document.querySelector('.finish-btn').style.display = 'none';
       summary.querySelectorAll('button[data-idx]').forEach(btn => {
         btn.onclick = () => {
           index = parseInt(btn.getAttribute('data-idx'), 10);
