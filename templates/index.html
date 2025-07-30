@@ -17,7 +17,12 @@
         <option value="{{ bank }}">{{ bank }}</option>
       {% endfor %}
     </select>
-    <button id="loadBtn">Load Question</button>
+    <label for="numInput">Number of questions:</label>
+    <input type="number" id="numInput" value="1" min="1">
+    <div class="button-row">
+      <button id="loadBtn">Load Question</button>
+      <button id="practiceBtn">Start Practice</button>
+    </div>
 
     <div id="questionArea">
       <h2 id="qTitle"></h2>
