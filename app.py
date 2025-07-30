@@ -32,6 +32,18 @@ def index():
     return render_template("index.html", banks=sorted(BANKS))
 
 
+@app.route("/launch.html")
+def launch():
+    """Serve a simple launch page with an embedded practice interface."""
+    return render_template("launch.html")
+
+
+@app.route("/htmlDelivery/index.html")
+def html_delivery():
+    """Alias path used by the launch page for the practice interface."""
+    return render_template("index.html", banks=sorted(BANKS))
+
+
 @app.route("/question")
 def question():
     bank = request.args.get("bank")
