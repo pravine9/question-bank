@@ -87,9 +87,11 @@ body {
 
 .nav li.flagged .flag-btn {
   color: #d32f2f;
+  display: inline;
 }
 
 .flag-btn {
+  display: none;
   position: absolute;
   top: 2px;
   right: 2px;
