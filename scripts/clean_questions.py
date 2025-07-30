@@ -19,6 +19,8 @@ def clean_text(text: str) -> str:
     text = unidecode(text)
     # Replace non-breaking spaces
     text = text.replace("\u00a0", " ")
+    if text.startswith('**') and text.endswith('**'):
+        text = text[2:-2].strip()
     # Collapse whitespace
     text = re.sub(r"\s+", " ", text)
     return text.strip()
