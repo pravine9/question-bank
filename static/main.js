@@ -60,6 +60,7 @@ function renderQuestion(q) {
     q.answers.forEach(a => {
       const btn = document.createElement('button');
       btn.textContent = a.text;
+      btn.dataset.num = a.answer_number;
       btn.onclick = () => {
         options.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
@@ -89,9 +90,13 @@ function renderQuestion(q) {
 
 document.getElementById('checkBtn').onclick = function() {
   if (!currentQuestion) return;
+  const options = document.getElementById('answerOptions');
   let correct = false;
   if (currentQuestion.answers && currentQuestion.answers.length) {
     correct = selected == currentQuestion.correct_answer_number;
+    options.querySelectorAll('button').forEach(b => b.disabled = true);
+    const correctBtn = options.querySelector(`button[data-num='${currentQuestion.correct_answer_number}']`);
+    if (correctBtn) correctBtn.classList.add('correct');
   } else {
     const value = document.getElementById('calcInput').value.trim();
     correct = value === (currentQuestion.correct_answer || '');
