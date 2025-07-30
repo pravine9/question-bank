@@ -63,6 +63,7 @@
   </footer>
   </div>
 
+  <script src="{{ url_for('static', filename='question_renderer.js') }}"></script>
   <script>
     const questions = {{ questions|tojson|safe }};
     let index = 0;
@@ -129,9 +130,17 @@
       const q = questions[index];
       selected = null;
       document.querySelector('.q-number').textContent = `Question ${index + 1}`;
-      document.querySelector('.scenario').textContent = q.text || '';
-      const qPrompt = document.querySelector('.prompt');
-      if(qPrompt) qPrompt.textContent = q.title || '';
+      const result = questionRenderer.renderQuestion(q, {
+        text: '.scenario',
+        title: '.prompt',
+        options: '.options',
+        input: '.calculator input',
+        unit: '.calculator .unit',
+        feedback: '.feedback',
+        answer: '.correct-answer',
+        explanation: '.explanation',
+        showInput: true
+      });
       const opts = document.querySelector('.options');
       const calc = document.querySelector('.calculator');
       const input = calc.querySelector('input');
@@ -140,35 +149,25 @@
       const details = document.querySelector('.details');
       const corr = details.querySelector('.correct-answer');
       const expl = details.querySelector('.explanation');
-      feedback.textContent = '';
-      feedback.className = 'feedback';
-      details.style.display = 'none';
-      corr.textContent = '';
-      expl.textContent = '';
-      opts.textContent = '';
       if(q.answers && q.answers.length){
         calc.style.display = 'none';
-        q.answers.forEach(a => {
-          const btn = document.createElement('button');
-          btn.textContent = a.text;
-          btn.dataset.num = a.answer_number;
+        result.buttons.forEach(btn => {
           btn.onclick = () => {
             if(reviewing) return;
             opts.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
-            selected = a.answer_number;
+            selected = btn.dataset.num;
           };
-          if(responses[index] && responses[index].answer == a.answer_number){
+          if(responses[index] && responses[index].answer == btn.dataset.num){
             btn.classList.add('selected');
-            selected = a.answer_number;
+            selected = btn.dataset.num;
           }
           if(reviewing){
             btn.disabled = true;
-            if(a.answer_number == q.correct_answer_number){
+            if(btn.dataset.num == q.correct_answer_number){
               btn.classList.add('correct');
             }
           }
-          opts.appendChild(btn);
         });
       } else {
         calc.style.display = 'block';
