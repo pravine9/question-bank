@@ -105,6 +105,13 @@
       initNav();
       renderQuestion();
     });
+
+    document.querySelector('.finish-btn').onclick = () => {
+      if (confirm('Are you sure you want to finish the test?')) {
+        const completed = index + 1;
+        alert(`Test complete! You viewed ${completed} of ${questions.length} questions.`);
+      }
+    };
   </script>
 </body>
 </html>
