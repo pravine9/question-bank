@@ -1,4 +1,6 @@
 document.getElementById('loadBtn').addEventListener('click', loadQuestion);
+const practiceBtn = document.getElementById('practiceBtn');
+if (practiceBtn) practiceBtn.addEventListener('click', startPractice);
 let currentQuestion;
 let selected;
 
@@ -18,6 +20,20 @@ function loadQuestion() {
   fetch(`/question?bank=${bank}`)
     .then(r => r.json())
     .then(renderQuestion);
+}
+
+function startPractice() {
+  const bank = document.getElementById('bankSelect').value;
+  const num = parseInt(document.getElementById('numInput').value, 10);
+  if (!bank) {
+    alert('Please select a bank');
+    return;
+  }
+  if (!num || num <= 0) {
+    alert('Please enter a positive number of questions');
+    return;
+  }
+  window.location.href = `/practice?bank=${encodeURIComponent(bank)}&num=${num}`;
 }
 
 function renderQuestion(q) {
