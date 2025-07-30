@@ -38,6 +38,12 @@ def launch():
     return render_template("launch.html")
 
 
+@app.route("/practice")
+def practice_page():
+    """Simple static page replicating the exam practice layout."""
+    return render_template("practice.html")
+
+
 @app.route("/htmlDelivery/index.html")
 def html_delivery():
     """Alias path used by the launch page for the practice interface."""
