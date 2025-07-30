@@ -62,12 +62,17 @@
           </thead>
           <tbody></tbody>
         </table>
-        <div id="statsQuestionArea" style="display:none;">
-          <h3 id="sqTitle"></h3>
-          <p id="sqText"></p>
-          <button id="sqRevealBtn">Reveal Answer</button>
-          <div id="sqAnswer"></div>
-          <div id="sqExplanation"></div>
+        <!-- Modal for displaying a single stats question -->
+        <div id="statsModal" class="modal-overlay">
+          <div class="modal-content">
+            <button id="sqCloseBtn" class="close">&times;</button>
+            <h3 id="sqTitle"></h3>
+            <p id="sqText"></p>
+            <img id="sqImg" alt="Question image">
+            <button id="sqRevealBtn">Reveal Answer</button>
+            <div id="sqAnswer"></div>
+            <div id="sqExplanation"></div>
+          </div>
         </div>
       </div>
     </div>
