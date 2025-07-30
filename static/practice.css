@@ -4,6 +4,11 @@ body {
   background: #f9fbfc;
 }
 
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
 .header {
   display: flex;
   align-items: center;
