@@ -138,3 +138,33 @@ body {
   background: #007bff;
   color: #fff;
 }
+
+.options button.selected {
+  background: #007bff;
+  color: #fff;
+}
+
+.review {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.summary {
+  padding: 20px;
+}
+
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.summary-table th,
+.summary-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+.summary-table tr {
+  cursor: pointer;
+}

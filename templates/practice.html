@@ -30,6 +30,7 @@
         <input type="number">
         <span class="unit"></span>
       </div>
+      <div class="review" style="display:none"></div>
     </section>
   </div>
 
@@ -42,9 +43,21 @@
     </div>
   </footer>
 
+  <section class="summary" style="display:none">
+    <h2>Test Summary</h2>
+    <table class="summary-table">
+      <thead>
+        <tr><th>#</th><th>Your Answer</th><th>Correct Answer</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
   <script>
     const questions = {{ questions|tojson|safe }};
     let index = 0;
+    const answers = new Array(questions.length).fill(null);
+    let reviewMode = false;
 
     function initNav() {
       const nav = document.querySelector('.nav');
@@ -76,19 +89,49 @@
       const calc = document.querySelector('.calculator');
       const input = calc.querySelector('input');
       const unit = calc.querySelector('.unit');
+      const review = document.querySelector('.review');
       opts.textContent = '';
       if(q.answers && q.answers.length){
         calc.style.display = 'none';
         q.answers.forEach(a => {
           const btn = document.createElement('button');
           btn.textContent = a.text;
+          if(answers[index] === a.answer_number) btn.classList.add('selected');
+          btn.disabled = reviewMode;
+          btn.onclick = () => {
+            answers[index] = a.answer_number;
+            opts.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+          };
           opts.appendChild(btn);
         });
       } else {
         calc.style.display = 'block';
-        input.value = '';
+        input.value = answers[index] || '';
         unit.textContent = q.answer_unit || '';
+        input.disabled = reviewMode;
+        input.oninput = () => { answers[index] = input.value; };
       }
+
+      if(reviewMode){
+        let user = answers[index];
+        let correct;
+        if(q.answers && q.answers.length){
+          const ua = q.answers.find(a => a.answer_number == user);
+          user = ua ? ua.text : '—';
+          const ca = q.answers.find(a => a.answer_number == q.correct_answer_number);
+          correct = ca ? ca.text : '';
+        } else {
+          correct = q.correct_answer || '';
+          if(q.answer_unit) correct += ' ' + q.answer_unit;
+          user = user || '—';
+        }
+        review.textContent = `Your answer: ${user} | Correct: ${correct}`;
+        review.style.display = 'block';
+      } else {
+        review.style.display = 'none';
+      }
+
       updateProgress();
       updateNav();
     }
@@ -99,6 +142,58 @@
     document.querySelector('.back-btn').onclick = () => {
       if(index > 0){ index--; renderQuestion(); }
     };
+
+    const finishBtn = document.querySelector('.finish-btn');
+
+    function showSummary() {
+      const section = document.querySelector('.summary');
+      const tbody = section.querySelector('tbody');
+      const main = document.querySelector('.main');
+      const footer = document.querySelector('.footer');
+      tbody.textContent = '';
+      questions.forEach((q,i) => {
+        let user = answers[i];
+        let correct;
+        if(q.answers && q.answers.length){
+          const ua = q.answers.find(a => a.answer_number == user);
+          user = ua ? ua.text : '—';
+          const ca = q.answers.find(a => a.answer_number == q.correct_answer_number);
+          correct = ca ? ca.text : '';
+        } else {
+          correct = q.correct_answer || '';
+          if(q.answer_unit) correct += ' ' + q.answer_unit;
+          user = user || '—';
+        }
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${i+1}</td><td>${user}</td><td>${correct}</td>`;
+        tr.onclick = () => { index = i; hideSummary(); };
+        tbody.appendChild(tr);
+      });
+      section.style.display = 'block';
+      main.style.display = 'none';
+      footer.style.display = 'none';
+      finishBtn.textContent = 'Back to Test';
+      finishBtn.onclick = hideSummary;
+    }
+
+    function hideSummary() {
+      const section = document.querySelector('.summary');
+      const main = document.querySelector('.main');
+      const footer = document.querySelector('.footer');
+      section.style.display = 'none';
+      main.style.display = 'flex';
+      footer.style.display = '';
+      finishBtn.textContent = 'Summary';
+      finishBtn.onclick = showSummary;
+      renderQuestion();
+    }
+
+    function finishTest() {
+      reviewMode = true;
+      showSummary();
+    }
+
+    finishBtn.onclick = finishTest;
 
     document.addEventListener('DOMContentLoaded', () => {
       if(!questions.length) return;
