@@ -33,6 +33,23 @@ By default the server loads question files from the `cleaned/` folder if it exis
 
 Open a browser to `http://localhost:5000/` to view the interface.
 
+## Practice overview
+
+1. **Start practice from `index.html`** – choose a bank, enter the number of
+   questions and hit **Start Practice** to open the dedicated test page.
+2. **Navigation** – move through questions using the **Back** and **Next**
+   buttons. A flag icon next to each number lets you mark items for review.
+3. **Finish and review** – click **Finish Test** to see your results. From the
+   summary screen you can **Review** individual questions and use the **Home**
+   link to return to the start page.
+4. **Question statistics** – right/wrong counts and flagged status are stored
+   in `localStorage` under `questionStats`. The index page provides a "Check
+   Question Stats" form for looking up stats by question ID.
+5. **Folder structure** – raw question JSON files live in `output/` while
+   cleaned versions created by `scripts/clean_questions.py` are stored in
+   `cleaned/` if that directory exists. The server automatically prefers the
+   cleaned copies when available.
+
 ## Repository layout
 
 ```
