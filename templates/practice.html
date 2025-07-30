@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Practice Test</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap">
+  <link rel="stylesheet" href="{{ url_for('static', filename='practice.css') }}">
+</head>
+<body>
+  <header class="header">
+    <span class="test-title">Test: 2025 example questions Part 1</span>
+    <div class="progress"><div class="bar" style="width:0%"></div></div>
+    <div class="header-right">
+      <button class="finish-btn">Finish Test</button>
+      <span class="candidate">Candidate Name</span>
+    </div>
+  </header>
+
+  <div class="main">
+    <aside class="sidebar">
+      <ul class="nav">
+        {% for n in range(1,16) %}
+        <li class="{% if n==1 %}active{% endif %}">{{ n }}</li>
+        {% endfor %}
+      </ul>
+    </aside>
+
+    <section class="question-area">
+      <p class="scenario">A mother brings her child to the pharmacy looking for paracetamol. The following dosing schedule is provided.</p>
+      <table class="dose-table">
+        <tr><th>Age</th><th>Dose</th><th>Frequency</th></tr>
+        <tr><td>6–12 years</td><td>500 mg</td><td>Up to four times daily</td></tr>
+      </table>
+      <p class="prompt"><strong>How many tablets should be supplied for a 5‑day course?</strong></p>
+      <div class="calculator">
+        <span class="icon">&#128425;</span>
+        <label>Basic Calculator</label>
+        <input type="number">
+        <span class="unit">tablet(s)</span>
+      </div>
+    </section>
+  </div>
+
+  <footer class="footer">
+    <span class="settings">&#9881;</span>
+    <button class="close-btn">Close all open tools</button>
+    <div class="nav-btns">
+      <button class="back-btn">Back</button>
+      <button class="next-btn">Next ❯</button>
+    </div>
+  </footer>
+</body>
+</html>
