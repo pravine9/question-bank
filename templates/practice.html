@@ -36,6 +36,16 @@
     </section>
   </div>
 
+  <section class="summary" style="display:none">
+    <h2>Test Summary</h2>
+    <table class="summary-table">
+      <thead>
+        <tr><th>#</th><th>Your Answer</th><th>Correct Answer</th><th>Review</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
   <footer class="footer">
     <span class="settings">&#9881;</span>
     <button class="close-btn">Close all open tools</button>
@@ -49,6 +59,8 @@
     const questions = {{ questions|tojson|safe }};
     let index = 0;
     let selected = null;
+    const responses = Array(questions.length).fill(null);
+    let reviewing = false;
 
     function initNav() {
       const nav = document.querySelector('.nav');
@@ -110,17 +122,34 @@
         q.answers.forEach(a => {
           const btn = document.createElement('button');
           btn.textContent = a.text;
+          btn.dataset.num = a.answer_number;
           btn.onclick = () => {
+            if(reviewing) return;
             opts.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
             selected = a.answer_number;
           };
+          if(responses[index] && responses[index].answer == a.answer_number){
+            btn.classList.add('selected');
+            selected = a.answer_number;
+          }
+          if(reviewing) btn.disabled = true;
           opts.appendChild(btn);
         });
       } else {
         calc.style.display = 'block';
-        input.value = '';
+        input.value = responses[index] ? (responses[index].answer || '') : '';
         unit.textContent = q.answer_unit || '';
+        input.disabled = reviewing;
+      }
+      if(reviewing && responses[index]){
+        const fb = document.querySelector('.feedback');
+        fb.textContent = responses[index].correct ? 'Correct!' : 'Incorrect';
+        fb.className = 'feedback ' + (responses[index].correct ? 'correct' : 'incorrect');
+      } else {
+        const fb = document.querySelector('.feedback');
+        fb.textContent = '';
+        fb.className = 'feedback';
       }
       updateProgress();
       updateNav();
@@ -133,10 +162,37 @@
       localStorage.setItem('questionStats', JSON.stringify(data));
     }
 
+    function recordAnswer(){
+      const q = questions[index];
+      const calc = document.querySelector('.calculator');
+      const input = calc.querySelector('input');
+      let userAns = null;
+      let userText = '';
+      if(q.answers && q.answers.length){
+        userAns = selected;
+        const obj = q.answers.find(a => a.answer_number == selected);
+        userText = obj ? obj.text : '';
+      } else {
+        userAns = input.value.trim();
+        userText = userAns ? userAns + (q.answer_unit ? ` ${q.answer_unit}` : '') : '';
+      }
+      let correctText = '';
+      if(q.answers && q.answers.length){
+        const obj = q.answers.find(a => a.answer_number == q.correct_answer_number);
+        correctText = obj ? obj.text : '';
+      } else {
+        correctText = (q.correct_answer || '') + (q.answer_unit ? ` ${q.answer_unit}` : '');
+      }
+      const correct = q.answers && q.answers.length ? (selected == q.correct_answer_number) : (userAns === (q.correct_answer || ''));
+      responses[index] = {answer: userAns, text: userText, correctAnswer: correctText, correct};
+    }
+
     document.querySelector('.next-btn').onclick = () => {
+      recordAnswer();
       if(index < questions.length - 1){ index++; renderQuestion(); }
     };
     document.querySelector('.back-btn').onclick = () => {
+      recordAnswer();
       if(index > 0){ index--; renderQuestion(); }
     };
 
@@ -155,6 +211,7 @@
       fb.textContent = correct ? 'Correct!' : 'Incorrect';
       fb.className = 'feedback ' + (correct ? 'correct' : 'incorrect');
       updateStats(q.id, correct);
+      recordAnswer();
     };
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -163,10 +220,37 @@
       renderQuestion();
     });
 
+    function showSummary(){
+      recordAnswer();
+      reviewing = false;
+      document.querySelector('.main').style.display = 'none';
+      document.querySelector('.footer').style.display = 'none';
+      const summary = document.querySelector('.summary');
+      const tbody = summary.querySelector('tbody');
+      tbody.textContent = '';
+      responses.forEach((r,i) => {
+        const tr = document.createElement('tr');
+        const ua = r ? r.text || '' : '';
+        const ca = r ? r.correctAnswer || '' : '';
+        tr.innerHTML = `<td>${i+1}</td><td>${ua}</td><td>${ca}</td><td><button data-idx='${i}'>Review</button></td>`;
+        tbody.appendChild(tr);
+      });
+      summary.style.display = 'block';
+      summary.querySelectorAll('button[data-idx]').forEach(btn => {
+        btn.onclick = () => {
+          index = parseInt(btn.getAttribute('data-idx'), 10);
+          reviewing = true;
+          summary.style.display = 'none';
+          document.querySelector('.main').style.display = 'flex';
+          document.querySelector('.footer').style.display = 'flex';
+          renderQuestion();
+        };
+      });
+    }
+
     document.querySelector('.finish-btn').onclick = () => {
       if (confirm('Are you sure you want to finish the test?')) {
-        const completed = index + 1;
-        alert(`Test complete! You viewed ${completed} of ${questions.length} questions.`);
+        showSummary();
       }
     };
   </script>
