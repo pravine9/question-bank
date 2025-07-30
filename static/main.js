@@ -2,6 +2,16 @@ document.getElementById('loadBtn').addEventListener('click', loadQuestion);
 let currentQuestion;
 let selected;
 
+// Adjust layout when loaded in standalone mode
+document.addEventListener('DOMContentLoaded', function() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('isStandAlone') === 'true') {
+    document.body.classList.add('standalone');
+    const container = document.querySelector('.container');
+    if (container) container.classList.add('standalone');
+  }
+});
+
 function loadQuestion() {
   const bank = document.getElementById('bankSelect').value;
   if (!bank) return;
