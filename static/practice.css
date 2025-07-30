@@ -188,3 +188,19 @@ body {
   background-color: #ffe082;
   color: #000;
 }
+
+.summary {
+  padding: 20px;
+}
+
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.summary-table th, .summary-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
