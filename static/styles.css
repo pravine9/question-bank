@@ -91,3 +91,8 @@ button:hover {
 .incorrect {
   color: #c62828;
 }
+
+.selected {
+  background-color: #ffe082;
+  color: #000;
+}

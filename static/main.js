@@ -19,6 +19,7 @@ function renderQuestion(q) {
   const img = document.getElementById('qImg');
   if (q.resource_image) { img.src = q.resource_image; img.style.display='block'; } else { img.style.display='none'; }
   const options = document.getElementById('answerOptions');
+  options.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
   options.innerHTML = '';
   const calcInput = document.getElementById('calcInput');
   const answerUnit = document.getElementById('answerUnit');
@@ -28,7 +29,11 @@ function renderQuestion(q) {
     q.answers.forEach(a => {
       const btn = document.createElement('button');
       btn.textContent = a.text;
-      btn.onclick = () => { selected = a.answer_number; };
+      btn.onclick = () => {
+        options.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selected = a.answer_number;
+      };
       options.appendChild(btn);
     });
   } else {
