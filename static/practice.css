@@ -78,6 +78,8 @@ body {
   font-weight: bold;
   cursor: pointer;
   position: relative;
+  box-sizing: border-box;
+  padding-right: 6px;
 }
 
 .nav li.active {
@@ -88,6 +90,8 @@ body {
 .nav li.flagged {
   background: #fff3cd;
   border-color: #ff9800;
+  color: #d32f2f;
+  font-weight: bold;
 }
 
 .nav li.flagged .flag-btn {
@@ -104,7 +108,7 @@ body {
   border: none;
   padding: 0;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 12px;
   line-height: 1;
 }
 
