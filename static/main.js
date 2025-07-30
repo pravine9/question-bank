@@ -144,17 +144,66 @@ function updateStats(id, correct) {
   localStorage.setItem('questionStats', JSON.stringify(data));
 }
 
-const statsForm = document.getElementById('statsForm');
-if (statsForm) {
-  statsForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    const id = document.getElementById('statsId').value.trim();
-    if (!id) return;
-    const data = JSON.parse(localStorage.getItem('questionStats') || '{}');
-    const stats = data[id] || {right:0, wrong:0, saved:false};
-    const res = document.getElementById('statsResult');
-    if (res) {
-      res.textContent = `Right: ${stats.right}, Wrong: ${stats.wrong}, Saved: ${stats.saved ? 'Yes' : 'No'}`;
-    }
+let statsQuestions = [];
+const loadStatsBtn = document.getElementById('loadStatsBtn');
+if (loadStatsBtn) loadStatsBtn.addEventListener('click', loadStats);
+
+function loadStats() {
+  const bank = document.getElementById('statsBankSelect').value;
+  if (!bank) return;
+  fetch(`/bank_questions?bank=${bank}`)
+    .then(r => r.json())
+    .then(qs => { statsQuestions = qs; renderStats(); });
+}
+
+function renderStats() {
+  const tbody = document.querySelector('#statsTable tbody');
+  const data = JSON.parse(localStorage.getItem('questionStats') || '{}');
+  tbody.textContent = '';
+  statsQuestions.forEach(q => {
+    const stats = data[q.id] || {right:0, wrong:0};
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${q.id}</td><td>${stats.right + stats.wrong}</td><td>${stats.right}</td><td>${stats.wrong}</td><td><button data-id="${q.id}">View</button>`;
+    tbody.appendChild(tr);
   });
+  tbody.querySelectorAll('button[data-id]').forEach(btn => {
+    btn.onclick = () => showStatsQuestion(btn.getAttribute('data-id'));
+  });
+}
+
+function showStatsQuestion(id) {
+  const q = statsQuestions.find(x => String(x.id) === String(id));
+  if (!q) return;
+  document.getElementById('statsQuestionArea').style.display = 'block';
+  document.getElementById('sqTitle').textContent = q.title || '';
+  const text = (q.text || '')
+    .replace(/\u2028/g, '\n')
+    .replace(/\u00a0/g, ' ')
+    .replace(/\u200b/g, '');
+  document.getElementById('sqText').innerHTML = DOMPurify.sanitize(marked.parse(text));
+  document.getElementById('sqAnswer').style.display = 'none';
+  document.getElementById('sqExplanation').style.display = 'none';
+  document.getElementById('sqAnswer').textContent = '';
+  document.getElementById('sqExplanation').textContent = '';
+  document.getElementById('sqRevealBtn').onclick = () => revealStatsQuestion(q);
+}
+
+function revealStatsQuestion(q) {
+  let answerText = '';
+  if (q.answers && q.answers.length) {
+    const obj = q.answers.find(a => a.answer_number == q.correct_answer_number);
+    answerText = obj ? obj.text : '';
+  } else {
+    answerText = q.correct_answer || '';
+    if (q.answer_unit) answerText += ' ' + q.answer_unit;
+  }
+  const ans = document.getElementById('sqAnswer');
+  ans.textContent = answerText ? `Answer: ${answerText}` : '';
+  const why = (q.why || '')
+    .replace(/\u2028/g, '\n')
+    .replace(/\u00a0/g, ' ')
+    .replace(/\u200b/g, '');
+  document.getElementById('sqExplanation').innerHTML = DOMPurify.sanitize(marked.parse(why || 'No explanation'));
+  ans.style.display = 'block';
+  document.getElementById('sqExplanation').style.display = 'block';
 }
