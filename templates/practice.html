@@ -83,7 +83,11 @@
           e.stopPropagation();
           toggleFlag(q.id, li);
         };
-        li.onclick = () => { index = i; renderQuestion(); };
+        li.onclick = () => { 
+          recordAnswer();
+          index = i; 
+          renderQuestion(); 
+        };
         nav.appendChild(li);
       });
     }
@@ -101,7 +105,8 @@
     }
 
     function updateProgress() {
-      const pct = ((index + 1) / questions.length) * 100;
+      const answered = responses.filter(r => r && r.answer !== null && r.answer !== '').length;
+      const pct = (answered / questions.length) * 100;
       document.querySelector('.bar').style.width = pct + '%';
     }
 
@@ -223,7 +228,8 @@
       }
       const correct = q.answers && q.answers.length ? (selected == q.correct_answer_number) : (userAns === (q.correct_answer || ''));
       responses[index] = {answer: userAns, text: userText, correctAnswer: correctText, correct};
-    }
+      updateProgress();
+   }
 
   document.querySelector('.next-btn').onclick = () => {
     recordAnswer();
