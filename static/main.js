@@ -179,19 +179,27 @@ function renderStats() {
 function showStatsQuestion(id) {
   const q = statsQuestions.find(x => String(x.id) === String(id));
   if (!q) return;
-  document.getElementById('statsQuestionArea').style.display = 'block';
+  const overlay = document.getElementById('statsModal');
+  overlay.style.display = 'flex';
   document.getElementById('sqTitle').textContent = q.title || '';
   const text = (q.text || '')
     .replace(/\u2028/g, '\n')
     .replace(/\u00a0/g, ' ')
     .replace(/\u200b/g, '');
   document.getElementById('sqText').innerHTML = DOMPurify.sanitize(marked.parse(text));
+  const img = document.getElementById('sqImg');
+  if (q.resource_image) { img.src = q.resource_image; img.style.display = 'block'; }
+  else { img.style.display = 'none'; }
   document.getElementById('sqAnswer').style.display = 'none';
   document.getElementById('sqExplanation').style.display = 'none';
   document.getElementById('sqAnswer').textContent = '';
   document.getElementById('sqExplanation').textContent = '';
   document.getElementById('sqRevealBtn').onclick = () => revealStatsQuestion(q);
 }
+
+document.getElementById('sqCloseBtn').onclick = function() {
+  document.getElementById('statsModal').style.display = 'none';
+};
 
 function revealStatsQuestion(q) {
   let answerText = '';
