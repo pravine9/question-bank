@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Practice Test</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap">
-  <link rel="stylesheet" href="/static/practice.css">
+  <link rel="stylesheet" href="../static/practice.css">
 </head>
 <body>
   <div class="container">
@@ -77,7 +77,7 @@
   </footer>
   </div>
 
-  <script src="/static/question_renderer.js"></script>
+  <script src="../static/question_renderer.js"></script>
   <script>
     let questions = [];
     let index = 0;
@@ -95,7 +95,7 @@
       const params = new URLSearchParams(window.location.search);
       const bank = params.get('bank');
       let num = parseInt(params.get('num') || '10', 10);
-      const bankMap = await fetch('/static/banks.json').then(r => r.json());
+      const bankMap = await fetch('../static/banks.json').then(r => r.json());
       const files = bankMap[bank] || [];
       let all = [];
       for(const f of files){
