@@ -81,7 +81,9 @@
         window.bankFiles = data;
         const bankSelect = document.getElementById('bankSelect');
         const statsSelect = document.getElementById('statsBankSelect');
-        const names = Object.keys(data).sort();
+        const names = Object.keys(data)
+          .filter(k => Array.isArray(data[k]))
+          .sort();
         names.forEach(name => {
           const opt1 = document.createElement('option');
           opt1.value = name;
