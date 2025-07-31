@@ -3,6 +3,7 @@ const practiceBtn = document.getElementById('practiceBtn');
 if (practiceBtn) practiceBtn.addEventListener('click', startPractice);
 let currentQuestion;
 let selected;
+let bankFiles = null;
 
 // Adjust layout when loaded in standalone mode
 document.addEventListener('DOMContentLoaded', function() {
@@ -12,14 +13,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const container = document.querySelector('.container');
     if (container) container.classList.add('standalone');
   }
+  if (!bankFiles) {
+    fetch('/static/banks.json').then(r => r.json()).then(data => { bankFiles = data; });
+  }
 });
 
-function loadQuestion() {
+async function loadQuestion() {
   const bank = document.getElementById('bankSelect').value;
   if (!bank) return;
-  fetch(`/question?bank=${bank}`)
-    .then(r => r.json())
-    .then(renderQuestion);
+  if (!bankFiles) {
+    bankFiles = await fetch('/static/banks.json').then(r => r.json());
+  }
+  const files = bankFiles[bank] || [];
+  if (!files.length) return;
+  const file = files[Math.floor(Math.random() * files.length)];
+  const qs = await fetch('/' + file).then(r => r.json());
+  const q = qs[Math.floor(Math.random() * qs.length)];
+  renderQuestion(q);
 }
 
 function startPractice() {
@@ -33,7 +43,7 @@ function startPractice() {
     alert('Please enter a positive number of questions');
     return;
   }
-  window.location.href = `/practice?bank=${encodeURIComponent(bank)}&num=${num}`;
+  window.location.href = `/templates/practice.html?bank=${encodeURIComponent(bank)}&num=${num}`;
 }
 
 function renderQuestion(q) {
@@ -126,9 +136,19 @@ if (loadStatsBtn) loadStatsBtn.addEventListener('click', loadStats);
 function loadStats() {
   const bank = document.getElementById('statsBankSelect').value;
   if (!bank) return;
-  fetch(`/bank_questions?bank=${bank}`)
-    .then(r => r.json())
-    .then(qs => { statsQuestions = qs.sort((a,b) => (a.id||0) - (b.id||0)); renderStats(); });
+  (async () => {
+    if (!bankFiles) {
+      bankFiles = await fetch('/static/banks.json').then(r => r.json());
+    }
+    const files = bankFiles[bank] || [];
+    let qs = [];
+    for (const f of files) {
+      const arr = await fetch('/' + f).then(r => r.json());
+      qs = qs.concat(arr);
+    }
+    statsQuestions = qs.sort((a,b) => (a.id||0) - (b.id||0));
+    renderStats();
+  })();
 }
 
 function renderStats() {
