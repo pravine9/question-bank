@@ -1,6 +1,6 @@
 # Question Bank
 
-This project provides a lightweight Flask app for revising question banks.
+This project provides a lightweight web interface for revising question banks.
 The questions are scraped from an external site and saved as JSON.  A
 few helper scripts take care of collecting and cleaning this data.  The web
 interface then lets you practise a subset of questions entirely in the
@@ -23,9 +23,8 @@ Open `templates/index.html` in your browser to use the interface.
    in `localStorage` under `questionStats`. The index page provides a "Check
    Question Stats" form for looking up stats by question ID.
 5. **Folder structure** – raw question JSON files live in `output/` while
-   cleaned versions created by `scripts/clean_questions.py` are stored in
-   `cleaned/` if that directory exists. The server automatically prefers the
-   cleaned copies when available.
+   cleaned versions created by `scripts/clean_questions.js` are stored in
+   `cleaned/` if that directory exists. The interface uses the cleaned copies when available.
 
 ## Repository layout
 
@@ -35,30 +34,13 @@ output/          # Raw question JSON files downloaded from the web
 cleaned/         # Normalised versions of the JSON files (generated)
 scripts/         # Helper utilities such as data cleaning
 static/          # Client-side JS and CSS
-templates/       # Jinja2 templates for the Flask app
+templates/       # HTML templates for the interface
 ```
 
-`cleaned/` is ignored by git and may not exist initially. The application
+`cleaned/` is ignored by git and may not exist initially. The interface
 prefers this folder when present, otherwise it loads data directly from
 `output/`.
 
-## Application structure
-
-The backend lives in **app.py** and exposes a few routes:
-
-* `/` – landing page where you choose a bank and number of questions
-* `/practice` – renders `practice.html` with the chosen questions
-* `/question` – API endpoint returning a random question in JSON
-* `/htmlDelivery/index.html` – alias used by `launch.html`
-* `/launch.html` – simple wrapper that embeds the interface in an iframe
-
-`app.py` reads all JSON files from `cleaned/` or `output/` and builds a map
-of available banks. Question selection happens server‑side before the
-template is rendered.
-
-Client logic is contained in `static/main.js` (for the landing page) and
-inline scripts within `practice.html`. CSS files in `static/` style both
-pages.
 
 ## Using the interface
 
@@ -99,7 +81,7 @@ given question ID.
 ### Folder structure
 
 Questions scraped from the web live under `output/`. Running
-`scripts/clean_questions.py` writes cleaned versions into `cleaned/`. If the
+`scripts/clean_questions.js` writes cleaned versions into `cleaned/`. If the
 `cleaned/` directory exists, the app loads questions from there; otherwise it
 falls back to `output/`.
 
@@ -128,5 +110,5 @@ Additional fields like `bank`, `resource_image` and `weighting` may also be pres
 
 ### `scripts/`
 
-* `clean_questions.py` – normalise whitespace and punctuation in the scraped JSON files and write the cleaned versions to `cleaned/`.
+* `clean_questions.js` – normalise whitespace and punctuation in the scraped JSON files and write the cleaned versions to `cleaned/`.
 
