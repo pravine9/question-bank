@@ -105,7 +105,7 @@ Additional fields like `bank`, `resource_image` and `weighting` may also be pres
 
 ### `Burp/`
 
-* `grabquetions.py` – interactively scrape questions from preregshortcuts.com using `curl` and save them into the `output/` directory. It prompts for a question bank and weighting and repeats requests until no new questions are found.
+* `grabquestions.py` – interactively scrape questions from preregshortcuts.com using `curl` and save them into the `output/` directory. It prompts for a question bank and weighting and repeats requests until no new questions are found.
 * `checkquestions.py` – count the number of questions in each JSON file within `output/` and print totals per bank.
 
 ### `scripts/`
