@@ -6,25 +6,8 @@ few helper scripts take care of collecting and cleaning this data.  The web
 interface then lets you practise a subset of questions entirely in the
 browser, storing your progress locally.
 
-## Setup
 
-1. Install Node dependencies:
-
-```bash
-npm install
-```
-
-## Running the app
-
-Launch the server with:
-
-```bash
-node server.js
-```
-
-By default the server loads question files from the `cleaned/` folder if it exists, otherwise it uses `output/`.
-
-Open a browser to `http://localhost:5000/` to view the interface.
+Open `templates/index.html` in your browser to use the interface.
 
 
 ## Practice overview
