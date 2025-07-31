@@ -8,30 +8,24 @@ browser, storing your progress locally.
 
 ## Setup
 
-1. Create and activate a virtual environment (optional but recommended):
+1. Install Node dependencies:
 
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
-
-2. Install the required dependencies:
-
-   ```bash
-   pip install -r requirements.txt
-   ```
+```bash
+npm install
+```
 
 ## Running the app
 
-Start the Flask development server by executing `app.py`:
+Launch the server with:
 
 ```bash
-python app.py
+node server.js
 ```
 
 By default the server loads question files from the `cleaned/` folder if it exists, otherwise it uses `output/`.
 
 Open a browser to `http://localhost:5000/` to view the interface.
+
 
 ## Practice overview
 
