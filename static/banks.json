@@ -1,4 +1,5 @@
 {
+  "_info": "Populate the output/ directory with downloaded JSON files before using the interface",
   "calculations": [
     "output/calculations_questions.json"
   ],
