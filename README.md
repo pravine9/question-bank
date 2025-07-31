@@ -101,6 +101,40 @@ Each question is represented as a JSON object. Key fields include:
 
 Additional fields like `bank`, `resource_image` and `weighting` may also be present.
 
+Other optional fields control how the question is displayed:
+
+* `bank` – identifies which question bank or topic the item belongs to.
+* `weighting` – difficulty rating where `1` is high, `2` is medium and `3` is low.
+* `resource_image` – URL of an image that will be shown inside the question. Images are scaled to fit within the question window.
+* `visible` – set to `true` for questions that should appear in practice tests.
+* `is_calculation` – `true` when the question expects a numeric calculation.
+* `correct_answer` – correct free text answer for non‑multiple choice questions.
+* `answer_unit` – unit label shown next to numeric answers.
+
+### Unicode characters in JSON
+
+The raw JSON uses escaped Unicode sequences for punctuation and symbols. Common examples include:
+
+| Escape | Character | Description |
+|--------|-----------|-------------|
+| `\u00a0` |   | Non‑breaking space |
+| `\u2013` | – | En dash |
+| `\u2014` | — | Em dash |
+| `\u2018` | ‘ | Left single quote |
+| `\u2019` | ’ | Right single quote |
+| `\u201c` | “ | Left double quote |
+| `\u201d` | ” | Right double quote |
+| `\u00a3` | £ | Pound sign |
+| `\u2192` | → | Right arrow |
+| `\u2265` | ≥ | Greater‑than or equal |
+| `\u2264` | ≤ | Less‑than or equal |
+| `\u2714` | ✔ | Check mark |
+| `\ud83e\udde0` | 🧠 | Brain emoji |
+| `\ud83d\udccc` | 📌 | Pushpin emoji |
+| `\ud83d\udd3a` | 🔺 | Red triangle |
+
+These sequences are converted to their corresponding characters when the question text is rendered in the browser.
+
 ## Helper scripts
 
 ### `Burp/`
