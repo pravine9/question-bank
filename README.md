@@ -15,14 +15,14 @@ Open `templates/index.html` in your browser to use the interface.
 1. **Start practice from `index.html`** – choose a bank, enter the number of
    questions and hit **Start Practice** to open the dedicated test page.
 2. **Navigation** – move through questions using the **Back** and **Next**
-   buttons. A flag icon next to each number lets you mark items for review.
+   buttons. Use the flag button to mark items for review for the current test session.
 3. **Finish and review** – click **Finish Test** to see your results. From the
-   summary screen you can **Review** individual questions and use the **Home**
+   summary screen you can **Review** individual questions with feedback shown on each one and use the **Home**
    link to return to the start page.
-4. **Question statistics** – right/wrong counts and flagged status are stored
-   in `localStorage` under `questionStats`. The index page provides a "Check
+4. **Question statistics** – right/wrong counts are stored
+   in `localStorage` under `questionStats`. Flagged status should not be stored after test ends. The index page provides a "Check
    Question Stats" form for looking up stats by question ID.
-5. **Folder structure** – raw question JSON files live in `output/` while
+5. **Folder structure** – raw question JSON files live in `question_bank/` while
    cleaned versions created by `scripts/clean_questions.js` are stored in
    `cleaned/` if that directory exists. The interface uses the cleaned copies when available.
 
@@ -30,7 +30,7 @@ Open `templates/index.html` in your browser to use the interface.
 
 ```
 Burp/            # Scripts for scraping and analysing question data
-output/          # Raw question JSON files downloaded from the web
+question_bank/   # Raw question JSON files downloaded from the web
 cleaned/         # Normalised versions of the JSON files (generated)
 scripts/         # Helper utilities such as data cleaning
 static/          # Client-side JS and CSS
@@ -39,7 +39,7 @@ templates/       # HTML templates for the interface
 
 `cleaned/` is ignored by git and may not exist initially. The interface
 prefers this folder when present, otherwise it loads data directly from
-`output/`.
+`question_bank/`.
 
 
 ## Using the interface
@@ -80,10 +80,10 @@ given question ID.
 
 ### Folder structure
 
-Questions scraped from the web live under `output/`. Running
+Questions live under `question_bank/`. Running
 `scripts/clean_questions.js` writes cleaned versions into `cleaned/`. If the
 `cleaned/` directory exists, the app loads questions from there; otherwise it
-falls back to `output/`.
+falls back to `output/`. (This may not be required if the JSON can be parsed without this extra folder/file creation step)
 
 ### Question format
 
@@ -136,11 +136,6 @@ The raw JSON uses escaped Unicode sequences for punctuation and symbols. Common 
 These sequences are converted to their corresponding characters when the question text is rendered in the browser.
 
 ## Helper scripts
-
-### `Burp/`
-
-* `grabquestions.py` – interactively scrape questions from preregshortcuts.com using `curl` and save them into the `output/` directory. It prompts for a question bank and weighting and repeats requests until no new questions are found.
-* `checkquestions.py` – count the number of questions in each JSON file within `output/` and print totals per bank.
 
 ### `scripts/`
 
