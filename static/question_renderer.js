@@ -88,6 +88,43 @@
     return {buttons, input: inputEl};
   }
 
+  function revealAnswer(question, targets){
+    targets = targets || {};
+    const get = sel => sel ? (typeof sel === 'string' ? document.querySelector(sel) : sel) : null;
+    const answerEl = get(targets.answer);
+    const explanationEl = get(targets.explanation);
+    const prefix = targets.prefix || 'Answer';
+
+    let answerText = '';
+    if (question.answers && question.answers.length) {
+      const obj = question.answers.find(a => a.answer_number == question.correct_answer_number);
+      answerText = obj ? obj.text : '';
+    } else {
+      answerText = question.correct_answer || '';
+      if (question.answer_unit) {
+        answerText += ' ' + question.answer_unit;
+      }
+    }
+
+    if (answerEl) {
+      answerEl.textContent = answerText ? `${prefix}: ${answerText}` : '';
+      answerEl.style.display = 'block';
+    }
+
+    if (explanationEl) {
+      const why = (question.why || '')
+        .replace(/\u2028/g, '\n')
+        .replace(/\u00a0/g, ' ')
+        .replace(/\u200b/g, '');
+      if (typeof DOMPurify !== 'undefined' && typeof marked !== 'undefined') {
+        explanationEl.innerHTML = DOMPurify.sanitize(marked.parse(why || 'No explanation'));
+      } else {
+        explanationEl.textContent = why || 'No explanation';
+      }
+      explanationEl.style.display = 'block';
+    }
+  }
+
   function updateStats(id, correct){
     const data = JSON.parse(localStorage.getItem('questionStats') || '{}');
     if(!data[id]) data[id] = {right:0, wrong:0, saved:false};
@@ -95,5 +132,5 @@
     localStorage.setItem('questionStats', JSON.stringify(data));
   }
 
-  global.questionRenderer = { renderQuestion, updateStats };
+  global.questionRenderer = { renderQuestion, revealAnswer, updateStats };
 })(this);

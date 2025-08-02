@@ -259,26 +259,15 @@
         if (responses[index]){
           fb.textContent = responses[index].correct ? 'Correct!' : 'Incorrect';
           fb.className = 'feedback ' + (responses[index].correct ? 'correct' : 'incorrect');
-          corr.textContent = responses[index].correctAnswer ? `Correct answer: ${responses[index].correctAnswer}` : '';
         } else {
           fb.textContent = 'Not answered';
           fb.className = 'feedback';
-          let correctText = '';
-          if(q.answers && q.answers.length){
-            const obj = q.answers.find(a => a.answer_number == q.correct_answer_number);
-            correctText = obj ? obj.text : '';
-          } else {
-            correctText = (q.correct_answer || '') + (q.answer_unit ? ` ${q.answer_unit}` : '');
-          }
-          corr.textContent = correctText ? `Correct answer: ${correctText}` : '';
         }
-        let expText = questions[index].why || '';
-        expText = expText.replace(/\u2028/g, '\n').replace(/\u00a0/g, ' ').replace(/\u200b/g, '');
-        if (typeof DOMPurify !== 'undefined' && typeof marked !== 'undefined') {
-          expl.innerHTML = DOMPurify.sanitize(marked.parse(expText));
-        } else {
-          expl.textContent = expText;
-        }
+        questionRenderer.revealAnswer(q, {
+          answer: corr,
+          explanation: expl,
+          prefix: 'Correct answer'
+        });
         convertPdfLinks(expl);
         details.style.display = 'block';
       } else {
