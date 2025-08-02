@@ -12,6 +12,7 @@
   <header class="header">
     <span class="test-title">Test: 2025 example questions Part 1</span>
     <div class="progress"><div class="bar" style="width:0%"></div></div>
+    <span class="timer"></span>
     <div class="header-right">
       <button class="summary-btn" style="display:none">Back to Summary</button>
       <button class="home-top-btn" style="display:none">Home</button>
@@ -95,10 +96,26 @@
     let questions=[], index=0, selected=null, responses=[], reviewing=false;
     const backSummaryBtn = document.querySelector('.summary-btn');
     const homeTopBtn = document.querySelector('.home-top-btn');
+    const timerEl = document.querySelector('.timer');
 
     // Ensure buttons start hidden
     backSummaryBtn.style.display = 'none';
     homeTopBtn.style.display = 'none';
+
+    function startTimer(){
+      const start = Date.now();
+      function pad(num){
+        return num.toString().padStart(2, '0');
+      }
+      function update(){
+        const elapsed = Math.floor((Date.now() - start)/1000);
+        const mins = Math.floor(elapsed / 60);
+        const secs = elapsed % 60;
+        timerEl.textContent = `${pad(mins)}:${pad(secs)}`;
+      }
+      update();
+      setInterval(update, 1000);
+    }
 
       function loadQuestions(){
         const params = new URLSearchParams(window.location.search);
@@ -335,6 +352,7 @@
     };
 
       document.addEventListener('DOMContentLoaded', () => {
+        startTimer();
         loadQuestions();
         if(!questions.length) return;
         initNav();
