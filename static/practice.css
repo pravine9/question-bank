@@ -169,6 +169,13 @@ body {
 .prompt {
   margin-top: 15px;
   font-weight: bold;
+  font-size: 16pt;
+}
+
+.q-number {
+  font-size: 16pt;
+  font-weight: bold;
+  margin: 0;
 }
 
 .calculator {
