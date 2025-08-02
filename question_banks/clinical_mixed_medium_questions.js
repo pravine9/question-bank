@@ -1,3 +1,4 @@
+export default 
 [
   {
     "id": 2154,
@@ -4247,4 +4248,4 @@
     ],
     "is_free": false
   }
-]
+];
