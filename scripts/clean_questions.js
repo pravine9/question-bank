@@ -37,7 +37,6 @@ function asciiNormalize(str) {
     .replace(/\u2714/g, '')
     .replace(/\u27a4/g, '')
     .replace(/\u25bc/g, 'V')
-    .replace(/\u2192/g, '-') // included again for order
     .replace(/\u21d2/g, '=')
     .replace(/\u{1F4CC}/ug, '')
     .replace(/\u{1F53A}/ug, '')
