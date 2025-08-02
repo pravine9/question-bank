@@ -95,5 +95,5 @@
     localStorage.setItem('questionStats', JSON.stringify(data));
   }
 
-  global.questionRenderer = { renderQuestion, updateStats };
+  global.questionRenderer = { renderQuestion, updateStats, sanitize };
 })(this);
