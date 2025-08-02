@@ -26,6 +26,11 @@ function startTimer() {
 function loadQuestions() {
   const params = new URLSearchParams(window.location.search);
   const bank = params.get('bank');
+  if (!bank || !(bank in banks)) {
+    alert('Invalid question bank.');
+    window.location.href = 'index.html';
+    return false;
+  }
   let num = parseInt(params.get('num') || '10', 10);
   const files = banks[bank] || [];
   let all = [];
@@ -38,6 +43,13 @@ function loadQuestions() {
   }
   questions = all.slice(0, num);
   responses = Array(questions.length).fill(null);
+  if (!questions.length) {
+    const main = document.querySelector('.main');
+    if (main) {
+      main.innerHTML = '<p>No questions available for this bank.</p>';
+    }
+  }
+  return true;
 }
 
 function initNav() {
@@ -247,8 +259,8 @@ document.querySelector('.check-btn').onclick = () => {
 
 document.addEventListener('DOMContentLoaded', () => {
   startTimer();
-  loadQuestions();
-  if (!questions.length) return;
+  const loaded = loadQuestions();
+  if (!loaded || !questions.length) return;
   initNav();
   renderQuestion();
 });
