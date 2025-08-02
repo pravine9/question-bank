@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (container) container.classList.add('standalone');
   }
   if (!bankFiles) {
-    fetch('/static/banks.json').then(r => r.json()).then(data => { bankFiles = data; });
+    fetch('../static/banks.json').then(r => r.json()).then(data => { bankFiles = data; });
   }
 });
 
@@ -22,12 +22,12 @@ async function loadQuestion() {
   const bank = document.getElementById('bankSelect').value;
   if (!bank) return;
   if (!bankFiles) {
-    bankFiles = await fetch('/static/banks.json').then(r => r.json());
+    bankFiles = await fetch('../static/banks.json').then(r => r.json());
   }
   const files = bankFiles[bank] || [];
   if (!files.length) return;
   const file = files[Math.floor(Math.random() * files.length)];
-  const qs = await fetch('/' + file).then(r => r.json());
+  const qs = await fetch('../' + file).then(r => r.json());
   const q = qs[Math.floor(Math.random() * qs.length)];
   renderQuestion(q);
 }
@@ -107,12 +107,12 @@ function loadStats() {
   if (!bank) return;
   (async () => {
     if (!bankFiles) {
-      bankFiles = await fetch('/static/banks.json').then(r => r.json());
+      bankFiles = await fetch('../static/banks.json').then(r => r.json());
     }
     const files = bankFiles[bank] || [];
     let qs = [];
     for (const f of files) {
-      const arr = await fetch('/' + f).then(r => r.json());
+      const arr = await fetch('../' + f).then(r => r.json());
       qs = qs.concat(arr);
     }
     statsQuestions = qs.sort((a,b) => (a.id||0) - (b.id||0));
