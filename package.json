@@ -1,7 +1,7 @@
 {
   "name": "question-bank",
   "version": "1.0.0",
-  "description": "This project provides a lightweight web interface for revising question banks. The questions are scraped from an external site and saved as JSON. A few helper scripts take care of collecting and cleaning this data. The web interface lets you practise a subset of questions entirely in the browser, storing your progress locally.",
+  "description": "This project provides a lightweight web interface for revising question banks. The questions are scraped from an external site and packaged as JavaScript modules rather than JSON files. A few helper scripts take care of collecting and cleaning this data. The web interface lets you practise a subset of questions entirely in the browser, storing your progress locally.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
