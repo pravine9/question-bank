@@ -89,37 +89,37 @@ function renderQuestion(q) {
   const options = document.getElementById('answerOptions');
   if (q.answers && q.answers.length) {
     result.buttons.forEach(btn => {
-      btn.onclick = () => {
+      btn.addEventListener('click', () => {
         options.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
         selected = btn.dataset.num;
-      };
+      });
     });
   }
 }
 
-document.getElementById('checkBtn').onclick = function() {
+document.getElementById('checkBtn').addEventListener('click', function() {
   if (!currentQuestion) return;
   const options = document.getElementById('answerOptions');
   const input = document.getElementById('calcInput');
   const feedback = document.getElementById('feedback');
   const value = currentQuestion.answers && currentQuestion.answers.length ? selected : input.value.trim();
   questionRenderer.evaluateAnswer(currentQuestion, value, { options, feedback });
-};
+});
 
-document.getElementById('revealBtn').onclick = function() {
+document.getElementById('revealBtn').addEventListener('click', function() {
   if (!currentQuestion) return;
   questionRenderer.revealAnswer(currentQuestion, { answer: '#answer', explanation: '#explanation' });
-};
+});
 
-document.getElementById('saveBtn').onclick = function() {
+document.getElementById('saveBtn').addEventListener('click', function() {
   if (!currentQuestion) return;
   const data = JSON.parse(localStorage.getItem('questionStats') || '{}');
   if (!data[currentQuestion.id]) data[currentQuestion.id] = {right:0, wrong:0, saved:false};
   data[currentQuestion.id].saved = !data[currentQuestion.id].saved;
   localStorage.setItem('questionStats', JSON.stringify(data));
   alert(data[currentQuestion.id].saved ? 'Saved!' : 'Removed!');
-};
+});
 
 let statsQuestions = [];
 const loadStatsBtn = document.getElementById('loadStatsBtn');
@@ -147,7 +147,7 @@ function renderStats() {
     tbody.appendChild(tr);
   });
   tbody.querySelectorAll('button[data-id]').forEach(btn => {
-    btn.onclick = () => showStatsQuestion(btn.getAttribute('data-id'));
+    btn.addEventListener('click', () => showStatsQuestion(btn.getAttribute('data-id')));
   });
 }
 
@@ -166,12 +166,12 @@ function showStatsQuestion(id) {
   });
   const revealBtn = document.getElementById('sqRevealBtn');
   revealBtn.textContent = 'Reveal Answer';
-  revealBtn.onclick = () => revealStatsQuestion(q);
+  revealBtn.addEventListener('click', () => revealStatsQuestion(q));
 }
 
-document.getElementById('sqCloseBtn').onclick = function() {
+document.getElementById('sqCloseBtn').addEventListener('click', function() {
   document.getElementById('statsModal').style.display = 'none';
-};
+});
 
 function revealStatsQuestion(q) {
   const ans = document.getElementById('sqAnswer');
