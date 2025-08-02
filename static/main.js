@@ -5,6 +5,29 @@ let currentQuestion;
 let selected;
 let bankFiles = null;
 
+function populateBankSelects(data) {
+  const bankSelect = document.getElementById('bankSelect');
+  const statsSelect = document.getElementById('statsBankSelect');
+  if (!bankSelect && !statsSelect) return;
+  const names = Object.keys(data)
+    .filter(k => Array.isArray(data[k]))
+    .sort();
+  names.forEach(name => {
+    if (bankSelect) {
+      const opt1 = document.createElement('option');
+      opt1.value = name;
+      opt1.textContent = name;
+      bankSelect.appendChild(opt1);
+    }
+    if (statsSelect) {
+      const opt2 = document.createElement('option');
+      opt2.value = name;
+      opt2.textContent = name;
+      statsSelect.appendChild(opt2);
+    }
+  });
+}
+
 // Adjust layout when loaded in standalone mode
 document.addEventListener('DOMContentLoaded', function() {
   const params = new URLSearchParams(window.location.search);
@@ -14,7 +37,14 @@ document.addEventListener('DOMContentLoaded', function() {
     if (container) container.classList.add('standalone');
   }
   if (!bankFiles) {
-    fetch('/static/banks.json').then(r => r.json()).then(data => { bankFiles = data; });
+    fetch('/static/banks.json')
+      .then(r => r.json())
+      .then(data => {
+        bankFiles = data;
+        populateBankSelects(bankFiles);
+      });
+  } else {
+    populateBankSelects(bankFiles);
   }
 });
 

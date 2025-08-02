@@ -74,28 +74,6 @@
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify@2.3.10/dist/purify.min.js"></script>
   <script src="../static/question_renderer.js"></script>
-  <script>
-    fetch('../static/banks.json')
-      .then(r => r.json())
-      .then(data => {
-        window.bankFiles = data;
-        const bankSelect = document.getElementById('bankSelect');
-        const statsSelect = document.getElementById('statsBankSelect');
-        const names = Object.keys(data)
-          .filter(k => Array.isArray(data[k]))
-          .sort();
-        names.forEach(name => {
-          const opt1 = document.createElement('option');
-          opt1.value = name;
-          opt1.textContent = name;
-          bankSelect.appendChild(opt1);
-          const opt2 = document.createElement('option');
-          opt2.value = name;
-          opt2.textContent = name;
-          statsSelect.appendChild(opt2);
-        });
-      });
-  </script>
   <script src="../static/main.js"></script>
 </body>
 </html>
