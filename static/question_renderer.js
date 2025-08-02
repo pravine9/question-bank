@@ -6,6 +6,32 @@ function sanitize(text) {
   return text;
 }
 
+function resetUI({ feedbackEl, answerEl, explanationEl, optionsEl, inputEl, unitEl }) {
+  if (feedbackEl) {
+    feedbackEl.textContent = '';
+    feedbackEl.classList.remove('correct', 'incorrect');
+  }
+  if (answerEl) {
+    answerEl.textContent = '';
+    answerEl.style.display = 'none';
+  }
+  if (explanationEl) {
+    explanationEl.innerHTML = '';
+    explanationEl.style.display = 'none';
+  }
+
+  if (optionsEl) {
+    optionsEl.textContent = '';
+    optionsEl.style.display = '';
+  }
+  if (inputEl) {
+    inputEl.style.display = 'none';
+  }
+  if (unitEl) {
+    unitEl.style.display = 'none';
+  }
+}
+
 function renderQuestion(question, config) {
   config = config || {};
   const get = sel => (sel ? document.querySelector(sel) : null);
@@ -40,30 +66,9 @@ function renderQuestion(question, config) {
     }
   }
 
-  if (feedbackEl) {
-    feedbackEl.textContent = '';
-    feedbackEl.classList.remove('correct', 'incorrect');
-  }
-  if (answerEl) {
-    answerEl.textContent = '';
-    answerEl.style.display = 'none';
-  }
-  if (explanationEl) {
-    explanationEl.innerHTML = '';
-    explanationEl.style.display = 'none';
-  }
+  resetUI({ feedbackEl, answerEl, explanationEl, optionsEl, inputEl, unitEl });
 
   let buttons = [];
-  if (optionsEl) {
-    optionsEl.textContent = '';
-    optionsEl.style.display = '';
-  }
-  if (inputEl) {
-    inputEl.style.display = 'none';
-  }
-  if (unitEl) {
-    unitEl.style.display = 'none';
-  }
 
   if (showInput) {
     if (question.answers && question.answers.length) {
