@@ -54,8 +54,6 @@ button:hover {
 }
 
 #qImg {
-  max-width: 100%;
-  height: auto;
   display: none;
 }
 
@@ -124,6 +122,7 @@ button:hover {
   text-align: left;
   cursor: pointer;
   background-color: #fff;
+  color: #000;
   transition: 0.2s;
 }
 
@@ -198,8 +197,12 @@ button:hover {
 }
 
 #sqImg {
+  display: none;
+}
+
+#questionArea img,
+#statsModal img {
   max-width: 100%;
   height: auto;
-  display: none;
 }
 

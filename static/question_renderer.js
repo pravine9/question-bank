@@ -1,7 +1,13 @@
-function sanitize(text) {
-  text = (text || '').replace(/\u2028/g, '\n').replace(/\u00a0/g, ' ').replace(/\u200b/g, '');
+function sanitize(text, inline) {
+  text = (text || '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n')
+    .replace(/\u2028/g, '\n')
+    .replace(/\u00a0/g, ' ')
+    .replace(/\u200b/g, '');
   if (typeof DOMPurify !== 'undefined' && typeof marked !== 'undefined') {
-    return DOMPurify.sanitize(marked.parse(text));
+    const parsed = inline ? marked.parseInline(text) : marked.parse(text);
+    return DOMPurify.sanitize(parsed);
   }
   return text;
 }
@@ -47,7 +53,14 @@ function renderQuestion(question, config) {
   const explanationEl = get(config.explanation);
   const showInput = config.showInput !== false;
 
-  if (titleEl) titleEl.textContent = question.title || '';
+  if (titleEl) {
+    const title = sanitize(question.title || '', true);
+    if (typeof DOMPurify !== 'undefined' && typeof marked !== 'undefined') {
+      titleEl.innerHTML = title;
+    } else {
+      titleEl.textContent = title;
+    }
+  }
   if (textEl) {
     const txt = sanitize(question.text || '');
     if (typeof DOMPurify !== 'undefined' && typeof marked !== 'undefined') {
@@ -85,7 +98,7 @@ function renderQuestion(question, config) {
       if (optionsEl) optionsEl.style.display = 'none';
       if (inputEl) {
         inputEl.value = '';
-        inputEl.style.display = 'block';
+        inputEl.style.display = 'inline-block';
       }
       if (unitEl) {
         if (question.answer_unit) {
