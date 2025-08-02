@@ -1,5 +1,7 @@
 const fs = require('fs');
 const path = require('path');
+const { questionRenderer } = require('../static/question_renderer.js');
+const sanitize = questionRenderer.sanitize;
 
 const INPUT_DIR = path.join(__dirname, '..', 'question_banks');
 const OUTPUT_DIR = path.join(__dirname, '..', 'output');
@@ -46,10 +48,10 @@ function asciiNormalize(str) {
 
 function cleanText(text) {
   if (typeof text !== 'string') return text;
+  text = sanitize(text);
   text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
   text = text.normalize('NFKC');
   text = asciiNormalize(text);
-  text = text.replace(/\u00a0/g, ' ');
   if (text.startsWith('**') && text.endsWith('**')) {
     text = text.slice(2, -2).trim();
   }

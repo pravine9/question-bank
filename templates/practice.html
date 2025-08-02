@@ -272,13 +272,8 @@
           }
           corr.textContent = correctText ? `Correct answer: ${correctText}` : '';
         }
-        let expText = questions[index].why || '';
-        expText = expText.replace(/\u2028/g, '\n').replace(/\u00a0/g, ' ').replace(/\u200b/g, '');
-        if (typeof DOMPurify !== 'undefined' && typeof marked !== 'undefined') {
-          expl.innerHTML = DOMPurify.sanitize(marked.parse(expText));
-        } else {
-          expl.textContent = expText;
-        }
+        const expText = questionRenderer.sanitize(questions[index].why || '');
+        expl.innerHTML = expText;
         convertPdfLinks(expl);
         details.style.display = 'block';
       } else {

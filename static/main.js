@@ -111,11 +111,7 @@ document.getElementById('revealBtn').onclick = function() {
     ans.style.display = 'block';
   }
   const ex = document.getElementById('explanation');
-  const why = (currentQuestion.why || '')
-    .replace(/\u2028/g, '\n')
-    .replace(/\u00a0/g, ' ')
-    .replace(/\u200b/g, '');
-  ex.innerHTML = DOMPurify.sanitize(marked.parse(why || 'No explanation'));
+  ex.innerHTML = questionRenderer.sanitize(currentQuestion.why || 'No explanation');
   ex.style.display = 'block';
 };
 
@@ -209,11 +205,7 @@ function revealStatsQuestion(q) {
     if (q.answer_unit) answerText += ' ' + q.answer_unit;
   }
   ans.textContent = answerText ? `Answer: ${answerText}` : '';
-  const why = (q.why || '')
-    .replace(/\u2028/g, '\n')
-    .replace(/\u00a0/g, ' ')
-    .replace(/\u200b/g, '');
-  ex.innerHTML = DOMPurify.sanitize(marked.parse(why || 'No explanation'));
+  ex.innerHTML = questionRenderer.sanitize(q.why || 'No explanation');
   ans.style.display = 'block';
   ex.style.display = 'block';
   btn.textContent = 'Hide Answer';
