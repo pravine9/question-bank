@@ -331,20 +331,9 @@
       const opts = document.querySelector('.options');
       const calc = document.querySelector('.calculator');
       const input = calc.querySelector('input');
-      let correct = false;
-      if(q.answers && q.answers.length){
-        correct = selected == q.correct_answer_number;
-        opts.querySelectorAll('button').forEach(b => b.disabled = true);
-        const correctBtn = opts.querySelector(`button[data-num='${q.correct_answer_number}']`);
-        if(correctBtn) correctBtn.classList.add('correct');
-      } else {
-        const value = input.value.trim();
-        correct = value === (q.correct_answer || '');
-      }
       const fb = document.querySelector('.feedback');
-      fb.textContent = correct ? 'Correct!' : 'Incorrect';
-      fb.className = 'feedback ' + (correct ? 'correct' : 'incorrect');
-      questionRenderer.updateStats(q.id, correct);
+      const value = q.answers && q.answers.length ? selected : input.value.trim();
+      questionRenderer.evaluateAnswer(q, value, { options: opts, feedback: fb });
       recordAnswer();
     };
 

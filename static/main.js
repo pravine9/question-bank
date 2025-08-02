@@ -77,20 +77,10 @@ function renderQuestion(q) {
 document.getElementById('checkBtn').onclick = function() {
   if (!currentQuestion) return;
   const options = document.getElementById('answerOptions');
-  let correct = false;
-  if (currentQuestion.answers && currentQuestion.answers.length) {
-    correct = selected == currentQuestion.correct_answer_number;
-    options.querySelectorAll('button').forEach(b => b.disabled = true);
-    const correctBtn = options.querySelector(`button[data-num='${currentQuestion.correct_answer_number}']`);
-    if (correctBtn) correctBtn.classList.add('correct');
-  } else {
-    const value = document.getElementById('calcInput').value.trim();
-    correct = value === (currentQuestion.correct_answer || '');
-  }
+  const input = document.getElementById('calcInput');
   const feedback = document.getElementById('feedback');
-  feedback.textContent = correct ? 'Correct!' : 'Incorrect';
-  feedback.className = correct ? 'correct' : 'incorrect';
-  questionRenderer.updateStats(currentQuestion.id, correct);
+  const value = currentQuestion.answers && currentQuestion.answers.length ? selected : input.value.trim();
+  questionRenderer.evaluateAnswer(currentQuestion, value, { options, feedback });
 };
 
 document.getElementById('revealBtn').onclick = function() {

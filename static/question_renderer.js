@@ -95,5 +95,32 @@
     localStorage.setItem('questionStats', JSON.stringify(data));
   }
 
-  global.questionRenderer = { renderQuestion, updateStats, sanitize };
+  function evaluateAnswer(question, value, hooks){
+    hooks = hooks || {};
+    const optionsEl = hooks.options;
+    const feedbackEl = hooks.feedback;
+
+    let correct = false;
+    if (question.answers && question.answers.length) {
+      correct = String(value) == String(question.correct_answer_number);
+      if (optionsEl) {
+        optionsEl.querySelectorAll('button').forEach(b => b.disabled = true);
+        const correctBtn = optionsEl.querySelector(`button[data-num='${question.correct_answer_number}']`);
+        if (correctBtn) correctBtn.classList.add('correct');
+      }
+    } else {
+      correct = String(value).trim() === String(question.correct_answer || '');
+    }
+
+    if (feedbackEl) {
+      feedbackEl.textContent = correct ? 'Correct!' : 'Incorrect';
+      feedbackEl.className = (feedbackEl.className || '').replace(/\b(correct|incorrect)\b/g, '').trim();
+      feedbackEl.classList.add(correct ? 'correct' : 'incorrect');
+    }
+
+    updateStats(question.id, correct);
+    return correct;
+  }
+
+  global.questionRenderer = { renderQuestion, updateStats, sanitize, evaluateAnswer };
 })(this);
