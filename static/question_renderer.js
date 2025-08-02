@@ -122,5 +122,38 @@
     return correct;
   }
 
-  global.questionRenderer = { renderQuestion, updateStats, sanitize, evaluateAnswer };
+  function revealAnswer(question, targets){
+    targets = targets || {};
+    const get = sel => {
+      if (!sel) return null;
+      return typeof sel === 'string' ? document.querySelector(sel) : sel;
+    };
+
+    const answerEl = get(targets.answer);
+    const explanationEl = get(targets.explanation);
+    const prefix = targets.prefix || 'Answer';
+
+    let answerText = '';
+    if (question.answers && question.answers.length) {
+      const obj = question.answers.find(a => a.answer_number == question.correct_answer_number);
+      answerText = obj ? obj.text : '';
+    } else {
+      answerText = question.correct_answer || '';
+      if (question.answer_unit) answerText += ' ' + question.answer_unit;
+    }
+
+    if (answerEl) {
+      answerEl.textContent = answerText ? `${prefix}: ${answerText}` : '';
+      answerEl.style.display = 'block';
+    }
+
+    if (explanationEl) {
+      explanationEl.innerHTML = sanitize(question.why || 'No explanation');
+      explanationEl.style.display = 'block';
+    }
+
+    return {answerText};
+  }
+
+  global.questionRenderer = { renderQuestion, updateStats, sanitize, evaluateAnswer, revealAnswer };
 })(this);
