@@ -6,6 +6,7 @@ function sanitize(text, inline) {
     .replace(/\u00a0/g, ' ')
     .replace(/\u200b/g, '');
   if (typeof DOMPurify !== 'undefined' && typeof marked !== 'undefined') {
+    marked.setOptions({ breaks: true });
     const parsed = inline ? marked.parseInline(text) : marked.parse(text);
     return DOMPurify.sanitize(parsed);
   }
