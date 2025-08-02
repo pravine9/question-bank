@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const INPUT_DIR = path.join(__dirname, '..', 'output');
-const OUTPUT_DIR = path.join(__dirname, '..', 'cleaned');
+const INPUT_DIR = path.join(__dirname, '..', 'question_banks');
+const OUTPUT_DIR = path.join(__dirname, '..', 'output');
 
 function asciiNormalize(str) {
   // remove diacritics by decomposing then stripping combining marks

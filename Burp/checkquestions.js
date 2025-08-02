@@ -1,7 +1,8 @@
+#!/usr/bin/env node
 const fs = require('fs');
 const path = require('path');
 
-const OUTPUT_DIR = 'output';
+const OUTPUT_DIR = 'question_banks';
 
 function countQuestionsInFile(filepath) {
   try {
