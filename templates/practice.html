@@ -78,7 +78,8 @@
   </div>
 
   <script src="../static/question_renderer.js"></script>
-  <script>
+  <script type="module">
+    import banks from "../static/banks.js";
     let questions = [];
     let index = 0;
     let selected = null;
@@ -91,24 +92,22 @@
     backSummaryBtn.style.display = 'none';
     homeTopBtn.style.display = 'none';
 
-    async function loadQuestions(){
-      const params = new URLSearchParams(window.location.search);
-      const bank = params.get('bank');
-      let num = parseInt(params.get('num') || '10', 10);
-      const bankMap = await fetch('../static/banks.json').then(r => r.json());
-      const files = bankMap[bank] || [];
-      let all = [];
-      for(const f of files){
-        const arr = await fetch('../' + f).then(r => r.json());
-        all = all.concat(arr);
+      function loadQuestions(){
+        const params = new URLSearchParams(window.location.search);
+        const bank = params.get('bank');
+        let num = parseInt(params.get('num') || '10', 10);
+        const files = banks[bank] || [];
+        let all = [];
+        for (const arr of files) {
+          all = all.concat(arr);
+        }
+        for (let i = all.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [all[i], all[j]] = [all[j], all[i]];
+        }
+        questions = all.slice(0, num);
+        responses = Array(questions.length).fill(null);
       }
-      for(let i=all.length-1;i>0;i--){
-        const j = Math.floor(Math.random()*(i+1));
-        [all[i], all[j]] = [all[j], all[i]];
-      }
-      questions = all.slice(0, num);
-      responses = Array(questions.length).fill(null);
-    }
 
     function initNav() {
       const nav = document.querySelector('.nav');
@@ -327,12 +326,12 @@
       recordAnswer();
     };
 
-    document.addEventListener('DOMContentLoaded', async () => {
-      await loadQuestions();
-      if(!questions.length) return;
-      initNav();
-      renderQuestion();
-    });
+      document.addEventListener('DOMContentLoaded', () => {
+        loadQuestions();
+        if(!questions.length) return;
+        initNav();
+        renderQuestion();
+      });
 
     function showSummary(){
       recordAnswer();

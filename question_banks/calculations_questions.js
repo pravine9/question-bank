@@ -1,3 +1,4 @@
+export default 
 [
   {
     "id": 790,
@@ -3855,4 +3856,4 @@
     "answers": [],
     "is_free": false
   }
-]
+];
