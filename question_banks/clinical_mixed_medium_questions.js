@@ -1,4 +1,4 @@
-export default 
+window.clinicalMixedMedium = 
 [
   {
     "id": 2154,

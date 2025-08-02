@@ -1,18 +1,8 @@
-import calculations from '../question_banks/calculations_questions.js';
-import clinicalMepLow from '../question_banks/clinical_mep_low_questions.js';
-import clinicalMixedHigh from '../question_banks/clinical_mixed_high_questions.js';
-import clinicalMixedLow from '../question_banks/clinical_mixed_low_questions.js';
-import clinicalMixedMedium from '../question_banks/clinical_mixed_medium_questions.js';
-import clinicalOtcLow from '../question_banks/clinical_otc_low_questions.js';
-import clinicalTherapeuticsHigh from '../question_banks/clinical_therapeutics_high_questions.js';
-import clinicalTherapeuticsLow from '../question_banks/clinical_therapeutics_low_questions.js';
-import clinicalTherapeuticsMedium from '../question_banks/clinical_therapeutics_medium_questions.js';
-
-export default {
+window.banks = {
   _info: "Populate the question_banks/ directory with JavaScript modules exporting question arrays before using the interface",
-  calculations: [calculations],
-  clinical_mep: [clinicalMepLow],
-  clinical_mixed: [clinicalMixedHigh, clinicalMixedLow, clinicalMixedMedium],
-  clinical_otc: [clinicalOtcLow],
-  clinical_therapeutics: [clinicalTherapeuticsHigh, clinicalTherapeuticsLow, clinicalTherapeuticsMedium]
+  calculations: [window.calculations],
+  clinical_mep: [window.clinicalMepLow],
+  clinical_mixed: [window.clinicalMixedHigh, window.clinicalMixedLow, window.clinicalMixedMedium],
+  clinical_otc: [window.clinicalOtcLow],
+  clinical_therapeutics: [window.clinicalTherapeuticsHigh, window.clinicalTherapeuticsLow, window.clinicalTherapeuticsMedium]
 };

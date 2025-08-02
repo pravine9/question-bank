@@ -1,4 +1,4 @@
-export default 
+window.clinicalMixedHigh = 
 [
   {
     "id": 1044,

@@ -1,8 +1,4 @@
-import banks from './banks.js';
-
-let currentQuestion;
-let selected;
-let bankFiles = banks;
+let currentQuestion, selected, bankFiles = window.banks;
 
 document.getElementById('loadBtn').addEventListener('click', loadQuestion);
 const practiceBtn = document.getElementById('practiceBtn');
@@ -71,7 +67,7 @@ function startPractice() {
     alert('Please enter a positive number of questions');
     return;
   }
-  window.location.href = `/templates/practice.html?bank=${encodeURIComponent(data.bank)}&num=${num}`;
+  window.location.href = `practice.html?bank=${encodeURIComponent(data.bank)}&num=${num}`;
 }
 
 function renderQuestion(q) {

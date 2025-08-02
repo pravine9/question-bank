@@ -1,4 +1,4 @@
-export default 
+window.clinicalTherapeuticsMedium = 
 [
   {
     "id": 2155,

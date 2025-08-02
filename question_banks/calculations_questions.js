@@ -1,4 +1,4 @@
-export default 
+window.calculations = 
 [
   {
     "id": 790,
