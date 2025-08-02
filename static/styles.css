@@ -53,9 +53,13 @@ button:hover {
   white-space: pre-line;
 }
 
+.question-title {
+  margin-top: 15px;
+  font-size: 16pt;
+  font-weight: bold;
+}
+
 #qImg {
-  max-width: 100%;
-  height: auto;
   display: none;
 }
 
@@ -124,6 +128,7 @@ button:hover {
   text-align: left;
   cursor: pointer;
   background-color: #fff;
+  color: #000;
   transition: 0.2s;
 }
 
@@ -198,8 +203,12 @@ button:hover {
 }
 
 #sqImg {
+  display: none;
+}
+
+#questionArea img,
+#statsModal img {
   max-width: 100%;
   height: auto;
-  display: none;
 }
 

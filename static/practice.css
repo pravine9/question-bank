@@ -169,6 +169,7 @@ body {
 .prompt {
   margin-top: 15px;
   font-weight: bold;
+  font-size: 16pt;
 }
 
 .calculator {
