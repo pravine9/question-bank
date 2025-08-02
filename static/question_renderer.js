@@ -95,5 +95,42 @@
     localStorage.setItem('questionStats', JSON.stringify(data));
   }
 
-  global.questionRenderer = { renderQuestion, updateStats };
+  function evaluateAnswer(question, selected, config){
+    config = config || {};
+    const get = sel => {
+      if (!sel) return null;
+      return typeof sel === 'string' ? document.querySelector(sel) : sel;
+    };
+
+    const optionsEl = get(config.options);
+    const feedbackEl = get(config.feedback);
+    const inputEl = get(config.input); // currently unused but kept for future
+
+    let correct = false;
+    if (question.answers && question.answers.length){
+      correct = String(selected) === String(question.correct_answer_number);
+      if (optionsEl){
+        optionsEl.querySelectorAll('button').forEach(b => b.disabled = true);
+        const correctBtn = optionsEl.querySelector(`button[data-num='${question.correct_answer_number}']`);
+        if (correctBtn) correctBtn.classList.add('correct');
+      }
+    } else {
+      const value = (selected || '').trim();
+      correct = value === (question.correct_answer || '');
+      if (inputEl) {
+        // allow future behaviour like disabling input if needed
+      }
+    }
+
+    if (feedbackEl){
+      feedbackEl.textContent = correct ? 'Correct!' : 'Incorrect';
+      feedbackEl.classList.remove('correct', 'incorrect');
+      feedbackEl.classList.add(correct ? 'correct' : 'incorrect');
+    }
+
+    updateStats(question.id, correct);
+    return correct;
+  }
+
+  global.questionRenderer = { renderQuestion, evaluateAnswer, updateStats };
 })(this);
