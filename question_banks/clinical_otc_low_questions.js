@@ -1,4 +1,4 @@
-export default 
+window.clinicalOtcLow = 
 [
   {
     "id": 885,

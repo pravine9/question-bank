@@ -1,4 +1,4 @@
-export default 
+window.clinicalMepLow = 
 [
   {
     "id": 882,

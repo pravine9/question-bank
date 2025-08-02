@@ -65,7 +65,7 @@
       <tbody></tbody>
     </table>
     <p class="score"></p>
-    <button class="home-btn" onclick="location.href='/'">Return Home</button>
+    <button class="home-btn" onclick="location.href='index.html'">Return Home</button>
   </section>
 
   <footer class="footer">
@@ -77,14 +77,20 @@
   </footer>
   </div>
 
+  <script src="../question_banks/calculations_questions.js"></script>
+  <script src="../question_banks/clinical_mep_low_questions.js"></script>
+  <script src="../question_banks/clinical_mixed_high_questions.js"></script>
+  <script src="../question_banks/clinical_mixed_low_questions.js"></script>
+  <script src="../question_banks/clinical_mixed_medium_questions.js"></script>
+  <script src="../question_banks/clinical_otc_low_questions.js"></script>
+  <script src="../question_banks/clinical_therapeutics_high_questions.js"></script>
+  <script src="../question_banks/clinical_therapeutics_low_questions.js"></script>
+  <script src="../question_banks/clinical_therapeutics_medium_questions.js"></script>
+  <script src="../static/banks.js"></script>
   <script src="../static/question_renderer.js"></script>
-  <script type="module">
-    import banks from "../static/banks.js";
-    let questions = [];
-    let index = 0;
-    let selected = null;
-    let responses = [];
-    let reviewing = false;
+  <script>
+    const banks = window.banks;
+    let questions=[], index=0, selected=null, responses=[], reviewing=false;
     const backSummaryBtn = document.querySelector('.summary-btn');
     const homeTopBtn = document.querySelector('.home-top-btn');
 
@@ -386,7 +392,7 @@
 
     // Quick exit to home
     homeTopBtn.onclick = () => {
-      window.location.href = '/';
+      window.location.href = 'index.html';
     };
   </script>
 </body>

@@ -1,4 +1,4 @@
-export default 
+window.clinicalTherapeuticsHigh = 
 [
   {
     "id": 1010,
