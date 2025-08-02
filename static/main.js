@@ -1,6 +1,7 @@
 let currentQuestion, selected, bankFiles = window.banks;
 
-document.getElementById('loadBtn').addEventListener('click', loadQuestion);
+const loadBtn = document.getElementById('loadBtn');
+if (loadBtn) loadBtn.addEventListener('click', loadQuestion);
 const practiceBtn = document.getElementById('practiceBtn');
 if (practiceBtn) practiceBtn.addEventListener('click', startPractice);
 
@@ -36,6 +37,16 @@ function getSelectedBank(id) {
   if (!Array.isArray(files) || !files.length) return null;
   return { bank, files };
 }
+
+function toggleFlag(id) {
+  const data = JSON.parse(localStorage.getItem('questionStats') || '{}');
+  if (!data[id]) data[id] = { right: 0, wrong: 0, saved: false };
+  data[id].saved = !data[id].saved;
+  localStorage.setItem('questionStats', JSON.stringify(data));
+  return data[id].saved;
+}
+
+window.toggleFlag = toggleFlag;
 
 // Adjust layout when loaded in standalone mode
 document.addEventListener('DOMContentLoaded', function() {
@@ -101,28 +112,34 @@ function renderQuestion(q) {
   }
 }
 
-document.getElementById('checkBtn').addEventListener('click', function() {
-  if (!currentQuestion) return;
-  const options = document.getElementById('answerOptions');
-  const input = document.getElementById('calcInput');
-  const feedback = document.getElementById('feedback');
-  const value = currentQuestion.answers && currentQuestion.answers.length ? selected : input.value.trim();
-  questionRenderer.evaluateAnswer(currentQuestion, value, { options, feedback });
-});
+const checkBtn = document.getElementById('checkBtn');
+if (checkBtn) {
+  checkBtn.addEventListener('click', function() {
+    if (!currentQuestion) return;
+    const options = document.getElementById('answerOptions');
+    const input = document.getElementById('calcInput');
+    const feedback = document.getElementById('feedback');
+    const value = currentQuestion.answers && currentQuestion.answers.length ? selected : input.value.trim();
+    questionRenderer.evaluateAnswer(currentQuestion, value, { options, feedback });
+  });
+}
 
-document.getElementById('revealBtn').addEventListener('click', function() {
-  if (!currentQuestion) return;
-  questionRenderer.revealAnswer(currentQuestion, { answer: '#answer', explanation: '#explanation' });
-});
+const revealBtn = document.getElementById('revealBtn');
+if (revealBtn) {
+  revealBtn.addEventListener('click', function() {
+    if (!currentQuestion) return;
+    questionRenderer.revealAnswer(currentQuestion, { answer: '#answer', explanation: '#explanation' });
+  });
+}
 
-document.getElementById('saveBtn').addEventListener('click', function() {
-  if (!currentQuestion) return;
-  const data = JSON.parse(localStorage.getItem('questionStats') || '{}');
-  if (!data[currentQuestion.id]) data[currentQuestion.id] = {right:0, wrong:0, saved:false};
-  data[currentQuestion.id].saved = !data[currentQuestion.id].saved;
-  localStorage.setItem('questionStats', JSON.stringify(data));
-  alert(data[currentQuestion.id].saved ? 'Saved!' : 'Removed!');
-});
+const saveBtn = document.getElementById('saveBtn');
+if (saveBtn) {
+  saveBtn.addEventListener('click', function() {
+    if (!currentQuestion) return;
+    const saved = toggleFlag(currentQuestion.id);
+    alert(saved ? 'Saved!' : 'Removed!');
+  });
+}
 
 let statsQuestions = [];
 const loadStatsBtn = document.getElementById('loadStatsBtn');
