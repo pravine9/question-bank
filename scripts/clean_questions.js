@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { questionRenderer } = require('../static/question_renderer.js');
-const sanitize = questionRenderer.sanitize;
+const { sanitize } = require('../static/question_renderer.js');
 
 const INPUT_DIR = path.join(__dirname, '..', 'question_banks');
 const OUTPUT_DIR = path.join(__dirname, '..', 'output');
