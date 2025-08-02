@@ -37,6 +37,44 @@ templates/       # HTML templates for the interface
 Available banks are listed in `static/banks.js` which maps to modules in
 `question_banks/`.
 
+## Code reuse
+
+Common browser-side logic lives in `static/question_renderer.js`. This module
+sanitises question text, builds the UI, checks answers and reveals
+explanations. Reuse these utilities instead of re‑implementing them:
+
+```javascript
+// Render a question
+const { buttons, input } = questionRenderer.renderQuestion(question, {
+  text: '#qText',
+  options: '#answerOptions',
+  input: '#calcInput',
+  unit: '#answerUnit',
+  feedback: '#feedback',
+  answer: '#answer',
+  explanation: '#explanation',
+  showInput: true
+});
+
+// Evaluate a user response
+const ok = questionRenderer.evaluateAnswer(question, input.value, {
+  options: document.querySelector('#answerOptions'),
+  feedback: document.querySelector('#feedback')
+});
+
+// Reveal the correct answer and explanation
+questionRenderer.revealAnswer(question, {
+  answer: '#answer',
+  explanation: '#explanation'
+});
+
+// Toggle flagged status for review
+const flagged = toggleFlag(question.id); // true when saved
+```
+
+Both `static/main.js` and `static/practice.js` call these helpers so the
+single‑question view and practice interface behave consistently.
+
 ## Burp scripts
 
 Two helper scripts in `Burp/` operate directly on the JavaScript question modules:
