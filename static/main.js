@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function loadQuestion() {
   const data = getSelectedBank('bankSelect');
   if (!data) {
-    alert('Please select a bank');
+    alert('Please select a question bank');
     return;
   }
   const qs = data.files[Math.floor(Math.random() * data.files.length)];
