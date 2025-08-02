@@ -22,7 +22,7 @@ Open `templates/index.html` in your browser to use the interface.
 4. **Question statistics** – right/wrong counts are stored
    in `localStorage` under `questionStats`. Flagged status should not be stored after test ends. The index page provides a "Check
    Question Stats" form for looking up stats by question ID.
-5. **Folder structure** – raw question JSON files live in `question_bank/` while
+5. **Folder structure** – raw question JSON files live in `question_banks/` while
    cleaned versions created by `scripts/clean_questions.js` are stored in
    `cleaned/` if that directory exists. The interface uses the cleaned copies when available.
 
@@ -30,7 +30,7 @@ Open `templates/index.html` in your browser to use the interface.
 
 ```
 Burp/            # Scripts for scraping and analysing question data
-question_bank/   # Raw question JSON files downloaded from the web
+question_banks/  # Raw question JSON files downloaded from the web
 cleaned/         # Normalised versions of the JSON files (generated)
 scripts/         # Helper utilities such as data cleaning
 static/          # Client-side JS and CSS
@@ -39,7 +39,7 @@ templates/       # HTML templates for the interface
 
 `cleaned/` is ignored by git and may not exist initially. The interface
 prefers this folder when present, otherwise it loads data directly from
-`question_bank/`.
+`question_banks/`.
 
 
 ## Using the interface
@@ -80,10 +80,10 @@ given question ID.
 
 ### Folder structure
 
-Questions live under `question_bank/`. Running
+Questions live under `question_banks/`. Running
 `scripts/clean_questions.js` writes cleaned versions into `cleaned/`. If the
 `cleaned/` directory exists, the app loads questions from there; otherwise it
-falls back to `output/`. (This may not be required if the JSON can be parsed without this extra folder/file creation step)
+falls back to `question_banks/`.
 
 ### Question format
 
