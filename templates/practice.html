@@ -356,12 +356,39 @@
       let correctCount = 0;
       responses.forEach((r,i) => {
         const tr = document.createElement('tr');
-        const ua = r ? r.text || '' : '';
-        const ca = r ? r.correctAnswer || '' : '';
-        const correct = r ? r.correct : false;
+        let ua = '';
+        let ca = '';
+        let correct = false;
+        if(r){
+          ua = r.text || '';
+          ca = r.correctAnswer || '';
+          correct = r.correct;
+        } else {
+          const q = questions[i];
+          if(q.answers && q.answers.length){
+            const obj = q.answers.find(a => a.answer_number == q.correct_answer_number);
+            ca = obj ? obj.text : '';
+          } else {
+            ca = (q.correct_answer || '') + (q.answer_unit ? ` ${q.answer_unit}` : '');
+          }
+        }
         if(correct) correctCount++;
         const icon = correct ? '✔' : '✘';
-        tr.innerHTML = `<td>${i+1}</td><td>${ua}</td><td>${ca}</td><td class="result-icon ${correct ? 'correct' : 'incorrect'}">${icon}</td><td><button data-idx='${i}'>Review</button></td>`;
+        const numTd = document.createElement('td');
+        numTd.textContent = i+1;
+        const uaTd = document.createElement('td');
+        uaTd.innerHTML = questionRenderer.sanitize(ua, true);
+        const caTd = document.createElement('td');
+        caTd.innerHTML = questionRenderer.sanitize(ca, true);
+        const resTd = document.createElement('td');
+        resTd.className = `result-icon ${correct ? 'correct' : 'incorrect'}`;
+        resTd.textContent = icon;
+        const revTd = document.createElement('td');
+        const btn = document.createElement('button');
+        btn.dataset.idx = i;
+        btn.textContent = 'Review';
+        revTd.appendChild(btn);
+        tr.append(numTd, uaTd, caTd, resTd, revTd);
         tbody.appendChild(tr);
       });
       score.textContent = `You answered ${correctCount} of ${questions.length} correctly.`;
