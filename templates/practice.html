@@ -358,10 +358,12 @@
         const tr = document.createElement('tr');
         const ua = r ? r.text || '' : '';
         const ca = r ? r.correctAnswer || '' : '';
+        const uaHTML = questionRenderer.sanitize(ua, true);
+        const caHTML = questionRenderer.sanitize(ca, true);
         const correct = r ? r.correct : false;
         if(correct) correctCount++;
         const icon = correct ? '✔' : '✘';
-        tr.innerHTML = `<td>${i+1}</td><td>${ua}</td><td>${ca}</td><td class="result-icon ${correct ? 'correct' : 'incorrect'}">${icon}</td><td><button data-idx='${i}'>Review</button></td>`;
+        tr.innerHTML = `<td>${i+1}</td><td>${uaHTML}</td><td>${caHTML}</td><td class="result-icon ${correct ? 'correct' : 'incorrect'}">${icon}</td><td><button data-idx='${i}'>Review</button></td>`;
         tbody.appendChild(tr);
       });
       score.textContent = `You answered ${correctCount} of ${questions.length} correctly.`;
