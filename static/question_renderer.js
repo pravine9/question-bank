@@ -168,5 +168,10 @@ function revealAnswer(question, targets) {
   return { answerText };
 }
 
-module.exports = { renderQuestion, updateStats, sanitize, evaluateAnswer, revealAnswer };
+const questionRendererObj = { renderQuestion, updateStats, sanitize, evaluateAnswer, revealAnswer };
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = questionRendererObj;
+} else {
+  window.questionRenderer = questionRendererObj;
+}
 
