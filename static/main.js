@@ -85,24 +85,7 @@ document.getElementById('checkBtn').onclick = function() {
 
 document.getElementById('revealBtn').onclick = function() {
   if (!currentQuestion) return;
-  let answerText = '';
-  if (currentQuestion.answers && currentQuestion.answers.length) {
-    const obj = currentQuestion.answers.find(a => a.answer_number == currentQuestion.correct_answer_number);
-    answerText = obj ? obj.text : '';
-  } else {
-    answerText = currentQuestion.correct_answer || '';
-    if (currentQuestion.answer_unit) {
-      answerText += ' ' + currentQuestion.answer_unit;
-    }
-  }
-  const ans = document.getElementById('answer');
-  if (ans) {
-    ans.textContent = answerText ? `Answer: ${answerText}` : '';
-    ans.style.display = 'block';
-  }
-  const ex = document.getElementById('explanation');
-  ex.innerHTML = questionRenderer.sanitize(currentQuestion.why || 'No explanation');
-  ex.style.display = 'block';
+  questionRenderer.revealAnswer(currentQuestion, { answer: '#answer', explanation: '#explanation' });
 };
 
 document.getElementById('saveBtn').onclick = function() {
@@ -185,18 +168,6 @@ function revealStatsQuestion(q) {
     btn.textContent = 'Reveal Answer';
     return;
   }
-
-  let answerText = '';
-  if (q.answers && q.answers.length) {
-    const obj = q.answers.find(a => a.answer_number == q.correct_answer_number);
-    answerText = obj ? obj.text : '';
-  } else {
-    answerText = q.correct_answer || '';
-    if (q.answer_unit) answerText += ' ' + q.answer_unit;
-  }
-  ans.textContent = answerText ? `Answer: ${answerText}` : '';
-  ex.innerHTML = questionRenderer.sanitize(q.why || 'No explanation');
-  ans.style.display = 'block';
-  ex.style.display = 'block';
+  questionRenderer.revealAnswer(q, { answer: ans, explanation: ex });
   btn.textContent = 'Hide Answer';
 }
