@@ -31,6 +31,16 @@ function populateBankSelects(data) {
   });
 }
 
+function getSelectedBank(id) {
+  const sel = document.getElementById(id);
+  if (!sel) return null;
+  const bank = sel.value;
+  if (!bank) return null;
+  const files = bankFiles[bank];
+  if (!Array.isArray(files) || !files.length) return null;
+  return { bank, files };
+}
+
 // Adjust layout when loaded in standalone mode
 document.addEventListener('DOMContentLoaded', function() {
   const params = new URLSearchParams(window.location.search);
@@ -43,19 +53,17 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function loadQuestion() {
-  const bank = document.getElementById('bankSelect').value;
-  if (!bank) return;
-  const files = bankFiles[bank] || [];
-  if (!files.length) return;
-  const qs = files[Math.floor(Math.random() * files.length)];
+  const data = getSelectedBank('bankSelect');
+  if (!data) return;
+  const qs = data.files[Math.floor(Math.random() * data.files.length)];
   const q = qs[Math.floor(Math.random() * qs.length)];
   renderQuestion(q);
 }
 
 function startPractice() {
-  const bank = document.getElementById('bankSelect').value;
+  const data = getSelectedBank('bankSelect');
   const num = parseInt(document.getElementById('numInput').value, 10);
-  if (!bank) {
+  if (!data) {
     alert('Please select a bank');
     return;
   }
@@ -63,7 +71,7 @@ function startPractice() {
     alert('Please enter a positive number of questions');
     return;
   }
-  window.location.href = `/templates/practice.html?bank=${encodeURIComponent(bank)}&num=${num}`;
+  window.location.href = `/templates/practice.html?bank=${encodeURIComponent(data.bank)}&num=${num}`;
 }
 
 function renderQuestion(q) {
@@ -122,11 +130,10 @@ const loadStatsBtn = document.getElementById('loadStatsBtn');
 if (loadStatsBtn) loadStatsBtn.addEventListener('click', loadStats);
 
 function loadStats() {
-  const bank = document.getElementById('statsBankSelect').value;
-  if (!bank) return;
-  const files = bankFiles[bank] || [];
+  const data = getSelectedBank('statsBankSelect');
+  if (!data) return;
   let qs = [];
-  for (const arr of files) {
+  for (const arr of data.files) {
     qs = qs.concat(arr);
   }
   statsQuestions = qs.sort((a,b) => (a.id||0) - (b.id||0));
