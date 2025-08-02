@@ -128,10 +128,7 @@ if (loadStatsBtn) loadStatsBtn.addEventListener('click', loadStats);
 function loadStats() {
   const data = getSelectedBank('statsBankSelect');
   if (!data) return;
-  let qs = [];
-  for (const arr of data.files) {
-    qs = qs.concat(arr);
-  }
+  const qs = data.files.flat();
   statsQuestions = qs.sort((a,b) => (a.id||0) - (b.id||0));
   renderStats();
 }
