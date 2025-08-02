@@ -10,7 +10,7 @@ import clinicalTherapeuticsMedium from '../question_banks/clinical_therapeutics_
 import clinicalTherapeuticsQuestionsLow from '../question_banks/clinical_therapeutics_questions_low.js';
 
 export default {
-  _info: "Populate the question_banks/ directory with downloaded JSON files before using the interface",
+  _info: "Populate the question_banks/ directory with JavaScript modules exporting question arrays before using the interface",
   calculations: [calculations],
   clinical_mep: [clinicalMepLow],
   clinical_mixed: [clinicalMixedHigh, clinicalMixedLow, clinicalMixedMedium],
