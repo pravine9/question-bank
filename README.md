@@ -7,7 +7,7 @@ interface then lets you practise a subset of questions entirely in the
 browser, storing your progress locally.
 
 
-Open `templates/index.html` directly in your browser to use the interface—no web server required.
+Open `templates/index.html` directly in your browser to use the interface—no web server required. This repo is designed to run offline without any localhosting required.
 
 
 ## Practice overview
