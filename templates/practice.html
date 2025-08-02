@@ -228,6 +228,7 @@
 
    function renderQuestion() {
       const q = questions[index];
+      const resp = responses[index] || {};
       selected = null;
       closePdf();
       document.querySelector('.q-number').textContent = `Question ${index + 1}`;
@@ -252,20 +253,21 @@
       const details = document.querySelector('.details');
       const corr = details.querySelector('.correct-answer');
       const expl = details.querySelector('.explanation');
+      const checkBtn = document.querySelector('.check-btn');
       if(q.answers && q.answers.length){
         calc.style.display = 'none';
         result.buttons.forEach(btn => {
           btn.onclick = () => {
-            if(reviewing) return;
+            if(reviewing || resp.checked) return;
             opts.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
             selected = btn.dataset.num;
           };
-          if(responses[index] && responses[index].answer == btn.dataset.num){
+          if(resp.answer == btn.dataset.num){
             btn.classList.add('selected');
             selected = btn.dataset.num;
           }
-          if(reviewing){
+          if(reviewing || resp.checked){
             btn.disabled = true;
             if(btn.dataset.num == q.correct_answer_number){
               btn.classList.add('correct');
@@ -274,34 +276,39 @@
         });
       } else {
         calc.style.display = 'block';
-        input.value = responses[index] ? (responses[index].answer || '') : '';
+        input.value = resp.answer || '';
         unit.textContent = q.answer_unit || '';
-        input.disabled = reviewing;
+        input.disabled = reviewing || resp.checked;
       }
       if(reviewing){
-        const fb = document.querySelector('.feedback');
-        if (responses[index]){
-          fb.textContent = responses[index].correct ? 'Correct!' : 'Incorrect';
-          fb.className = 'feedback ' + (responses[index].correct ? 'correct' : 'incorrect');
+        if (resp.answer !== undefined && resp.answer !== null){
+          feedback.textContent = resp.correct ? 'Correct!' : 'Incorrect';
+          feedback.className = 'feedback ' + (resp.correct ? 'correct' : 'incorrect');
         } else {
-          fb.textContent = 'Not answered';
-          fb.className = 'feedback';
+          feedback.textContent = 'Not answered';
+          feedback.className = 'feedback';
         }
         questionRenderer.revealAnswer(q, { answer: corr, explanation: expl, prefix: 'Correct answer' });
         convertPdfLinks(expl);
         details.style.display = 'block';
+        checkBtn.disabled = true;
       } else {
-        const fb = document.querySelector('.feedback');
-        fb.textContent = '';
-        fb.className = 'feedback';
+        if(resp.checked){
+          feedback.textContent = resp.correct ? 'Correct!' : 'Incorrect';
+          feedback.className = 'feedback ' + (resp.correct ? 'correct' : 'incorrect');
+        } else {
+          feedback.textContent = '';
+          feedback.className = 'feedback';
+        }
         details.style.display = 'none';
+        checkBtn.disabled = !!resp.checked;
       }
       updateProgress();
       updateNav();
     }
 
 
-    function recordAnswer(){
+    function recordAnswer(markChecked){
       const q = questions[index];
       const calc = document.querySelector('.calculator');
       const input = calc.querySelector('input');
@@ -323,7 +330,9 @@
         correctText = (q.correct_answer || '') + (q.answer_unit ? ` ${q.answer_unit}` : '');
       }
       const correct = q.answers && q.answers.length ? (selected == q.correct_answer_number) : (userAns === (q.correct_answer || ''));
-      responses[index] = {answer: userAns, text: userText, correctAnswer: correctText, correct};
+      const prev = responses[index] || {};
+      const checked = markChecked ? true : !!prev.checked;
+      responses[index] = {answer: userAns, text: userText, correctAnswer: correctText, correct, checked};
       updateProgress();
    }
 
@@ -348,7 +357,9 @@
       const fb = document.querySelector('.feedback');
       const value = q.answers && q.answers.length ? selected : input.value.trim();
       questionRenderer.evaluateAnswer(q, value, { options: opts, feedback: fb });
-      recordAnswer();
+      if(!(q.answers && q.answers.length)) input.disabled = true;
+      document.querySelector('.check-btn').disabled = true;
+      recordAnswer(true);
     };
 
       document.addEventListener('DOMContentLoaded', () => {
