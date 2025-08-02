@@ -30,7 +30,6 @@ Open `templates/index.html` directly in your browser to use the interface—no w
 ```
 Burp/            # Scripts for scraping and analysing question data
 question_banks/  # Question bank JavaScript module files
-scripts/         # Helper utilities for data scraping
 static/          # Client-side JS and CSS (includes banks registry in banks.js)
 templates/       # HTML templates for the interface
 ```
