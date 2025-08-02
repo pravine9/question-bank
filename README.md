@@ -1,13 +1,13 @@
 # Question Bank
 
 This project provides a lightweight web interface for revising question banks.
-The questions are scraped from an external site and saved as JSON.  A
-few helper scripts take care of collecting and cleaning this data.  The web
+The questions are scraped from an external site and saved as JavaScript module files.
+A few helper scripts take care of collecting this data. The web
 interface then lets you practise a subset of questions entirely in the
 browser, storing your progress locally.
 
 
-Open `templates/index.html` in your browser to use the interface.
+Open `templates/index.html` directly in your browser to use the interface—no web server required.
 
 
 ## Practice overview
@@ -22,23 +22,20 @@ Open `templates/index.html` in your browser to use the interface.
 4. **Question statistics** – right/wrong counts are stored
    in `localStorage` under `questionStats`. Flagged status should not be stored after test ends. The index page provides a "Check
    Question Stats" form for looking up stats by question ID.
-5. **Folder structure** – raw question JSON files live in `question_banks/` while
-   cleaned versions created by `scripts/clean_questions.js` are stored in
-   `cleaned/` if that directory exists. The interface uses the cleaned copies when available.
+5. **Folder structure** – question bank JavaScript modules live in `question_banks/`.
+   The available banks are registered in `static/banks.js`.
 
 ## Repository layout
 
 ```
 Burp/            # Scripts for scraping and analysing question data
-question_banks/  # Raw question JSON files downloaded from the web
-cleaned/         # Normalised versions of the JSON files (generated)
-scripts/         # Helper utilities such as data cleaning
-static/          # Client-side JS and CSS
+question_banks/  # Question bank JavaScript module files
+scripts/         # Helper utilities for data scraping
+static/          # Client-side JS and CSS (includes banks registry in banks.js)
 templates/       # HTML templates for the interface
 ```
 
-`cleaned/` is ignored by git and may not exist initially. The interface
-prefers this folder when present, otherwise it loads data directly from
+Available banks are listed in `static/banks.js` which maps to modules in
 `question_banks/`.
 
 
@@ -80,14 +77,12 @@ given question ID.
 
 ### Folder structure
 
-Questions live under `question_banks/`. Running
-`scripts/clean_questions.js` writes cleaned versions into `cleaned/`. If the
-`cleaned/` directory exists, the app loads questions from there; otherwise it
-falls back to `question_banks/`.
+Questions live under `question_banks/` as JavaScript modules. Available banks
+are listed in `static/banks.js`, which the interface uses to locate the modules.
 
 ### Question format
 
-Each question is represented as a JSON object. Key fields include:
+Each question is represented as a JavaScript object. Key fields include:
 
 | Field | Description |
 |-------|-------------|
@@ -111,9 +106,9 @@ Other optional fields control how the question is displayed:
 * `correct_answer` – correct free text answer for non‑multiple choice questions.
 * `answer_unit` – unit label shown next to numeric answers.
 
-### Unicode characters in JSON
+### Unicode characters in question data
 
-The raw JSON uses escaped Unicode sequences for punctuation and symbols. Common examples include:
+The question data uses escaped Unicode sequences for punctuation and symbols. Common examples include:
 
 | Escape | Character | Description |
 |--------|-----------|-------------|
@@ -134,10 +129,4 @@ The raw JSON uses escaped Unicode sequences for punctuation and symbols. Common 
 | `\ud83d\udd3a` | 🔺 | Red triangle |
 
 These sequences are converted to their corresponding characters when the question text is rendered in the browser.
-
-## Helper scripts
-
-### `scripts/`
-
-* `clean_questions.js` – normalise whitespace and punctuation in the scraped JSON files and write the cleaned versions to `cleaned/`.
 
