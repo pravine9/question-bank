@@ -127,7 +127,7 @@ function renderStats() {
   statsQuestions.forEach(q => {
     const stats = data[q.id] || {right:0, wrong:0};
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${q.id}</td><td>${stats.right + stats.wrong}</td><td>${stats.right}</td><td>${stats.wrong}</td><td><button data-id="${q.id}">View</button>`;
+    tr.innerHTML = `<td>${q.id}</td><td>${stats.right + stats.wrong}</td><td>${stats.right}</td><td>${stats.wrong}</td><td><button data-id="${q.id}">View</button></td>`;
     tbody.appendChild(tr);
   });
   tbody.querySelectorAll('button[data-id]').forEach(btn => {
