@@ -77,16 +77,16 @@ async function main() {
 
   if (bankName === 'Calculations') {
     console.log(`\n📥 Scraping '${bankName}' questions (no weighting)...\n`);
-    outputFile = path.join('output', `${bankName.toLowerCase().replace(/ /g, '_')}_questions.json`);
+    outputFile = path.join('question_banks', `${bankName.toLowerCase().replace(/ /g, '_')}_questions.js`);
     url = `https://www.preregshortcuts.com/api/questions/get/?bank=${bankName.replace(/ /g, '+')}&num_questions=40`;
   } else {
     weighting = await promptForWeighting();
     console.log(`\n📥 Scraping '${bankName}' questions with '${weighting}' weighting...\n`);
-    outputFile = path.join('output', `${bankName.toLowerCase().replace(/ /g, '_')}_${weighting.toLowerCase()}_questions.json`);
+    outputFile = path.join('question_banks', `${bankName.toLowerCase().replace(/ /g, '_')}_${weighting.toLowerCase()}_questions.js`);
     url = `https://www.preregshortcuts.com/api/questions/get/?bank=${bankName.replace(/ /g, '+')}&num_questions=40&weighting=${weighting}`;
   }
 
-  fs.mkdirSync('output', { recursive: true });
+  fs.mkdirSync('question_banks', { recursive: true });
 
   const headers = {
     'Host': 'www.preregshortcuts.com',
@@ -113,7 +113,9 @@ async function main() {
 
   if (fs.existsSync(outputFile)) {
     try {
-      uniqueQuestions = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
+      const code = fs.readFileSync(outputFile, 'utf8');
+      const mod = await import('data:text/javascript,' + encodeURIComponent(code));
+      uniqueQuestions = Array.isArray(mod.default) ? mod.default : [];
       seenHashes = new Set(uniqueQuestions.map(hashQuestion));
       console.log(`🔁 Loaded ${uniqueQuestions.length} existing unique questions for bank '${bankName}'${weightingText}.`);
     } catch (err) {
@@ -158,7 +160,7 @@ async function main() {
     await new Promise(res => setTimeout(res, 2000));
   }
 
-  fs.writeFileSync(outputFile, JSON.stringify(uniqueQuestions, null, 2));
+  fs.writeFileSync(outputFile, 'export default ' + JSON.stringify(uniqueQuestions, null, 2));
   console.log(`\n💾 Saved ${uniqueQuestions.length} unique questions to ${outputFile}`);
   rl.close();
 }

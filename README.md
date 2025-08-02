@@ -38,6 +38,15 @@ templates/       # HTML templates for the interface
 Available banks are listed in `static/banks.js` which maps to modules in
 `question_banks/`.
 
+## Burp scripts
+
+Two helper scripts in `Burp/` operate directly on the JavaScript question modules:
+
+* `node Burp/checkquestions.js` – dynamically imports each file in `question_banks/` and prints question totals by bank.
+* `node Burp/grabquestions.js` – interactively fetches questions from the external API and saves them to `question_banks/` as ES modules. Existing files are imported to prevent duplicate entries.
+
+These scripts no longer read or write JSON; all data is handled as JavaScript modules.
+
 
 ## Using the interface
 
