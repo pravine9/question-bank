@@ -230,28 +230,31 @@
       const q = questions[index];
       selected = null;
       closePdf();
-      document.querySelector('.q-number').textContent = `Question ${index + 1}`;
-      const result = questionRenderer.renderQuestion(q, {
-        text: '.scenario',
-        title: '.prompt',
-        options: '.options',
-        input: '.calculator input',
-        unit: '.calculator .unit',
-        feedback: '.feedback',
-        answer: '.correct-answer',
-        explanation: '.explanation',
-        showInput: true
-      });
+     document.querySelector('.q-number').textContent = `Question ${index + 1}`;
+     const cfg = {
+       text: '.scenario',
+       title: '.prompt',
+       options: '.options',
+       input: '.calculator input',
+       unit: '.calculator .unit',
+       feedback: '.feedback',
+       showInput: true
+     };
+     if (reviewing) {
+       cfg.answer = '.correct-answer';
+       cfg.explanation = '.explanation';
+     }
+     const result = questionRenderer.renderQuestion(q, cfg);
       convertPdfLinks(document.querySelector('.scenario'));
       convertPdfLinks(document.querySelector('.prompt'));
       const opts = document.querySelector('.options');
       const calc = document.querySelector('.calculator');
       const input = calc.querySelector('input');
       const unit = calc.querySelector('.unit');
-      const feedback = document.querySelector('.feedback');
-      const details = document.querySelector('.details');
-      const corr = details.querySelector('.correct-answer');
-      const expl = details.querySelector('.explanation');
+     const feedback = document.querySelector('.feedback');
+     const details = document.querySelector('.details');
+     const corr = details.querySelector('.correct-answer');
+     const expl = details.querySelector('.explanation');
       if(q.answers && q.answers.length){
         calc.style.display = 'none';
         result.buttons.forEach(btn => {
@@ -278,24 +281,26 @@
         unit.textContent = q.answer_unit || '';
         input.disabled = reviewing;
       }
-      if(reviewing){
-        const fb = document.querySelector('.feedback');
-        if (responses[index]){
-          fb.textContent = responses[index].correct ? 'Correct!' : 'Incorrect';
-          fb.className = 'feedback ' + (responses[index].correct ? 'correct' : 'incorrect');
-        } else {
-          fb.textContent = 'Not answered';
-          fb.className = 'feedback';
-        }
-        questionRenderer.revealAnswer(q, { answer: corr, explanation: expl, prefix: 'Correct answer' });
-        convertPdfLinks(expl);
-        details.style.display = 'block';
-      } else {
-        const fb = document.querySelector('.feedback');
-        fb.textContent = '';
-        fb.className = 'feedback';
-        details.style.display = 'none';
-      }
+     if(reviewing){
+       const fb = document.querySelector('.feedback');
+       if (responses[index]){
+         fb.textContent = responses[index].correct ? 'Correct!' : 'Incorrect';
+         fb.className = 'feedback ' + (responses[index].correct ? 'correct' : 'incorrect');
+       } else {
+         fb.textContent = 'Not answered';
+         fb.className = 'feedback';
+       }
+       questionRenderer.revealAnswer(q, { answer: corr, explanation: expl, prefix: 'Correct answer' });
+       convertPdfLinks(expl);
+       details.style.display = 'block';
+     } else {
+       const fb = document.querySelector('.feedback');
+       fb.textContent = '';
+       fb.className = 'feedback';
+       corr.textContent = '';
+       expl.innerHTML = '';
+       details.style.display = 'none';
+     }
       updateProgress();
       updateNav();
     }
