@@ -106,19 +106,33 @@ start a full practice session:
 
 ### Navigation
 
-Use the **Back** and **Next** buttons at the bottom of the practice page to move
-between questions. Each question number in the sidebar has a small flag icon—
-click it to mark that question for review. Your answers are stored in
-`localStorage`, while flags live only for the current session and are cleared
-when the test ends. The progress bar in the header shows how far through the
-test you are.
+A fixed footer holds the navigation controls: a 🚩 **Flag Question** button for
+the current item alongside **Back** and **Next**. The sidebar still lists each
+question number with its own flag icon. A **Home** button sits in the
+top‑right of the header.
+
+### External links
+
+Links inside questions open in a new tab with `noopener noreferrer` to keep the
+test page focused. Links to PDFs are replaced with an **Open PDF** button that
+shows the document in an overlay, and clicking images opens them in a new tab.
 
 ### Finishing a test
 
 Press **Finish Test** in the header when you reach the end. A summary table
 lists every question with your response and the correct answer. Use the
-**Review** buttons to revisit a specific question. A **Home** link at the top
-of the summary screen returns you to the start page.
+**Review** buttons to revisit a specific question. The **Home** button in the
+header returns you to the start page and resets the session.
+
+### Session saving and resuming
+
+The practice page saves its state in `localStorage` under `practice_state`. If
+you refresh or close the page, reopening `practice.html` with the same bank will
+pick up where you left off. After finishing a test the summary and timer are
+also stored, allowing you to reopen the page later and continue reviewing with
+the **Review** buttons. Use the **Back to Summary** button to return from a
+reviewed question, or **Home** at any time to clear the saved state and start a
+new session.
 
 ### Question statistics
 
