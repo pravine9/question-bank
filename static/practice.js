@@ -402,11 +402,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.querySelector('.next-btn')?.addEventListener('click', () => {
     recordAnswer();
-    if (index < questions.length - 1) { index++; saveState(); renderQuestion(); }
+    if (index < questions.length - 1) {
+      index++;
+      saveState();
+      renderQuestion();
+      history.replaceState(null, '', window.location.href);
+    }
   });
   document.querySelector('.back-btn')?.addEventListener('click', () => {
     recordAnswer();
-    if (index > 0) { index--; saveState(); renderQuestion(); }
+    if (index > 0) {
+      index--;
+      saveState();
+      renderQuestion();
+      history.replaceState(null, '', window.location.href);
+    }
   });
   document.querySelector('.flag-current-btn')?.addEventListener('click', () => {
     const li = document.querySelectorAll('.nav li')[index];
