@@ -278,7 +278,7 @@ function showSummary() {
     tr.appendChild(reviewTd);
     tbody.appendChild(tr);
   });
-  score.textContent = `You answered ${correctCount} of ${questions.length} correctly.`;
+  score.textContent = `You answered ${correctCount} of ${questions.length} correctly (${Math.round(correctCount / questions.length * 100)}%).`;
   summary.style.display = 'block';
   document.querySelector('.finish-btn').style.display = 'none';
   summary.querySelectorAll('button[data-idx]').forEach(btn => {
