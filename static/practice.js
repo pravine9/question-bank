@@ -19,6 +19,8 @@ function startTimer() {
 }
 
 function loadQuestions() {
+  console.log('window.banks:', window.banks);
+  console.log('URLSearchParams:', URLSearchParams);
   const params = new URLSearchParams(window.location.search);
   const bank = params.get('bank');
   if (!bank || !(bank in banks)) {
@@ -37,6 +39,7 @@ function loadQuestions() {
     [all[i], all[j]] = [all[j], all[i]];
   }
   questions = all.slice(0, num);
+  console.log(all.slice(0, num));
   responses = Array(questions.length).fill(null);
   if (!questions.length) {
     const main = document.querySelector('.main');
