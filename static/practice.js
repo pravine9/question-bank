@@ -14,6 +14,7 @@ let pdfZoom = 1, pdfPane, pdfFrame;
 const flagged = new Set();
 let finished = false;
 let summaryData = null;
+let statsRecorded = false;
 
 const STORAGE_KEY = 'practice_state';
 let persistState = true;
@@ -29,7 +30,8 @@ function saveState() {
       flagged: Array.from(flagged),
       startTime,
       finished,
-      summary: summaryData
+      summary: summaryData,
+      statsRecorded
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (e) {
@@ -322,6 +324,13 @@ function showSummary() {
   if (timeEl) {
     timeEl.textContent = `Time taken: ${pad(mins)}:${pad(secs)}`;
   }
+  if (!statsRecorded) {
+    questions.forEach((q, i) => {
+      const r = responses[i];
+      questionRenderer.updateStats(q.id, r.correct);
+    });
+    statsRecorded = true;
+  }
   tbody.textContent = '';
   let correctCount = 0;
   responses.forEach((r, i) => {
@@ -461,6 +470,7 @@ document.addEventListener('DOMContentLoaded', () => {
     (state.flagged || []).forEach(id => flagged.add(id));
     finished = state.finished || false;
     summaryData = state.summary || null;
+    statsRecorded = state.statsRecorded || false;
     const titleEl = document.querySelector('.test-title');
     if (titleEl) { titleEl.textContent = bankLabels[bank] || bank; }
     if (!questions.length) return;
