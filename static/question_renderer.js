@@ -29,6 +29,20 @@ function sanitize(text, inline) {
   return text;
 }
 
+function enhanceLinksAndImages(el) {
+  if (!el) return;
+  el.querySelectorAll('a').forEach(a => {
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+  });
+  el.querySelectorAll('img').forEach(img => {
+    img.style.cursor = 'pointer';
+    img.addEventListener('click', () => {
+      window.open(img.src, '_blank', 'noopener,noreferrer');
+    });
+  });
+}
+
 function resetUI({ feedbackEl, answerEl, explanationEl, optionsEl, inputEl, unitEl }) {
   if (feedbackEl) {
     feedbackEl.textContent = '';
@@ -77,6 +91,7 @@ function renderQuestion(question, config) {
     } else {
       titleEl.textContent = title;
     }
+    enhanceLinksAndImages(titleEl);
   }
   if (textEl) {
     const txt = sanitize(question.text || '');
@@ -85,14 +100,20 @@ function renderQuestion(question, config) {
     } else {
       textEl.textContent = txt;
     }
+    enhanceLinksAndImages(textEl);
   }
 
   if (imgEl) {
     if (question.resource_image) {
       imgEl.src = question.resource_image;
       imgEl.style.display = 'block';
+      imgEl.style.cursor = 'pointer';
+      imgEl.onclick = () => {
+        window.open(imgEl.src, '_blank', 'noopener,noreferrer');
+      };
     } else {
       imgEl.style.display = 'none';
+      imgEl.onclick = null;
     }
   }
 
@@ -198,6 +219,7 @@ function revealAnswer(question, targets) {
   if (explanationEl) {
     explanationEl.innerHTML = sanitize(question.why || 'No explanation');
     explanationEl.style.display = 'block';
+    enhanceLinksAndImages(explanationEl);
   }
 
   return { answerText };
