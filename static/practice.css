@@ -166,7 +166,7 @@ body {
   text-align: left;
 }
 
-.prompt {
+.question-title {
   margin-top: 15px;
   font-weight: bold;
   font-size: 16pt;
@@ -227,7 +227,7 @@ body {
   color: #fff;
 }
 
-.feedback {
+#feedback {
   margin-top: 10px;
   font-weight: bold;
 }
@@ -285,12 +285,12 @@ body {
   border-radius: 4px;
 }
 
-.correct-answer {
+#answer {
   font-weight: bold;
   margin-bottom: 5px;
 }
 
-.explanation {
+#explanation {
   margin-top: 5px;
 }
 

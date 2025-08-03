@@ -139,25 +139,24 @@ function renderQuestion() {
   closePdf();
   document.querySelector('.q-number').textContent = `Question ${index + 1}`;
   const result = questionRenderer.renderQuestion(q, {
-    text: '.scenario',
-    title: '.prompt',
-    options: '.options',
-    input: '.calculator input',
-    unit: '.calculator .unit',
-    feedback: '.feedback',
-    answer: '.correct-answer',
-    explanation: '.explanation',
+    text: '#qText',
+    title: '#qTitle',
+    options: '#answerOptions',
+    input: '#calcInput',
+    unit: '#answerUnit',
+    feedback: '#feedback',
+    answer: '#answer',
+    explanation: '#explanation',
     showInput: true
   });
-  convertPdfLinks(document.querySelector('.scenario'));
-  convertPdfLinks(document.querySelector('.prompt'));
-  const opts = document.querySelector('.options');
+  convertPdfLinks(document.getElementById('qText'));
+  convertPdfLinks(document.getElementById('qTitle'));
+  const opts = document.getElementById('answerOptions');
   const calc = document.querySelector('.calculator');
-  const input = calc.querySelector('input');
-  const unit = calc.querySelector('.unit');
+  const input = document.getElementById('calcInput');
   const details = document.querySelector('.details');
-  const corr = details.querySelector('.correct-answer');
-  const expl = details.querySelector('.explanation');
+  const corr = document.getElementById('answer');
+  const expl = document.getElementById('explanation');
   if (q.answers && q.answers.length) {
     calc.style.display = 'none';
     result.buttons.forEach(btn => {
@@ -181,25 +180,24 @@ function renderQuestion() {
   } else {
     calc.style.display = 'block';
     input.value = responses[index] ? (responses[index].answer || '') : '';
-    unit.textContent = q.answer_unit || '';
     input.disabled = reviewing;
   }
   if (reviewing) {
-    const fb = document.querySelector('.feedback');
+    const fb = document.getElementById('feedback');
     if (responses[index]) {
       fb.textContent = responses[index].correct ? 'Correct!' : 'Incorrect';
-      fb.className = 'feedback ' + (responses[index].correct ? 'correct' : 'incorrect');
+      fb.className = responses[index].correct ? 'correct' : 'incorrect';
     } else {
       fb.textContent = 'Not answered';
-      fb.className = 'feedback';
+      fb.className = '';
     }
     questionRenderer.revealAnswer(q, { answer: corr, explanation: expl, prefix: 'Correct answer' });
     convertPdfLinks(expl);
     details.style.display = 'block';
   } else {
-    const fb = document.querySelector('.feedback');
+    const fb = document.getElementById('feedback');
     fb.textContent = '';
-    fb.className = 'feedback';
+    fb.className = '';
     details.style.display = 'none';
   }
   updateProgress();
@@ -208,8 +206,7 @@ function renderQuestion() {
 
 function recordAnswer() {
   const q = questions[index];
-  const calc = document.querySelector('.calculator');
-  const input = calc.querySelector('input');
+  const input = document.getElementById('calcInput');
   let userAns = null;
   let userText = '';
   if (q.answers && q.answers.length) {
@@ -248,10 +245,9 @@ document.querySelector('.flag-current-btn').onclick = () => {
 
 document.querySelector('.check-btn').onclick = () => {
   const q = questions[index];
-  const opts = document.querySelector('.options');
-  const calc = document.querySelector('.calculator');
-  const input = calc.querySelector('input');
-  const fb = document.querySelector('.feedback');
+  const opts = document.getElementById('answerOptions');
+  const input = document.getElementById('calcInput');
+  const fb = document.getElementById('feedback');
   const value = q.answers && q.answers.length ? selected : input.value.trim();
   questionRenderer.evaluateAnswer(q, value, { options: opts, feedback: fb });
   recordAnswer();

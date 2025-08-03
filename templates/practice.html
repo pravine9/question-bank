@@ -39,20 +39,20 @@
 
     <section class="question-area">
       <p class="q-number"></p>
-      <p class="scenario"></p>
-      <p class="prompt"></p>
-      <div class="options"></div>
+      <p id="qText"></p>
+      <p id="qTitle" class="question-title"></p>
+      <div id="answerOptions" class="options"></div>
       <div class="calculator" style="display:none">
         <span class="icon">&#128425;</span>
         <label>Answer</label>
-        <input type="number">
-        <span class="unit"></span>
+        <input type="number" id="calcInput">
+        <span class="unit" id="answerUnit"></span>
       </div>
       <button class="check-btn">Check</button>
-      <div class="feedback"></div>
+      <div id="feedback"></div>
       <div class="details" style="display:none">
-        <div class="correct-answer"></div>
-        <div class="explanation"></div>
+        <div id="answer"></div>
+        <div id="explanation"></div>
       </div>
     </section>
   </div>
