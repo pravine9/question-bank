@@ -189,14 +189,19 @@ function showStatsQuestion(id) {
   if (!q) return;
   const overlay = document.getElementById('statsModal');
   overlay.style.display = 'flex';
-  questionRenderer.renderQuestion(q, {
+  const result = questionRenderer.renderQuestion(q, {
     text: '#sqText',
     title: '#sqTitle',
     img: '#sqImg',
+    options: '#sqOptions',
+    input: '#sqCalcInput',
+    unit: '#sqAnswerUnit',
     answer: '#sqAnswer',
     explanation: '#sqExplanation',
-    showInput: false
+    showInput: true
   });
+  if (result.buttons) result.buttons.forEach(btn => (btn.disabled = true));
+  if (result.input) result.input.disabled = true;
   const revealBtn = document.getElementById('sqRevealBtn');
   revealBtn.textContent = 'Reveal Answer';
   revealBtn.addEventListener('click', () => revealStatsQuestion(q));
