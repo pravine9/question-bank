@@ -85,7 +85,9 @@ function renderQuestion(question, config) {
   const showInput = config.showInput !== false;
 
   if (titleEl) {
-    const title = sanitize(question.title || '', true);
+    const rawTitle = question.title || '';
+    const needsBlock = /\n/.test(rawTitle) || /(^|\n)\s*\*\s/.test(rawTitle);
+    const title = sanitize(rawTitle, !needsBlock);
     if (typeof DOMPurify !== 'undefined' && typeof marked !== 'undefined') {
       titleEl.innerHTML = title;
     } else {
