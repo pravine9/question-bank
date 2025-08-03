@@ -8,6 +8,7 @@ const bankLabels = {
 const banks = window.banks;
 let questions = [], index = 0, selected = null, responses = [], reviewing = false;
 let backSummaryBtn, homeTopBtn, timerEl;
+let timerId, startTime;
 let pdfZoom = 1, pdfPane, pdfFrame;
 
 function toggleFlag(id) {
@@ -19,18 +20,18 @@ function toggleFlag(id) {
 }
 
 function startTimer() {
-  const start = Date.now();
+  startTime = Date.now();
   function pad(num) {
     return num.toString().padStart(2, '0');
   }
   function update() {
-    const elapsed = Math.floor((Date.now() - start) / 1000);
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
     const mins = Math.floor(elapsed / 60);
     const secs = elapsed % 60;
     timerEl.textContent = `${pad(mins)}:${pad(secs)}`;
   }
   update();
-  setInterval(update, 1000);
+  timerId = setInterval(update, 1000);
 }
 
 function computeCorrectText(q) {
@@ -257,6 +258,7 @@ function recordAnswer() {
 
 function showSummary() {
   recordAnswer();
+  clearInterval(timerId);
   reviewing = false;
   closePdf();
   backSummaryBtn.style.display = 'none';
@@ -266,6 +268,14 @@ function showSummary() {
   const summary = document.querySelector('.summary');
   const tbody = summary.querySelector('tbody');
   const score = summary.querySelector('.score');
+  const timeEl = summary.querySelector('.time-taken');
+  if (timeEl) {
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const mins = Math.floor(elapsed / 60);
+    const secs = elapsed % 60;
+    const pad = num => num.toString().padStart(2, '0');
+    timeEl.textContent = `Time taken: ${pad(mins)}:${pad(secs)}`;
+  }
   tbody.textContent = '';
   let correctCount = 0;
   responses.forEach((r, i) => {
