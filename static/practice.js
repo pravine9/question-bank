@@ -10,7 +10,6 @@ let bank;
 let questions = [], index = 0, selected = null, responses = [], reviewing = false;
 let backSummaryBtn, homeTopBtn, timerEl;
 let timerId, startTime;
-let pdfZoom = 1, pdfPane, pdfFrame;
 const flagged = new Set();
 let finished = false;
 let summaryData = null;
@@ -188,33 +187,10 @@ function updateNav() {
 
 
 
-function openPdf(url) {
-  pdfFrame.src = url;
-  pdfZoom = 1;
-  pdfFrame.style.transform = 'scale(1)';
-  pdfPane.style.display = 'flex';
-}
-
-function closePdf() {
-  pdfPane.style.display = 'none';
-  pdfFrame.src = '';
-}
-
-function convertPdfLinks(el) {
-  if (!el) return;
-  el.querySelectorAll('a[href$=".pdf"]').forEach(a => {
-    const btn = document.createElement('button');
-    btn.textContent = 'Open PDF';
-    btn.className = 'pdf-btn';
-    btn.onclick = (e) => { e.preventDefault(); openPdf(a.href); };
-    a.replaceWith(btn);
-  });
-}
-
 function renderQuestion() {
   const q = questions[index];
   selected = null;
-  closePdf();
+  questionRenderer.closePdf();
   document.querySelector('.q-number').textContent = `Question ${index + 1}`;
   const result = questionRenderer.renderQuestion(q, {
     text: '#qText',
@@ -227,8 +203,8 @@ function renderQuestion() {
     explanation: '#explanation',
     showInput: true
   });
-  convertPdfLinks(document.getElementById('qText'));
-  convertPdfLinks(document.getElementById('qTitle'));
+  questionRenderer.convertPdfLinks(document.getElementById('qText'));
+  questionRenderer.convertPdfLinks(document.getElementById('qTitle'));
   const opts = document.getElementById('answerOptions');
   const calc = document.querySelector('.calculator');
   const input = document.getElementById('calcInput');
@@ -270,7 +246,7 @@ function renderQuestion() {
       fb.className = '';
     }
     questionRenderer.revealAnswer(q, { answer: corr, explanation: expl, prefix: 'Correct answer' });
-    convertPdfLinks(expl);
+    questionRenderer.convertPdfLinks(expl);
     details.style.display = 'block';
   } else {
     const fb = document.getElementById('feedback');
@@ -308,7 +284,7 @@ function showSummary() {
   clearInterval(timerId);
   reviewing = false;
   finished = true;
-  closePdf();
+  questionRenderer.closePdf();
   backSummaryBtn.style.display = 'none';
   homeTopBtn.style.display = 'inline-block';
   document.querySelector('.main').style.display = 'none';
@@ -393,25 +369,14 @@ document.addEventListener('DOMContentLoaded', () => {
   backSummaryBtn = document.querySelector('.summary-btn');
   homeTopBtn = document.querySelector('.home-top-btn');
   timerEl = document.querySelector('.timer');
-  pdfPane = document.getElementById('pdfPane');
-  pdfFrame = document.getElementById('pdfFrame');
+  questionRenderer.initPdfViewer();
 
-  if (!backSummaryBtn || !homeTopBtn || !timerEl || !pdfPane || !pdfFrame) {
+  if (!backSummaryBtn || !homeTopBtn || !timerEl) {
     return;
   }
 
   backSummaryBtn.style.display = 'none';
   homeTopBtn.style.display = 'none';
-
-  document.querySelector('.pdf-close')?.addEventListener('click', closePdf);
-  document.querySelector('.pdf-zoom-in')?.addEventListener('click', () => {
-    pdfZoom += 0.1;
-    pdfFrame.style.transform = `scale(${pdfZoom})`;
-  });
-  document.querySelector('.pdf-zoom-out')?.addEventListener('click', () => {
-    pdfZoom = Math.max(0.1, pdfZoom - 0.1);
-    pdfFrame.style.transform = `scale(${pdfZoom})`;
-  });
 
   document.querySelector('.next-btn')?.addEventListener('click', () => {
     recordAnswer();
