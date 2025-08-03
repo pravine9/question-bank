@@ -111,7 +111,11 @@ function updateNav() {
   const data = JSON.parse(localStorage.getItem('questionStats') || '{}');
   document.querySelectorAll('.nav li').forEach((li, i) => {
     const q = questions[i];
-    li.classList.toggle('active', i === index);
+    const isActive = i === index;
+    li.classList.toggle('active', isActive);
+    if (isActive) {
+      li.scrollIntoView({ block: 'nearest' });
+    }
     const flagged = data[q.id] && data[q.id].saved;
     if (flagged) {
       li.classList.add('flagged');
