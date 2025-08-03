@@ -111,7 +111,10 @@ function renderQuestion(q) {
     showInput: true
   });
   const options = document.getElementById('answerOptions');
+  const calc = document.querySelector('.calculator');
+  const input = document.getElementById('calcInput');
   if (q.answers && q.answers.length) {
+    if (calc) calc.style.display = 'none';
     result.buttons.forEach(btn => {
       btn.addEventListener('click', () => {
         options.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
@@ -119,6 +122,9 @@ function renderQuestion(q) {
         selected = btn.dataset.num;
       });
     });
+  } else if (calc) {
+    calc.style.display = 'block';
+    input.value = '';
   }
 }
 
