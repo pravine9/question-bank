@@ -15,9 +15,9 @@
     <div class="progress"><div class="bar" style="width:0%"></div></div>
     <span class="timer"></span>
     <div class="header-right">
-      <button class="summary-btn" style="display:none">Back to Summary</button>
-      <button class="home-top-btn" style="display:none">Home</button>
-      <button class="finish-btn">Finish Test</button>
+      <button type="button" class="summary-btn" style="display:none">Back to Summary</button>
+      <button type="button" class="home-top-btn" style="display:none">Home</button>
+      <button type="button" class="finish-btn">Finish Test</button>
     </div>
   </header>
 
@@ -28,9 +28,9 @@
 
     <div class="pdf-pane" id="pdfPane" style="display:none">
       <div class="pdf-controls">
-        <button class="pdf-zoom-in">+</button>
-        <button class="pdf-zoom-out">-</button>
-        <button class="pdf-close">&times;</button>
+        <button type="button" class="pdf-zoom-in">+</button>
+        <button type="button" class="pdf-zoom-out">-</button>
+        <button type="button" class="pdf-close">&times;</button>
       </div>
       <div class="pdf-wrapper">
         <iframe id="pdfFrame" src="" title="PDF viewer"></iframe>
@@ -47,7 +47,7 @@
         <input type="number" id="calcInput">
         <span class="unit" id="answerUnit"></span>
       </div>
-      <button class="check-btn">Check</button>
+      <button type="button" class="check-btn">Check</button>
       <div id="feedback"></div>
       <div class="details" style="display:none">
         <div id="answer"></div>
@@ -66,14 +66,14 @@
       </thead>
       <tbody></tbody>
     </table>
-    <button class="home-btn" onclick="location.href='index.html'">Return Home</button>
+    <button type="button" class="home-btn" onclick="location.href='index.html'">Return Home</button>
   </section>
 
   <footer class="footer">
     <div class="nav-btns">
-      <button class="back-btn">Back</button>
-      <button class="next-btn">Next ❯</button>
-      <button class="flag-current-btn">Flag</button>
+      <button type="button" class="back-btn">Back</button>
+      <button type="button" class="next-btn">Next ❯</button>
+      <button type="button" class="flag-current-btn">Flag</button>
     </div>
   </footer>
   </div>
