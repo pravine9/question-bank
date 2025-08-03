@@ -20,7 +20,8 @@ Open `templates/index.html` directly in your browser to use the interface—no w
    summary screen you can **Review** individual questions with feedback shown on each one and use the **Home**
    link to return to the start page.
 4. **Question statistics** – right/wrong counts are stored
-   in `localStorage` under `questionStats`. Flagged status should not be stored after test ends. The index page provides a "Check
+   in `localStorage` under `questionStats`. Flags are kept only for the current
+   session and cleared when the test ends. The index page provides a "Check
    Question Stats" form for looking up stats by question ID.
 5. **Folder structure** – question bank JavaScript modules live in `question_banks/`.
    The available banks are registered in `static/banks.js`.
@@ -102,9 +103,9 @@ start a full practice session:
 
 Use the **Back** and **Next** buttons at the bottom of the practice page to move
 between questions. Each question number in the sidebar has a small flag icon—
-click it to mark that question for review. Flagging and your answers are saved
-in `localStorage` so you can revisit them later. The progress bar in the header
-shows how far through the test you are.
+click it to mark that question for review. Flags only last for the current
+session, while your answers are saved in `localStorage` so you can revisit them
+later. The progress bar in the header shows how far through the test you are.
 
 ### Finishing a test
 
@@ -117,8 +118,8 @@ of the summary screen returns you to the start page.
 
 The browser keeps track of how often you answer each question correctly or
 incorrectly. These counts are stored in `localStorage` under the key
-`questionStats` along with whether you flagged the question for review. Use the
-"Check Question Stats" form on the index page to look up your history for a
+`questionStats`. Flags are not persisted and are cleared when a test ends. Use
+the "Check Question Stats" form on the index page to look up your history for a
 given question ID.
 
 ### Folder structure
