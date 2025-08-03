@@ -4,7 +4,23 @@ function sanitize(text, inline) {
     .replace(/\r/g, '\n')
     .replace(/\u2028/g, '\n')
     .replace(/\u00a0/g, ' ')
-    .replace(/\u200b/g, '');
+    .replace(/\u200b/g, '')
+    .trim();
+
+  // Strip unmatched leading/trailing asterisks
+  let prev;
+  do {
+    prev = text;
+    if (text.startsWith('**') && !text.slice(2).includes('**')) {
+      text = text.slice(2).trim();
+    } else if (text.startsWith('*') && !text.slice(1).includes('*')) {
+      text = text.slice(1).trim();
+    } else if (text.endsWith('**') && !text.slice(0, -2).includes('**')) {
+      text = text.slice(0, -2).trim();
+    } else if (text.endsWith('*') && !text.slice(0, -1).includes('*')) {
+      text = text.slice(0, -1).trim();
+    }
+  } while (text !== prev);
   if (typeof DOMPurify !== 'undefined' && typeof marked !== 'undefined') {
     marked.setOptions({ breaks: true });
     const parsed = inline ? marked.parseInline(text) : marked.parse(text);
