@@ -69,7 +69,7 @@ questionRenderer.revealAnswer(question, {
 });
 
 // Toggle flagged status for review
-const flagged = toggleFlag(question.id); // true when saved
+const flagged = toggleFlag(question.id); // true when flagged
 ```
 
 Both `static/main.js` and `static/practice.js` call these helpers so the
@@ -102,9 +102,10 @@ start a full practice session:
 
 Use the **Back** and **Next** buttons at the bottom of the practice page to move
 between questions. Each question number in the sidebar has a small flag icon—
-click it to mark that question for review. Flagging and your answers are saved
-in `localStorage` so you can revisit them later. The progress bar in the header
-shows how far through the test you are.
+click it to mark that question for review. Your answers are stored in
+`localStorage`, while flags live only for the current session and are cleared
+when the test ends. The progress bar in the header shows how far through the
+test you are.
 
 ### Finishing a test
 
@@ -117,9 +118,9 @@ of the summary screen returns you to the start page.
 
 The browser keeps track of how often you answer each question correctly or
 incorrectly. These counts are stored in `localStorage` under the key
-`questionStats` along with whether you flagged the question for review. Use the
-"Check Question Stats" form on the index page to look up your history for a
-given question ID.
+`questionStats`. Flagged status is tracked in-memory for the current session and
+is discarded when the test ends. Use the "Check Question Stats" form on the
+index page to look up your history for a given question ID.
 
 ### Folder structure
 
