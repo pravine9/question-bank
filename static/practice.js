@@ -307,7 +307,7 @@ function showSummary() {
   reviewing = false;
   closePdf();
   backSummaryBtn.style.display = 'none';
-  homeTopBtn.style.display = 'none';
+  homeTopBtn.style.display = 'inline-block';
   document.querySelector('.main').style.display = 'none';
   document.querySelector('.footer').style.display = 'none';
   const summary = document.querySelector('.summary');
