@@ -1,5 +1,13 @@
 let currentQuestion, selected, bankFiles = window.banks;
 
+const bankLabels = {
+  calculations: 'Calculations',
+  clinical_mep: 'Clinical MEP',
+  clinical_mixed: 'Clinical Mixed',
+  clinical_otc: 'Clinical OTC',
+  clinical_therapeutics: 'Clinical Therapeutics'
+};
+
 const loadBtn = document.getElementById('loadBtn');
 if (loadBtn) loadBtn.addEventListener('click', loadQuestion);
 const practiceBtn = document.getElementById('practiceBtn');
@@ -16,13 +24,13 @@ function populateBankSelects(data) {
     if (bankSelect) {
       const opt1 = document.createElement('option');
       opt1.value = name;
-      opt1.textContent = name;
+      opt1.textContent = bankLabels[name] || name;
       bankSelect.appendChild(opt1);
     }
     if (statsSelect) {
       const opt2 = document.createElement('option');
       opt2.value = name;
-      opt2.textContent = name;
+      opt2.textContent = bankLabels[name] || name;
       statsSelect.appendChild(opt2);
     }
   });
