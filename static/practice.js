@@ -208,27 +208,16 @@ function renderQuestion() {
 
 function recordAnswer() {
   const q = questions[index];
-  const calc = document.querySelector('.calculator');
-  const input = calc.querySelector('input');
+  const input = document.querySelector('.calculator input');
   let userAns = null;
-  let userText = '';
   if (q.answers && q.answers.length) {
     userAns = selected;
-    const obj = q.answers.find(a => a.answer_number == selected);
-    userText = obj ? obj.text : '';
   } else {
     userAns = input.value.trim();
-    userText = userAns ? userAns + (q.answer_unit ? ` ${q.answer_unit}` : '') : '';
   }
-  let correctText = '';
-  if (q.answers && q.answers.length) {
-    const obj = q.answers.find(a => a.answer_number == q.correct_answer_number);
-    correctText = obj ? obj.text : '';
-  } else {
-    correctText = (q.correct_answer || '') + (q.answer_unit ? ` ${q.answer_unit}` : '');
-  }
-  const correct = q.answers && q.answers.length ? (selected == q.correct_answer_number) : (userAns === (q.correct_answer || ''));
-  responses[index] = { answer: userAns, text: userText, correctAnswer: correctText, correct };
+  const correct = questionRenderer.evaluateAnswer(q, userAns);
+  const { answerText } = questionRenderer.revealAnswer(q, { prefix: '', answer: null, explanation: null });
+  responses[index] = { answer: userAns, correct, correctAnswer: answerText };
   updateProgress();
 }
 
@@ -280,7 +269,16 @@ function showSummary() {
   let correctCount = 0;
   responses.forEach((r, i) => {
     const tr = document.createElement('tr');
-    const ua = r ? r.text || '' : '';
+    const q = questions[i];
+    let ua = '';
+    if (r) {
+      if (q.answers && q.answers.length) {
+        const obj = q.answers.find(a => String(a.answer_number) == String(r.answer));
+        ua = obj ? obj.text : '';
+      } else {
+        ua = r.answer ? r.answer + (q.answer_unit ? ` ${q.answer_unit}` : '') : '';
+      }
+    }
     const ca = r ? r.correctAnswer || '' : '';
     const correct = r ? r.correct : false;
     if (correct) correctCount++;
