@@ -9,13 +9,15 @@ const banks = window.banks;
 let questions = [], index = 0, selected = null, responses = [], reviewing = false;
 let backSummaryBtn, homeTopBtn, timerEl;
 let pdfZoom = 1, pdfPane, pdfFrame;
+const flagged = new Set();
 
 function toggleFlag(id) {
-  const data = JSON.parse(localStorage.getItem('questionStats') || '{}');
-  if (!data[id]) data[id] = { right: 0, wrong: 0, saved: false };
-  data[id].saved = !data[id].saved;
-  localStorage.setItem('questionStats', JSON.stringify(data));
-  return data[id].saved;
+  if (flagged.has(id)) {
+    flagged.delete(id);
+    return false;
+  }
+  flagged.add(id);
+  return true;
 }
 
 function startTimer() {
@@ -93,12 +95,11 @@ function loadQuestions() {
 function initNav() {
   const nav = document.querySelector('.nav');
   nav.textContent = '';
-  const data = JSON.parse(localStorage.getItem('questionStats') || '{}');
   questions.forEach((q, i) => {
     const li = document.createElement('li');
     li.innerHTML = `${i + 1}<button class="flag-btn" title="Flag">\u2691</button>`;
     if (i === 0) li.classList.add('active');
-    if (data[q.id] && data[q.id].saved) li.classList.add('flagged');
+    if (flagged.has(q.id)) li.classList.add('flagged');
     const flag = li.querySelector('.flag-btn');
     flag.onclick = (e) => {
       e.stopPropagation();
@@ -121,7 +122,6 @@ function updateProgress() {
 }
 
 function updateNav() {
-  const data = JSON.parse(localStorage.getItem('questionStats') || '{}');
   document.querySelectorAll('.nav li').forEach((li, i) => {
     const q = questions[i];
     const isActive = i === index;
@@ -129,8 +129,7 @@ function updateNav() {
     if (isActive) {
       li.scrollIntoView({ block: 'nearest' });
     }
-    const flagged = data[q.id] && data[q.id].saved;
-    if (flagged) {
+    if (flagged.has(q.id)) {
       li.classList.add('flagged');
     } else {
       li.classList.remove('flagged');
@@ -317,6 +316,7 @@ function showSummary() {
       renderQuestion();
     };
   });
+  flagged.clear();
 }
 
 document.addEventListener('DOMContentLoaded', () => {

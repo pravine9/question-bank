@@ -1,4 +1,5 @@
 let currentQuestion, selected, bankFiles = window.banks;
+const flagged = new Set();
 
 const bankLabels = {
   calculations: 'Calculations',
@@ -47,11 +48,12 @@ function getSelectedBank(id) {
 }
 
 function toggleFlag(id) {
-  const data = JSON.parse(localStorage.getItem('questionStats') || '{}');
-  if (!data[id]) data[id] = { right: 0, wrong: 0, saved: false };
-  data[id].saved = !data[id].saved;
-  localStorage.setItem('questionStats', JSON.stringify(data));
-  return data[id].saved;
+  if (flagged.has(id)) {
+    flagged.delete(id);
+    return false;
+  }
+  flagged.add(id);
+  return true;
 }
 
 window.toggleFlag = toggleFlag;
