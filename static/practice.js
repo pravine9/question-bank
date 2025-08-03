@@ -356,6 +356,7 @@ function showSummary() {
 
     const reviewTd = document.createElement('td');
     const reviewBtn = document.createElement('button');
+    reviewBtn.classList.add('review-btn');
     reviewBtn.dataset.idx = i;
     reviewBtn.textContent = 'Review';
     reviewTd.appendChild(reviewBtn);
