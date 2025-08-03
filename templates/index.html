@@ -27,7 +27,11 @@
         <p id="qTitle" class="question-title"></p>
         <img id="qImg" alt="Question image">
         <div id="answerOptions" class="options"></div>
-        <input type="text" id="calcInput"><span id="answerUnit"></span>
+        <div class="calculator" style="display:none">
+          <label>Answer</label>
+          <input type="number" id="calcInput">
+          <span class="unit" id="answerUnit"></span>
+        </div>
         <div class="button-row">
           <button id="checkBtn">Check</button>
           <button id="revealBtn">Reveal</button>

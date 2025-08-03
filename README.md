@@ -75,6 +75,12 @@ const flagged = toggleFlag(question.id); // true when flagged
 Both `static/main.js` and `static/practice.js` call these helpers so the
 single‑question view and practice interface behave consistently.
 
+When updating the question markup, mirror changes in both
+`templates/index.html` and `templates/practice.html` so they render the
+answer field identically (a simple "Answer" label and input without
+preceding icons). Keeping these pages in sync avoids confusing
+differences between the single question view and the practice test.
+
 ## Burp scripts
 
 Two helper scripts in `Burp/` operate directly on the JavaScript question modules:
