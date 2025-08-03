@@ -3,6 +3,14 @@ let questions = [], index = 0, selected = null, responses = [], reviewing = fals
 let backSummaryBtn, homeTopBtn, timerEl;
 let pdfZoom = 1, pdfPane, pdfFrame;
 
+function toggleFlag(id) {
+  const data = JSON.parse(localStorage.getItem('questionStats') || '{}');
+  if (!data[id]) data[id] = { right: 0, wrong: 0, saved: false };
+  data[id].saved = !data[id].saved;
+  localStorage.setItem('questionStats', JSON.stringify(data));
+  return data[id].saved;
+}
+
 function startTimer() {
   const start = Date.now();
   function pad(num) {
