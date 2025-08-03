@@ -67,6 +67,18 @@ document.addEventListener('DOMContentLoaded', function() {
     if (container) container.classList.add('standalone');
   }
   populateBankSelects(bankFiles);
+  // Preselect the last used bank if available
+  try {
+    const last = localStorage.getItem('lastBank');
+    if (last) {
+      const bankSelect = document.getElementById('bankSelect');
+      if (bankSelect && bankFiles[last]) {
+        bankSelect.value = last;
+      }
+    }
+  } catch (e) {
+    console.warn('Failed to load lastBank', e);
+  }
   questionRenderer.initPdfViewer();
 });
 
@@ -91,6 +103,12 @@ function startPractice() {
   if (!num || num <= 0) {
     alert('Please enter a positive number of questions');
     return;
+  }
+  // Remember the chosen bank so it can be preselected next time
+  try {
+    localStorage.setItem('lastBank', data.bank);
+  } catch (e) {
+    console.warn('Failed to store lastBank', e);
   }
   window.location.href = `practice.html?bank=${encodeURIComponent(data.bank)}&num=${num}`;
 }

@@ -422,6 +422,12 @@ document.addEventListener('DOMContentLoaded', () => {
     clearState();
     persistState = false;
     window.removeEventListener('beforeunload', saveState);
+    // Remember the bank so it can be preselected on the home page
+    try {
+      localStorage.setItem('lastBank', bank);
+    } catch (e) {
+      console.warn('Failed to store lastBank', e);
+    }
     window.location.href = 'index.html';
   });
   const params = new URLSearchParams(window.location.search);
