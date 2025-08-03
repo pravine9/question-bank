@@ -1,12 +1,7 @@
 const banks = window.banks;
 let questions = [], index = 0, selected = null, responses = [], reviewing = false;
-const backSummaryBtn = document.querySelector('.summary-btn');
-const homeTopBtn = document.querySelector('.home-top-btn');
-const timerEl = document.querySelector('.timer');
-
-// Ensure buttons start hidden
-backSummaryBtn.style.display = 'none';
-homeTopBtn.style.display = 'none';
+let backSummaryBtn, homeTopBtn, timerEl;
+let pdfZoom = 1, pdfPane, pdfFrame;
 
 function startTimer() {
   const start = Date.now();
@@ -96,9 +91,7 @@ function updateNav() {
   });
 }
 
-let pdfZoom = 1;
-const pdfPane = document.getElementById('pdfPane');
-const pdfFrame = document.getElementById('pdfFrame');
+
 
 function openPdf(url) {
   pdfFrame.src = url;
@@ -111,16 +104,6 @@ function closePdf() {
   pdfPane.style.display = 'none';
   pdfFrame.src = '';
 }
-
-document.querySelector('.pdf-close').onclick = closePdf;
-document.querySelector('.pdf-zoom-in').onclick = () => {
-  pdfZoom += 0.1;
-  pdfFrame.style.transform = `scale(${pdfZoom})`;
-};
-document.querySelector('.pdf-zoom-out').onclick = () => {
-  pdfZoom = Math.max(0.1, pdfZoom - 0.1);
-  pdfFrame.style.transform = `scale(${pdfZoom})`;
-};
 
 function convertPdfLinks(el) {
   if (!el) return;
@@ -229,38 +212,6 @@ function recordAnswer() {
   updateProgress();
 }
 
-document.querySelector('.next-btn').onclick = () => {
-  recordAnswer();
-  if (index < questions.length - 1) { index++; renderQuestion(); }
-};
-document.querySelector('.back-btn').onclick = () => {
-  recordAnswer();
-  if (index > 0) { index--; renderQuestion(); }
-};
-document.querySelector('.flag-current-btn').onclick = () => {
-  const li = document.querySelectorAll('.nav li')[index];
-  const saved = toggleFlag(questions[index].id);
-  li.classList.toggle('flagged', saved);
-};
-
-document.querySelector('.check-btn').onclick = () => {
-  const q = questions[index];
-  const opts = document.getElementById('answerOptions');
-  const input = document.getElementById('calcInput');
-  const fb = document.getElementById('feedback');
-  const value = q.answers && q.answers.length ? selected : input.value.trim();
-  questionRenderer.evaluateAnswer(q, value, { options: opts, feedback: fb });
-  recordAnswer();
-};
-
-document.addEventListener('DOMContentLoaded', () => {
-  startTimer();
-  const loaded = loadQuestions();
-  if (!loaded || !questions.length) return;
-  initNav();
-  renderQuestion();
-});
-
 function showSummary() {
   recordAnswer();
   reviewing = false;
@@ -325,19 +276,69 @@ function showSummary() {
   });
 }
 
-document.querySelector('.finish-btn').onclick = () => {
-  if (confirm('Are you sure you want to finish the test?')) {
-    showSummary();
+document.addEventListener('DOMContentLoaded', () => {
+  backSummaryBtn = document.querySelector('.summary-btn');
+  homeTopBtn = document.querySelector('.home-top-btn');
+  timerEl = document.querySelector('.timer');
+  pdfPane = document.getElementById('pdfPane');
+  pdfFrame = document.getElementById('pdfFrame');
+
+  if (!backSummaryBtn || !homeTopBtn || !timerEl || !pdfPane || !pdfFrame) {
+    return;
   }
-};
 
-// Back to summary from review mode
-backSummaryBtn.onclick = () => {
-  showSummary();
-};
+  backSummaryBtn.style.display = 'none';
+  homeTopBtn.style.display = 'none';
 
-// Quick exit to home
-homeTopBtn.onclick = () => {
-  window.location.href = 'index.html';
-};
+  document.querySelector('.pdf-close')?.addEventListener('click', closePdf);
+  document.querySelector('.pdf-zoom-in')?.addEventListener('click', () => {
+    pdfZoom += 0.1;
+    pdfFrame.style.transform = `scale(${pdfZoom})`;
+  });
+  document.querySelector('.pdf-zoom-out')?.addEventListener('click', () => {
+    pdfZoom = Math.max(0.1, pdfZoom - 0.1);
+    pdfFrame.style.transform = `scale(${pdfZoom})`;
+  });
+
+  document.querySelector('.next-btn')?.addEventListener('click', () => {
+    recordAnswer();
+    if (index < questions.length - 1) { index++; renderQuestion(); }
+  });
+  document.querySelector('.back-btn')?.addEventListener('click', () => {
+    recordAnswer();
+    if (index > 0) { index--; renderQuestion(); }
+  });
+  document.querySelector('.flag-current-btn')?.addEventListener('click', () => {
+    const li = document.querySelectorAll('.nav li')[index];
+    const saved = toggleFlag(questions[index].id);
+    li.classList.toggle('flagged', saved);
+  });
+  document.querySelector('.check-btn')?.addEventListener('click', () => {
+    const q = questions[index];
+    const opts = document.getElementById('answerOptions');
+    const input = document.getElementById('calcInput');
+    const fb = document.getElementById('feedback');
+    const value = q.answers && q.answers.length ? selected : input.value.trim();
+    questionRenderer.evaluateAnswer(q, value, { options: opts, feedback: fb });
+    recordAnswer();
+  });
+  document.querySelector('.finish-btn')?.addEventListener('click', () => {
+    if (confirm('Are you sure you want to finish the test?')) {
+      showSummary();
+    }
+  });
+
+  backSummaryBtn.addEventListener('click', showSummary);
+  homeTopBtn.addEventListener('click', () => {
+    window.location.href = 'index.html';
+  });
+
+  startTimer();
+  const loaded = loadQuestions();
+  if (!loaded || !questions.length) return;
+  initNav();
+  renderQuestion();
+});
+
+
 
