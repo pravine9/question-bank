@@ -6,23 +6,64 @@ const bankLabels = {
   clinical_therapeutics: 'Clinical Therapeutics'
 };
 const banks = window.banks;
+let bank;
 let questions = [], index = 0, selected = null, responses = [], reviewing = false;
 let backSummaryBtn, homeTopBtn, timerEl;
 let timerId, startTime;
 let pdfZoom = 1, pdfPane, pdfFrame;
 const flagged = new Set();
 
+const STORAGE_KEY = 'practice_state';
+let persistState = true;
+
+function saveState() {
+  try {
+    if (!persistState || !questions.length) return;
+    const data = {
+      bank,
+      questions,
+      index,
+      responses,
+      flagged: Array.from(flagged),
+      startTime
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (e) {
+    console.error('Failed to save state', e);
+  }
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    console.error('Failed to load state', e);
+    return null;
+  }
+}
+
+function clearState() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (e) {
+    console.error('Failed to clear state', e);
+  }
+}
+
 function toggleFlag(id) {
   if (flagged.has(id)) {
     flagged.delete(id);
+    saveState();
     return false;
   }
   flagged.add(id);
+  saveState();
   return true;
 }
 
-function startTimer() {
-  startTime = Date.now();
+function startTimer(savedStart) {
+  startTime = savedStart || Date.now();
   function pad(num) {
     return num.toString().padStart(2, '0');
   }
@@ -48,7 +89,7 @@ function loadQuestions() {
   console.log('window.banks:', window.banks);
   console.log('URLSearchParams:', URLSearchParams);
   const params = new URLSearchParams(window.location.search);
-  const bank = params.get('bank');
+  bank = params.get('bank');
   const titleEl = document.querySelector('.test-title');
   if (titleEl) {
     titleEl.textContent = bankLabels[bank] || bank;
@@ -110,6 +151,7 @@ function initNav() {
     li.onclick = () => {
       recordAnswer();
       index = i;
+      saveState();
       renderQuestion();
     };
     nav.appendChild(li);
@@ -253,11 +295,15 @@ function recordAnswer() {
   r.text = userText;
   r.correct = correct;
   updateProgress();
+  saveState();
 }
 
 function showSummary() {
   recordAnswer();
   clearInterval(timerId);
+  clearState();
+  persistState = false;
+  window.removeEventListener('beforeunload', saveState);
   reviewing = false;
   closePdf();
   backSummaryBtn.style.display = 'none';
@@ -317,6 +363,7 @@ function showSummary() {
   summary.querySelectorAll('button[data-idx]').forEach(btn => {
     btn.onclick = () => {
       index = parseInt(btn.getAttribute('data-idx'), 10);
+      saveState();
       reviewing = true;
       backSummaryBtn.style.display = 'inline-block';
       homeTopBtn.style.display = 'inline-block';
@@ -355,11 +402,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.querySelector('.next-btn')?.addEventListener('click', () => {
     recordAnswer();
-    if (index < questions.length - 1) { index++; renderQuestion(); }
+    if (index < questions.length - 1) { index++; saveState(); renderQuestion(); }
   });
   document.querySelector('.back-btn')?.addEventListener('click', () => {
     recordAnswer();
-    if (index > 0) { index--; renderQuestion(); }
+    if (index > 0) { index--; saveState(); renderQuestion(); }
   });
   document.querySelector('.flag-current-btn')?.addEventListener('click', () => {
     const li = document.querySelectorAll('.nav li')[index];
@@ -383,14 +430,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
   backSummaryBtn.addEventListener('click', showSummary);
   homeTopBtn.addEventListener('click', () => {
+    clearState();
+    persistState = false;
+    window.removeEventListener('beforeunload', saveState);
     window.location.href = 'index.html';
   });
-
-  startTimer();
-  const loaded = loadQuestions();
-  if (!loaded || !questions.length) return;
-  initNav();
-  renderQuestion();
+  const params = new URLSearchParams(window.location.search);
+  const urlBank = params.get('bank');
+  const state = loadState();
+  if (state && state.bank === urlBank) {
+    bank = state.bank;
+    questions = state.questions || [];
+    index = state.index || 0;
+    responses = state.responses || [];
+    flagged.clear();
+    (state.flagged || []).forEach(id => flagged.add(id));
+    const titleEl = document.querySelector('.test-title');
+    if (titleEl) { titleEl.textContent = bankLabels[bank] || bank; }
+    startTimer(state.startTime);
+    if (!questions.length) return;
+    initNav();
+    renderQuestion();
+  } else {
+    clearState();
+    startTimer();
+    const loaded = loadQuestions();
+    if (!loaded || !questions.length) return;
+    initNav();
+    renderQuestion();
+  }
+  window.addEventListener('beforeunload', saveState);
 });
 
 
