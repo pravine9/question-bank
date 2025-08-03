@@ -67,6 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (container) container.classList.add('standalone');
   }
   populateBankSelects(bankFiles);
+  questionRenderer.initPdfViewer();
 });
 
 function loadQuestion() {
@@ -97,6 +98,7 @@ function startPractice() {
 function renderQuestion(q) {
   currentQuestion = q;
   selected = null;
+  questionRenderer.closePdf();
   document.getElementById('questionArea').style.display = 'block';
   const result = questionRenderer.renderQuestion(q, {
     text: '#qText',
@@ -110,6 +112,8 @@ function renderQuestion(q) {
     explanation: '#explanation',
     showInput: true
   });
+  questionRenderer.convertPdfLinks(document.getElementById('qText'));
+  questionRenderer.convertPdfLinks(document.getElementById('qTitle'));
   const options = document.getElementById('answerOptions');
   const calc = document.querySelector('.calculator');
   const input = document.getElementById('calcInput');
@@ -145,6 +149,7 @@ if (revealBtn) {
   revealBtn.addEventListener('click', function() {
     if (!currentQuestion) return;
     questionRenderer.revealAnswer(currentQuestion, { answer: '#answer', explanation: '#explanation' });
+    questionRenderer.convertPdfLinks(document.getElementById('explanation'));
   });
 }
 
@@ -187,6 +192,7 @@ function renderStats() {
 function showStatsQuestion(id) {
   const q = statsQuestions.find(x => String(x.id) === String(id));
   if (!q) return;
+  questionRenderer.closePdf();
   const overlay = document.getElementById('statsModal');
   overlay.style.display = 'flex';
   const result = questionRenderer.renderQuestion(q, {
@@ -200,6 +206,8 @@ function showStatsQuestion(id) {
     explanation: '#sqExplanation',
     showInput: true
   });
+  questionRenderer.convertPdfLinks(document.getElementById('sqText'));
+  questionRenderer.convertPdfLinks(document.getElementById('sqTitle'));
   if (result.buttons) result.buttons.forEach(btn => (btn.disabled = true));
   if (result.input) result.input.disabled = true;
   const revealBtn = document.getElementById('sqRevealBtn');
@@ -211,6 +219,7 @@ const sqClose = document.getElementById('sqCloseBtn');
 if (sqClose) {
   sqClose.addEventListener('click', () => {
     document.getElementById('statsModal').style.display = 'none';
+    questionRenderer.closePdf();
   });
 }
 
@@ -227,4 +236,5 @@ function revealStatsQuestion(q) {
   }
   questionRenderer.revealAnswer(q, { answer: ans, explanation: ex });
   btn.textContent = 'Hide Answer';
+  questionRenderer.convertPdfLinks(ex);
 }
