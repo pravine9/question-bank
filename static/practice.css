@@ -45,6 +45,7 @@ body {
   border-radius: 4px;
   cursor: pointer;
   margin-right: 10px;
+  font-size: 18px;
 }
 
 .summary-btn,
@@ -56,6 +57,7 @@ body {
   border-radius: 4px;
   cursor: pointer;
   margin-right: 10px;
+  font-size: 18px;
 }
 
 .main {
@@ -187,7 +189,7 @@ body {
 .nav-btns {
   width: 100%;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
 }
 
 .nav-btns button {
@@ -196,6 +198,7 @@ body {
   border-radius: 4px;
   border: none;
   cursor: pointer;
+  font-size: 18px;
 }
 
 .flag-current-btn {
