@@ -199,7 +199,7 @@ function showStatsQuestion(id) {
   });
   const revealBtn = document.getElementById('sqRevealBtn');
   revealBtn.textContent = 'Reveal Answer';
-  revealBtn.addEventListener('click', () => revealStatsQuestion(q));
+  revealBtn.onclick = () => revealStatsQuestion(q);
 }
 
 const sqClose = document.getElementById('sqCloseBtn');
