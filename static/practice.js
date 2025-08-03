@@ -33,6 +33,14 @@ function startTimer() {
   setInterval(update, 1000);
 }
 
+function computeCorrectText(q) {
+  if (q.answers && q.answers.length) {
+    const obj = q.answers.find(a => a.answer_number == q.correct_answer_number);
+    return obj ? obj.text : '';
+  }
+  return (q.correct_answer || '') + (q.answer_unit ? ` ${q.answer_unit}` : '');
+}
+
 function loadQuestions() {
   console.log('window.banks:', window.banks);
   console.log('URLSearchParams:', URLSearchParams);
@@ -66,8 +74,13 @@ function loadQuestions() {
     [all[i], all[j]] = [all[j], all[i]];
   }
   questions = all.slice(0, num);
-  console.log(all.slice(0, num));
-  responses = Array(questions.length).fill(null);
+  console.log(questions);
+  responses = questions.map(q => ({
+    answer: null,
+    text: '',
+    correctAnswer: computeCorrectText(q),
+    correct: false
+  }));
   if (!questions.length) {
     const main = document.querySelector('.main');
     if (main) {
@@ -234,15 +247,11 @@ function recordAnswer() {
     userAns = input.value.trim();
     userText = userAns ? userAns + (q.answer_unit ? ` ${q.answer_unit}` : '') : '';
   }
-  let correctText = '';
-  if (q.answers && q.answers.length) {
-    const obj = q.answers.find(a => a.answer_number == q.correct_answer_number);
-    correctText = obj ? obj.text : '';
-  } else {
-    correctText = (q.correct_answer || '') + (q.answer_unit ? ` ${q.answer_unit}` : '');
-  }
   const correct = q.answers && q.answers.length ? (selected == q.correct_answer_number) : (userAns === (q.correct_answer || ''));
-  responses[index] = { answer: userAns, text: userText, correctAnswer: correctText, correct };
+  const r = responses[index];
+  r.answer = userAns;
+  r.text = userText;
+  r.correct = correct;
   updateProgress();
 }
 
@@ -261,9 +270,9 @@ function showSummary() {
   let correctCount = 0;
   responses.forEach((r, i) => {
     const tr = document.createElement('tr');
-    const ua = r ? r.text || '' : '';
-    const ca = r ? r.correctAnswer || '' : '';
-    const correct = r ? r.correct : false;
+    const ua = r.text || '';
+    const ca = r.correctAnswer || '';
+    const correct = r.correct;
     if (correct) correctCount++;
     const icon = correct ? '✔' : '✘';
 
