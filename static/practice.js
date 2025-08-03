@@ -28,6 +28,14 @@ function loadQuestions() {
   }
   let num = parseInt(params.get('num') || '10', 10);
   const files = banks[bank] || [];
+  if (files.length === 0) {
+    console.warn(`No files found for bank: ${bank}`);
+    const main = document.querySelector('.main');
+    if (main) {
+      main.innerHTML = '<p>No questions available for this bank.</p>';
+    }
+    return false;
+  }
   let all = [];
   for (const arr of files) {
     all = all.concat(arr);
