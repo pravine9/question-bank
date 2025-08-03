@@ -186,9 +186,12 @@ function showStatsQuestion(id) {
   revealBtn.addEventListener('click', () => revealStatsQuestion(q));
 }
 
-document.getElementById('sqCloseBtn').addEventListener('click', function() {
-  document.getElementById('statsModal').style.display = 'none';
-});
+const sqClose = document.getElementById('sqCloseBtn');
+if (sqClose) {
+  sqClose.addEventListener('click', () => {
+    document.getElementById('statsModal').style.display = 'none';
+  });
+}
 
 function revealStatsQuestion(q) {
   const ans = document.getElementById('sqAnswer');
