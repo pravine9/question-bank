@@ -12,6 +12,8 @@ let backSummaryBtn, homeTopBtn, timerEl;
 let timerId, startTime;
 let pdfZoom = 1, pdfPane, pdfFrame;
 const flagged = new Set();
+let finished = false;
+let summaryData = null;
 
 const STORAGE_KEY = 'practice_state';
 let persistState = true;
@@ -25,7 +27,9 @@ function saveState() {
       index,
       responses,
       flagged: Array.from(flagged),
-      startTime
+      startTime,
+      finished,
+      summary: summaryData
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (e) {
@@ -299,26 +303,23 @@ function recordAnswer() {
 }
 
 function showSummary() {
-  recordAnswer();
   clearInterval(timerId);
-  clearState();
-  persistState = false;
-  window.removeEventListener('beforeunload', saveState);
   reviewing = false;
+  finished = true;
   closePdf();
   backSummaryBtn.style.display = 'none';
   homeTopBtn.style.display = 'none';
   document.querySelector('.main').style.display = 'none';
   document.querySelector('.footer').style.display = 'none';
-  const summary = document.querySelector('.summary');
-  const tbody = summary.querySelector('tbody');
-  const score = summary.querySelector('.score');
-  const timeEl = summary.querySelector('.time-taken');
+  const summaryEl = document.querySelector('.summary');
+  const tbody = summaryEl.querySelector('tbody');
+  const score = summaryEl.querySelector('.score');
+  const timeEl = summaryEl.querySelector('.time-taken');
+  const elapsed = summaryData?.elapsed || Math.floor((Date.now() - startTime) / 1000);
+  const mins = Math.floor(elapsed / 60);
+  const secs = elapsed % 60;
+  const pad = num => num.toString().padStart(2, '0');
   if (timeEl) {
-    const elapsed = Math.floor((Date.now() - startTime) / 1000);
-    const mins = Math.floor(elapsed / 60);
-    const secs = elapsed % 60;
-    const pad = num => num.toString().padStart(2, '0');
     timeEl.textContent = `Time taken: ${pad(mins)}:${pad(secs)}`;
   }
   tbody.textContent = '';
@@ -357,23 +358,25 @@ function showSummary() {
     tr.appendChild(reviewTd);
     tbody.appendChild(tr);
   });
+  summaryData = { elapsed, correctCount };
   score.textContent = `You answered ${correctCount} of ${questions.length} correctly (${Math.round(correctCount / questions.length * 100)}%).`;
-  summary.style.display = 'block';
+  summaryEl.style.display = 'block';
   document.querySelector('.finish-btn').style.display = 'none';
-  summary.querySelectorAll('button[data-idx]').forEach(btn => {
+  summaryEl.querySelectorAll('button[data-idx]').forEach(btn => {
     btn.onclick = () => {
       index = parseInt(btn.getAttribute('data-idx'), 10);
       saveState();
       reviewing = true;
       backSummaryBtn.style.display = 'inline-block';
       homeTopBtn.style.display = 'inline-block';
-      summary.style.display = 'none';
+      summaryEl.style.display = 'none';
       document.querySelector('.main').style.display = 'flex';
       document.querySelector('.footer').style.display = 'flex';
       renderQuestion();
     };
   });
   flagged.clear();
+  saveState();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -434,6 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.querySelector('.finish-btn')?.addEventListener('click', () => {
     if (confirm('Are you sure you want to finish the test?')) {
+      recordAnswer();
       showSummary();
     }
   });
@@ -455,14 +459,20 @@ document.addEventListener('DOMContentLoaded', () => {
     responses = state.responses || [];
     flagged.clear();
     (state.flagged || []).forEach(id => flagged.add(id));
+    finished = state.finished || false;
+    summaryData = state.summary || null;
     const titleEl = document.querySelector('.test-title');
     if (titleEl) { titleEl.textContent = bankLabels[bank] || bank; }
-    startTimer(state.startTime);
     if (!questions.length) return;
     initNav();
-    renderQuestion();
+    if (finished) {
+      startTime = state.startTime;
+      showSummary();
+    } else {
+      startTimer(state.startTime);
+      renderQuestion();
+    }
   } else {
-    clearState();
     startTimer();
     const loaded = loadQuestions();
     if (!loaded || !questions.length) return;
