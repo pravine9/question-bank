@@ -3,6 +3,7 @@ function sanitize(text, inline) {
     .replace(/\r\n/g, '\n')
     .replace(/\r/g, '\n')
     .replace(/\u2028/g, '\n')
+    .replace(/\n{2,}/g, '\n')
     .replace(/\u00a0/g, ' ')
     .replace(/\u200b/g, '')
     .trim();
