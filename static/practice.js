@@ -1,3 +1,10 @@
+const bankLabels = {
+  calculations: 'Calculations',
+  clinical_mep: 'Clinical MEP',
+  clinical_mixed: 'Clinical Mixed',
+  clinical_otc: 'Clinical OTC',
+  clinical_therapeutics: 'Clinical Therapeutics'
+};
 const banks = window.banks;
 let questions = [], index = 0, selected = null, responses = [], reviewing = false;
 let backSummaryBtn, homeTopBtn, timerEl;
@@ -31,6 +38,10 @@ function loadQuestions() {
   console.log('URLSearchParams:', URLSearchParams);
   const params = new URLSearchParams(window.location.search);
   const bank = params.get('bank');
+  const titleEl = document.querySelector('.test-title');
+  if (titleEl) {
+    titleEl.textContent = bankLabels[bank] || bank;
+  }
   if (!bank || !(bank in banks)) {
     alert('Invalid question bank.');
     window.location.href = 'index.html';
