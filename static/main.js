@@ -67,6 +67,18 @@ document.addEventListener('DOMContentLoaded', function() {
     if (container) container.classList.add('standalone');
   }
   populateBankSelects(bankFiles);
+
+  const pdfPane = document.getElementById('pdfPane');
+  const pdfFrame = document.getElementById('pdfFrame');
+  if (pdfPane && pdfFrame) {
+    document.querySelector('.pdf-close')?.addEventListener('click', questionRenderer.closePdf);
+    document.querySelector('.pdf-zoom-in')?.addEventListener('click', () => {
+      questionRenderer.zoomPdfIn();
+    });
+    document.querySelector('.pdf-zoom-out')?.addEventListener('click', () => {
+      questionRenderer.zoomPdfOut();
+    });
+  }
 });
 
 function loadQuestion() {
@@ -110,6 +122,8 @@ function renderQuestion(q) {
     explanation: '#explanation',
     showInput: true
   });
+  questionRenderer.convertPdfLinks(document.getElementById('qText'));
+  questionRenderer.convertPdfLinks(document.getElementById('qTitle'));
   const options = document.getElementById('answerOptions');
   const calc = document.querySelector('.calculator');
   const input = document.getElementById('calcInput');
@@ -145,6 +159,7 @@ if (revealBtn) {
   revealBtn.addEventListener('click', function() {
     if (!currentQuestion) return;
     questionRenderer.revealAnswer(currentQuestion, { answer: '#answer', explanation: '#explanation' });
+    questionRenderer.convertPdfLinks(document.getElementById('explanation'));
   });
 }
 
@@ -197,6 +212,8 @@ function showStatsQuestion(id) {
     explanation: '#sqExplanation',
     showInput: false
   });
+  questionRenderer.convertPdfLinks(document.getElementById('sqText'));
+  questionRenderer.convertPdfLinks(document.getElementById('sqTitle'));
   const revealBtn = document.getElementById('sqRevealBtn');
   revealBtn.textContent = 'Reveal Answer';
   revealBtn.addEventListener('click', () => revealStatsQuestion(q));
@@ -221,5 +238,6 @@ function revealStatsQuestion(q) {
     return;
   }
   questionRenderer.revealAnswer(q, { answer: ans, explanation: ex });
+  questionRenderer.convertPdfLinks(ex);
   btn.textContent = 'Hide Answer';
 }

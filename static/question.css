@@ -56,3 +56,45 @@
   max-width: 100%;
   height: auto;
 }
+
+.main {
+  display: flex;
+}
+
+/* PDF viewer pane */
+.pdf-pane {
+  flex: 0 0 40%;
+  max-width: 40%;
+  display: none;
+  flex-direction: column;
+  height: 100%;
+  background: #fff;
+  border-right: 1px solid #ccc;
+}
+
+.pdf-controls {
+  padding: 5px;
+  background: #e5e9f0;
+  border-bottom: 1px solid #ccc;
+}
+
+.pdf-controls button {
+  margin-right: 5px;
+  padding: 4px 8px;
+}
+
+.pdf-wrapper {
+  flex: 1;
+  overflow: auto;
+}
+
+.pdf-btn {
+  margin-top: 10px;
+}
+
+#pdfFrame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  transform-origin: top left;
+}

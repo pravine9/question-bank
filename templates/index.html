@@ -22,6 +22,18 @@
       <button id="practiceBtn">Start Practice</button>
     </div>
 
+    <div class="main">
+      <div class="pdf-pane" id="pdfPane" style="display:none">
+        <div class="pdf-controls">
+          <button type="button" class="pdf-zoom-in">+</button>
+          <button type="button" class="pdf-zoom-out">-</button>
+          <button type="button" class="pdf-close">&times;</button>
+        </div>
+        <div class="pdf-wrapper">
+          <iframe id="pdfFrame" src="" title="PDF viewer"></iframe>
+        </div>
+      </div>
+
       <div id="questionArea">
         <div id="qText"></div>
         <p id="qTitle" class="question-title"></p>
@@ -41,8 +53,9 @@
         <div id="answer"></div>
         <div id="explanation"></div>
       </div>
+    </div>
 
-      <div id="statsArea">
+    <div id="statsArea">
         <h2>Question Statistics</h2>
         <label for="statsBankSelect">Select Bank:</label>
         <select id="statsBankSelect">

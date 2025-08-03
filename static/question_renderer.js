@@ -43,6 +43,59 @@ function enhanceLinksAndImages(el) {
   });
 }
 
+let pdfZoom = 1;
+
+function getPdfElements() {
+  return {
+    pane: document.getElementById('pdfPane'),
+    frame: document.getElementById('pdfFrame')
+  };
+}
+
+function openPdf(url) {
+  const { pane, frame } = getPdfElements();
+  if (!pane || !frame) return;
+  frame.src = url;
+  pdfZoom = 1;
+  frame.style.transform = 'scale(1)';
+  pane.style.display = 'flex';
+}
+
+function closePdf() {
+  const { pane, frame } = getPdfElements();
+  if (!pane || !frame) return;
+  pane.style.display = 'none';
+  frame.src = '';
+}
+
+function convertPdfLinks(el) {
+  if (!el) return;
+  el.querySelectorAll('a[href$=".pdf"]').forEach(a => {
+    const btn = document.createElement('button');
+    btn.textContent = 'Open PDF';
+    btn.className = 'pdf-btn';
+    btn.addEventListener('click', e => {
+      e.preventDefault();
+      openPdf(a.href);
+    });
+    a.replaceWith(btn);
+  });
+}
+
+function zoomPdfIn() {
+  const { frame } = getPdfElements();
+  if (!frame) return;
+  pdfZoom += 0.1;
+  frame.style.transform = `scale(${pdfZoom})`;
+}
+
+function zoomPdfOut() {
+  const { frame } = getPdfElements();
+  if (!frame) return;
+  pdfZoom = Math.max(0.1, pdfZoom - 0.1);
+  frame.style.transform = `scale(${pdfZoom})`;
+}
+
 function resetUI({ feedbackEl, answerEl, explanationEl, optionsEl, inputEl, unitEl }) {
   if (feedbackEl) {
     feedbackEl.textContent = '';
@@ -225,7 +278,18 @@ function revealAnswer(question, targets) {
   return { answerText };
 }
 
-const questionRendererObj = { renderQuestion, updateStats, sanitize, evaluateAnswer, revealAnswer };
+const questionRendererObj = {
+  renderQuestion,
+  updateStats,
+  sanitize,
+  evaluateAnswer,
+  revealAnswer,
+  openPdf,
+  closePdf,
+  convertPdfLinks,
+  zoomPdfIn,
+  zoomPdfOut
+};
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = questionRendererObj;
 } else {
