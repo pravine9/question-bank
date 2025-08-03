@@ -126,7 +126,8 @@ function renderQuestion(question, config) {
       if (optionsEl) {
         question.answers.forEach(a => {
           const btn = document.createElement('button');
-          btn.textContent = a.text;
+          btn.innerHTML = sanitize(a.text, true);
+          enhanceLinksAndImages(btn);
           btn.dataset.num = a.answer_number;
           optionsEl.appendChild(btn);
           buttons.push(btn);
