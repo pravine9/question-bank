@@ -33,6 +33,10 @@ body {
   width: 0%;
 }
 
+.timer {
+  margin-right: 10px;
+}
+
 .finish-btn {
   background: #f6c71a;
   color: #000;
