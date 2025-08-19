@@ -40,29 +40,7 @@ body.standalone {
   height: fit-content;
 }
 
-/* Responsive design for smaller screens */
-@media (max-width: 1024px) {
-  .main-layout {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  
-  .right-column {
-    position: static;
-    order: -1;
-  }
-}
-
-@media (max-width: 768px) {
-  .container {
-    max-width: 100%;
-    margin: 10px;
-  }
-  
-  .main-layout {
-    gap: 15px;
-  }
-}
+/* Layout adjustments */
 
 #bankSelect,
 button,

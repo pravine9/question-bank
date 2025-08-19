@@ -814,86 +814,7 @@
   border: none;
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .exam-sidebar {
-    width: 240px;
-  }
-  
-  .question-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .exam-header {
-    flex-direction: column;
-    gap: var(--space-3);
-    padding: var(--space-3);
-    min-height: auto;
-  }
-  
-  .header-left, .header-center, .header-right {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .header-center {
-    margin: 0;
-  }
-  
-  .exam-sidebar {
-    width: 100%;
-    height: auto;
-    max-height: 200px;
-    order: 2;
-  }
-  
-  .question-grid {
-    grid-template-columns: repeat(6, 1fr);
-  }
-  
-  .main {
-    flex-direction: column;
-  }
-  
-  .question-area {
-    order: 1;
-  }
-  
-  .footer-navigation {
-    flex-direction: column;
-    gap: var(--space-3);
-  }
-  
-  .summary-actions {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .summary-stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 480px) {
-  .question-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-  
-  .question-number {
-    font-size: var(--font-size-xs);
-  }
-  
-  .timer-display {
-    font-size: var(--font-size-base);
-  }
-  
-  .question-type {
-    font-size: var(--font-size-xs);
-    padding: var(--space-1) var(--space-2);
-  }
-}
+/* Layout adjustments */
 
 /* Animations */
 @keyframes slideIn {
@@ -916,34 +837,8 @@
   }
 }
 
-/* Accessibility */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
 
-/* Focus Management */
-.question-number:focus,
-.option-btn:focus,
-.calculator-input:focus {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-}
 
-/* High Contrast Mode */
-@media (prefers-contrast: high) {
-  .exam-header {
-    background: var(--color-primary);
-  }
-  
-  .question-number {
-    border-width: 3px;
-  }
-  
-  .progress-bar {
-    background: var(--color-success);
-  }
-}
+
+
+

@@ -124,9 +124,8 @@ playwright/.cache/
 # Local development
 .local
 
-# PWA files (if generated)
+# Service worker files (if generated)
 sw.js
-workbox-*.js
 
 # Question bank data (if sensitive)
 # question_banks/*.js

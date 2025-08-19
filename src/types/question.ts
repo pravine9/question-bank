@@ -101,4 +101,5 @@ export interface RenderOptions {
   answer: string;
   explanation: string;
   showInput: boolean;
+  title?: string; // Add missing title property
 }

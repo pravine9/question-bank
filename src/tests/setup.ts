@@ -71,7 +71,9 @@ Object.defineProperty(window, 'matchMedia', {
 });
 
 // Mock requestAnimationFrame
-global.requestAnimationFrame = vi.fn(cb => setTimeout(cb, 0));
+global.requestAnimationFrame = vi.fn((cb: FrameRequestCallback) => {
+  return setTimeout(cb, 0) as unknown as number;
+});
 global.cancelAnimationFrame = vi.fn();
 
 // Mock performance

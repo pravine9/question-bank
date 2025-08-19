@@ -60,6 +60,12 @@ window.toggleFlag = toggleFlag;
 
 // Adjust layout when loaded in standalone mode
 document.addEventListener('DOMContentLoaded', function() {
+  // Ensure statsModal is hidden by default
+  const statsModal = document.getElementById('statsModal');
+  if (statsModal) {
+    statsModal.classList.remove('show');
+  }
+  
   const params = new URLSearchParams(window.location.search);
   if (params.get('isStandAlone') === 'true') {
     document.body.classList.add('standalone');
@@ -212,7 +218,7 @@ function showStatsQuestion(id) {
   if (!q) return;
   questionRenderer.closePdf();
   const overlay = document.getElementById('statsModal');
-  overlay.style.display = 'flex';
+  overlay.classList.add('show');
   const result = questionRenderer.renderQuestion(q, {
     text: '#sqText',
     title: '#sqTitle',
@@ -236,7 +242,7 @@ function showStatsQuestion(id) {
 const sqClose = document.getElementById('sqCloseBtn');
 if (sqClose) {
   sqClose.addEventListener('click', () => {
-    document.getElementById('statsModal').style.display = 'none';
+    document.getElementById('statsModal').classList.remove('show');
     questionRenderer.closePdf();
   });
 }

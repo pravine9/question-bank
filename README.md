@@ -7,11 +7,11 @@ A modern, offline-capable question bank application for GPhC (General Pharmaceut
 - **📚 Comprehensive Question Banks** - Multiple question categories including calculations, clinical therapeutics, and more
 - **🎯 Practice Mode** - Timed practice sessions with progress tracking
 - **📊 Statistics & Analytics** - Track your performance across all questions
-- **📱 Progressive Web App (PWA)** - Install on mobile devices and work offline
-- **🎨 Modern UI/UX** - Responsive design with dark mode support
+- **📚 Offline Capable** - Works without internet connection
+- **🎨 Modern UI/UX** - Clean design with dark mode support
 - **⚡ Performance Optimized** - Fast loading with intelligent caching
 - **🔒 Privacy First** - All data stored locally, no external tracking
-- **♿ Accessibility** - WCAG compliant with keyboard navigation
+
 - **🧪 Comprehensive Testing** - Unit tests with high coverage
 
 ## 🚀 Quick Start
@@ -95,7 +95,7 @@ gphc-scraper/
 ├── question_banks/        # Question data
 ├── public/               # Public assets
 │   ├── sw.js            # Service worker
-│   └── icons/           # PWA icons
+│   └── icons/           # Application icons
 ├── dist/                 # Build output
 └── Burp/                 # Scraping scripts (legacy)
 ```
@@ -103,10 +103,10 @@ gphc-scraper/
 ### Technology Stack
 
 - **Frontend**: TypeScript, Vite, Modern CSS
-- **Build Tool**: Vite with PWA plugin
+- **Build Tool**: Vite
 - **Testing**: Vitest with jsdom
 - **Code Quality**: ESLint, Prettier, TypeScript
-- **PWA**: Service Worker, Web App Manifest
+- **Offline**: Service Worker for offline functionality
 - **Styling**: CSS Custom Properties, Utility Classes
 
 ## 📚 Question Banks
@@ -247,21 +247,19 @@ describe('QuestionRenderer', () => {
 });
 ```
 
-## 📱 Progressive Web App
+## 🔌 Offline Functionality
 
-The application is a fully functional PWA with:
+The application provides offline capabilities through:
 
 - **Offline Support**: Works without internet connection
-- **Installable**: Can be installed on mobile devices
-- **Push Notifications**: Get notified of new content (if implemented)
-- **Background Sync**: Sync data when connection is restored
+- **Local Storage**: All data stored locally in the browser
+- **Caching**: Intelligent caching strategies for performance
 
-### PWA Features
+### Offline Features
 
 - Service Worker for caching and offline functionality
-- Web App Manifest for installation
-- Responsive design for all screen sizes
-- Touch-friendly interface
+- Local data storage for questions and progress
+- Optimized performance with intelligent caching
 
 ## 🔒 Privacy & Security
 
@@ -306,7 +304,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 - Follow TypeScript best practices
 - Use ESLint and Prettier for code formatting
 - Write comprehensive tests
-- Follow accessibility guidelines
+
 
 ## 📄 License
 

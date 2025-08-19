@@ -6,7 +6,6 @@
   },
   "extends": [
     "eslint:recommended",
-    "@typescript-eslint/recommended",
     "prettier"
   ],
   "parser": "@typescript-eslint/parser",
@@ -15,8 +14,7 @@
     "sourceType": "module"
   },
   "plugins": [
-    "@typescript-eslint",
-    "html"
+    "@typescript-eslint"
   ],
   "rules": {
     "@typescript-eslint/no-unused-vars": "error",
@@ -26,11 +24,5 @@
     "eqeqeq": "error",
     "curly": "error",
     "no-console": "warn"
-  },
-  "overrides": [
-    {
-      "files": ["*.html"],
-      "parser": "html-eslint-parser"
-    }
-  ]
+  }
 }

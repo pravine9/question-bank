@@ -708,122 +708,9 @@ function showNotification(message, type = 'info', duration = 3000) {
   TimerNotification.show(message, type, duration);
 }
 
-// Enhanced accessibility features
-function setupAccessibility() {
-  // Add ARIA labels and roles
-  const questionArea = document.querySelector('.question-area');
-  if (questionArea) {
-    questionArea.setAttribute('role', 'main');
-    questionArea.setAttribute('aria-label', 'Question content area');
-  }
 
-  // Add live regions for screen readers
-  createLiveRegion('timer-updates', 'Timer updates');
-  createLiveRegion('progress-updates', 'Progress updates');
-  createLiveRegion('feedback-updates', 'Answer feedback');
-}
 
-function createLiveRegion(id, label) {
-  const existing = document.getElementById(id);
-  if (existing) return;
-  
-  const region = document.createElement('div');
-  region.id = id;
-  region.setAttribute('aria-live', 'polite');
-  region.setAttribute('aria-label', label);
-  region.style.position = 'absolute';
-  region.style.left = '-10000px';
-  region.style.width = '1px';
-  region.style.height = '1px';
-  region.style.overflow = 'hidden';
-  document.body.appendChild(region);
-}
 
-function updateLiveRegion(id, message) {
-  const region = document.getElementById(id);
-  if (region) {
-    region.textContent = message;
-  }
-}
-
-// Enhanced keyboard navigation
-function setupKeyboardShortcuts() {
-  document.addEventListener('keydown', (e) => {
-    if (finished) return; // Don't handle keys when test is finished
-    
-    // Handle number keys for option selection
-    if (e.key >= '1' && e.key <= '5') {
-      e.preventDefault();
-      const optionIndex = parseInt(e.key) - 1;
-      const options = document.querySelectorAll('#answerOptions button');
-      if (optionIndex >= 0 && optionIndex < options.length) {
-        options[optionIndex].click();
-      }
-      return;
-    }
-    
-    switch (e.key) {
-      case 'ArrowLeft':
-        e.preventDefault();
-        if (index > 0) {
-          recordAnswer();
-          index--;
-          saveState();
-          renderQuestion();
-          resetScrollPosition();
-          history.replaceState(null, '', window.location.href);
-        }
-        break;
-      case 'ArrowRight':
-        e.preventDefault();
-        if (index < questions.length - 1) {
-          recordAnswer();
-          index++;
-          saveState();
-          renderQuestion();
-          resetScrollPosition();
-          history.replaceState(null, '', window.location.href);
-        }
-        break;
-      case 'f':
-      case 'F':
-        e.preventDefault();
-        const li = document.querySelectorAll('.nav li')[index];
-        const saved = toggleFlag(questions[index].id);
-        li.classList.toggle('flagged', saved);
-        
-        // Update flag button state in footer
-        const flagBtn = document.querySelector('.flag-current-btn');
-        if (flagBtn) {
-          if (saved) {
-            flagBtn.classList.add('flagged');
-            flagBtn.title = 'Remove Flag';
-          } else {
-            flagBtn.classList.remove('flagged');
-            flagBtn.title = 'Flag for Review';
-          }
-        }
-        break;
-      case 'Enter':
-        e.preventDefault();
-        const q = questions[index];
-        const opts = document.getElementById('answerOptions');
-        const input = document.getElementById('calcInput');
-        const fb = document.getElementById('feedback');
-        const value = q.answers && q.answers.length ? selected : input.value.trim();
-        if (value) {
-          questionRenderer.evaluateAnswer(q, value, { options: opts, feedback: fb });
-          recordAnswer();
-        }
-        break;
-      case 'r':
-      case 'R':
-        e.preventDefault();
-        showReviewModal();
-        break;
-    }
-  });
-}
 
 function resetScrollPosition() {
   const questionArea = document.querySelector('.question-area');
@@ -1001,8 +888,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('beforeunload', saveState);
   
   // Initialize enhancements
-  setupAccessibility();
-  setupKeyboardShortcuts();
+  // setupKeyboardShortcuts(); // Removed for simplified interface
   setupNavigationProtection();
 });
 

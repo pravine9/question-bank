@@ -1,7 +1,13 @@
 // Main entry point for the enhanced application
 import { questionRenderer } from './utils/questionRenderer';
 import { storage } from './utils/storage';
-import type { Question } from './types/question';
+
+// Extend Window interface to include questionRenderer
+declare global {
+  interface Window {
+    questionRenderer?: any;
+  }
+}
 
 console.log('🚀 GPhC Question Bank Enhanced Version Loaded!');
 

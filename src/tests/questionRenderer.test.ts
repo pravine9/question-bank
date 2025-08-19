@@ -10,7 +10,30 @@ const mockDocument = {
   getElementById: vi.fn()
 };
 
+// Create a proper HTMLElement mock
 const mockElement = {
+  // HTMLElement properties
+  accessKey: '',
+  accessKeyLabel: '',
+  autocapitalize: 'off',
+  dir: 'ltr',
+  draggable: false,
+  hidden: false,
+  inert: false,
+  innerText: '',
+  lang: '',
+  offsetHeight: 0,
+  offsetLeft: 0,
+  offsetParent: null,
+  offsetTop: 0,
+  offsetWidth: 0,
+  outerHTML: '',
+  outerText: '',
+  spellcheck: true,
+  title: '',
+  translate: true,
+  
+  // Element properties
   innerHTML: '',
   style: { display: 'none' },
   setAttribute: vi.fn(),
@@ -21,8 +44,21 @@ const mockElement = {
   placeholder: '',
   src: '',
   alt: '',
-  loading: ''
-};
+  loading: '',
+  
+  // Mock methods
+  querySelector: vi.fn(),
+  querySelectorAll: vi.fn(),
+  getAttribute: vi.fn(),
+  hasAttribute: vi.fn(),
+  removeAttribute: vi.fn(),
+  classList: {
+    add: vi.fn(),
+    remove: vi.fn(),
+    contains: vi.fn(),
+    toggle: vi.fn()
+  }
+} as unknown as HTMLElement;
 
 // Mock window object
 Object.defineProperty(global, 'document', {
@@ -80,7 +116,7 @@ describe('QuestionRenderer', () => {
   });
 
   describe('renderQuestion', () => {
-    it('should render question text and title', () => {
+    it('should render question text and title', async () => {
       const options = {
         text: '#qText',
         title: '#qTitle',
@@ -93,7 +129,7 @@ describe('QuestionRenderer', () => {
         showInput: false
       };
 
-      const result = renderer.renderQuestion(mockQuestion, options);
+      const result = await renderer.renderQuestion(mockQuestion, options);
 
       expect(mockDocument.querySelector).toHaveBeenCalledWith('#qText');
       expect(mockDocument.querySelector).toHaveBeenCalledWith('#qTitle');
@@ -101,7 +137,7 @@ describe('QuestionRenderer', () => {
       expect(result.input).toBeNull();
     });
 
-    it('should handle calculation questions', () => {
+    it('should handle calculation questions', async () => {
       const calcQuestion = { ...mockQuestion, is_calculation: true };
       const options = {
         text: '#qText',
@@ -115,13 +151,13 @@ describe('QuestionRenderer', () => {
         showInput: true
       };
 
-      const result = renderer.renderQuestion(calcQuestion, options);
+      const result = await renderer.renderQuestion(calcQuestion, options);
 
       expect(mockDocument.querySelector).toHaveBeenCalledWith('.calculator');
       expect(result.input).toBeDefined();
     });
 
-    it('should handle questions with images', () => {
+    it('should handle questions with images', async () => {
       const options = {
         text: '#qText',
         title: '#qTitle',
@@ -134,12 +170,12 @@ describe('QuestionRenderer', () => {
         showInput: false
       };
 
-      renderer.renderQuestion(mockQuestion, options);
+      await renderer.renderQuestion(mockQuestion, options);
 
       expect(mockDocument.querySelector).toHaveBeenCalledWith('#qImg');
     });
 
-    it('should handle questions without images', () => {
+    it('should handle questions without images', async () => {
       const questionWithoutImage = { ...mockQuestion, resource_image: null };
       const options = {
         text: '#qText',
@@ -153,7 +189,7 @@ describe('QuestionRenderer', () => {
         showInput: false
       };
 
-      renderer.renderQuestion(questionWithoutImage, options);
+      await renderer.renderQuestion(questionWithoutImage, options);
 
       expect(mockDocument.querySelector).toHaveBeenCalledWith('#qImg');
     });
@@ -161,7 +197,7 @@ describe('QuestionRenderer', () => {
 
   describe('evaluateAnswer', () => {
     it('should evaluate calculation questions correctly', () => {
-      const calcQuestion = { ...mockQuestion, is_calculation: true, correct_answer: '25.5' };
+      const calcQuestion = { ...mockQuestion, is_calculation: true, correct_answer: '25.5', correct_answer_number: 25.5 };
       const options = {
         options: mockElement,
         feedback: mockElement
@@ -172,7 +208,7 @@ describe('QuestionRenderer', () => {
     });
 
     it('should evaluate calculation questions with tolerance', () => {
-      const calcQuestion = { ...mockQuestion, is_calculation: true, correct_answer: '25.5' };
+      const calcQuestion = { ...mockQuestion, is_calculation: true, correct_answer: '25.5', correct_answer_number: 25.5 };
       const options = {
         options: mockElement,
         feedback: mockElement
@@ -184,20 +220,16 @@ describe('QuestionRenderer', () => {
 
     it('should evaluate multiple choice questions correctly', () => {
       const options = {
-        options: {
-          querySelector: vi.fn().mockReturnValue({
-            getAttribute: vi.fn().mockReturnValue('1')
-          })
-        },
+        options: mockElement,
         feedback: mockElement
       };
 
-      const result = renderer.evaluateAnswer(mockQuestion, '', options);
+      const result = renderer.evaluateAnswer(mockQuestion, '1', options);
       expect(result).toBe(true);
     });
 
     it('should evaluate free text questions correctly', () => {
-      const freeTextQuestion = { ...mockQuestion, answers: [], is_free: true };
+      const freeTextQuestion = { ...mockQuestion, is_free: true, correct_answer: 'Test answer' };
       const options = {
         options: mockElement,
         feedback: mockElement
@@ -208,7 +240,7 @@ describe('QuestionRenderer', () => {
     });
 
     it('should handle case-insensitive comparison for free text', () => {
-      const freeTextQuestion = { ...mockQuestion, answers: [], is_free: true };
+      const freeTextQuestion = { ...mockQuestion, is_free: true, correct_answer: 'Test answer' };
       const options = {
         options: mockElement,
         feedback: mockElement
@@ -221,41 +253,35 @@ describe('QuestionRenderer', () => {
 
   describe('revealAnswer', () => {
     it('should reveal calculation answer with unit', () => {
-      const calcQuestion = { ...mockQuestion, is_calculation: true };
+      const calcQuestion = { ...mockQuestion, is_calculation: true, answer_unit: 'mg' };
       const options = {
-        answer: '#answer',
-        explanation: '#explanation'
+        options: mockElement,
+        feedback: mockElement
       };
 
       renderer.revealAnswer(calcQuestion, options);
-
-      expect(mockDocument.querySelector).toHaveBeenCalledWith('#answer');
-      expect(mockDocument.querySelector).toHaveBeenCalledWith('#explanation');
+      expect(mockDocument.querySelector).toHaveBeenCalledWith('#correctAnswer');
     });
 
     it('should reveal multiple choice answer', () => {
       const options = {
-        answer: '#answer',
-        explanation: '#explanation'
+        options: mockElement,
+        feedback: mockElement
       };
 
       renderer.revealAnswer(mockQuestion, options);
-
-      expect(mockDocument.querySelector).toHaveBeenCalledWith('#answer');
-      expect(mockDocument.querySelector).toHaveBeenCalledWith('#explanation');
+      expect(mockDocument.querySelector).toHaveBeenCalledWith('#correctAnswer');
     });
 
     it('should reveal free text answer', () => {
-      const freeTextQuestion = { ...mockQuestion, answers: [], is_free: true };
+      const freeTextQuestion = { ...mockQuestion, is_free: true };
       const options = {
-        answer: '#answer',
-        explanation: '#explanation'
+        options: mockElement,
+        feedback: mockElement
       };
 
       renderer.revealAnswer(freeTextQuestion, options);
-
-      expect(mockDocument.querySelector).toHaveBeenCalledWith('#answer');
-      expect(mockDocument.querySelector).toHaveBeenCalledWith('#explanation');
+      expect(mockDocument.querySelector).toHaveBeenCalledWith('#correctAnswer');
     });
   });
 

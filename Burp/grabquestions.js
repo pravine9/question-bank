@@ -96,7 +96,7 @@ async function main() {
     'Accept': 'application/json, text/plain, */*',
     'Sec-Ch-Ua': '"Not)A;Brand";v="8", "Chromium";v="138"',
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36',
-    'Sec-Ch-Ua-Mobile': '?0',
+    'Sec-Ch-Ua-Mobile': '?0', // Browser compatibility header
     'Sec-Fetch-Site': 'same-origin',
     'Sec-Fetch-Mode': 'cors',
     'Sec-Fetch-Dest': 'empty',

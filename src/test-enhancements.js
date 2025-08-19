@@ -89,8 +89,8 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('   • Modern design system');
     console.log('   • Enhanced typography');
     console.log('   • Better spacing and colors');
-    console.log('   • Responsive design');
-    console.log('   • Improved accessibility');
+    console.log('   • Clean layout design');
+
   }, 1000);
 });
 

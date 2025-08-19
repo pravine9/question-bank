@@ -16,7 +16,7 @@
   text-decoration: none;
   user-select: none;
   white-space: nowrap;
-  min-height: 44px; /* Accessibility: minimum touch target size */
+  min-height: 44px;
 }
 
 .btn:focus {
@@ -494,11 +494,24 @@
   right: 0;
   bottom: 0;
   background-color: rgb(0 0 0 / 0.5);
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   z-index: var(--z-modal-backdrop);
   padding: var(--space-4);
+}
+
+.modal-overlay.show {
+  display: flex;
+}
+
+/* Ensure statsModal is hidden by default */
+#statsModal.modal-overlay {
+  display: none !important;
+}
+
+#statsModal.modal-overlay.show {
+  display: flex !important;
 }
 
 .modal-content {
@@ -639,24 +652,7 @@
   color: var(--color-gray-600);
 }
 
-/* Responsive design for practice history */
-@media (max-width: 1024px) {
-  .history-stats {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .history-stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .result-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-2);
-  }
-}
+/* Practice history layout */
 
 .result-details {
   display: flex;
@@ -881,82 +877,7 @@
   font-weight: var(--font-weight-semibold);
 }
 
-/* Responsive design */
-@media (max-width: 768px) {
-  .question-container {
-    padding: var(--space-4);
-    margin-bottom: var(--space-4);
-  }
-  
-  .question-title {
-    font-size: var(--font-size-lg);
-  }
-  
-  .question-text {
-    font-size: var(--font-size-base);
-  }
-  
-  .option-btn {
-    padding: var(--space-3) var(--space-4);
-    min-height: 50px;
-  }
-  
-  .nav-buttons {
-    flex-direction: column;
-    gap: var(--space-2);
-  }
-  
-  .nav-btn {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .calculator {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--space-2);
-  }
-  
-  .calculator input {
-    max-width: none;
-  }
-
-  .history-stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .result-details {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-3);
-  }
-
-  .result-stats {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .summary-stats {
-    grid-template-columns: 1fr;
-  }
-
-  .question-answers {
-    gap: var(--space-1);
-  }
-
-  .answer {
-    flex-direction: column;
-    gap: var(--space-1);
-  }
-
-  .answer-label {
-    min-width: auto;
-  }
-
-  .practice-section .button-row {
-    flex-direction: column;
-  }
-}
+/* Layout adjustments */
 
 /* Animations */
 @keyframes fadeIn {
