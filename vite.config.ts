@@ -25,7 +25,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
-      '@static': resolve(__dirname, 'static'),
+
       '@templates': resolve(__dirname, 'templates'),
       '@question-banks': resolve(__dirname, 'question_banks')
     }

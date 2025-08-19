@@ -190,65 +190,42 @@ export class PracticeHistoryComponent {
   }
 
   private showAllResultsModal(): void {
-    const modal = document.createElement('div');
-    modal.className = 'modal-overlay';
-    modal.innerHTML = `
-      <div class="modal-content large">
-        <div class="modal-header">
-          <h3>All Practice Test Results</h3>
-          <button class="modal-close">&times;</button>
-        </div>
-        <div class="modal-body">
+    // Simplified: just show all results in the main area
+    if (this.container) {
+      this.container.innerHTML = `
+        <div class="practice-history">
+          <div class="history-header">
+            <h2>📊 All Practice Test Results</h2>
+            <button class="btn btn-secondary btn-sm" id="backToSummary">Back to Summary</button>
+          </div>
           <div class="all-results-list">
             ${this.history.results.map(result => this.generateResultCard(result)).join('')}
           </div>
         </div>
-      </div>
-    `;
-
-    document.body.appendChild(modal);
-
-    // Close modal functionality
-    const closeBtn = modal.querySelector('.modal-close');
-    if (closeBtn) {
-      closeBtn.addEventListener('click', () => {
-        document.body.removeChild(modal);
-      });
-    }
-
-    // Close on overlay click
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        document.body.removeChild(modal);
+      `;
+      
+      // Add back button functionality
+      const backBtn = this.container.querySelector('#backToSummary');
+      if (backBtn) {
+        backBtn.addEventListener('click', () => {
+          this.render(this.container?.id || 'practiceHistory');
+        });
       }
-    });
-
-    // Attach event listeners to review buttons in modal
-    const reviewBtns = modal.querySelectorAll('.review-result');
-    reviewBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const resultId = (e.target as HTMLElement).getAttribute('data-result-id');
-        if (resultId) {
-          document.body.removeChild(modal);
-          this.showResultDetails(resultId);
-        }
-      });
-    });
+    }
   }
 
   private showResultDetails(resultId: string): void {
     const result = this.history.results.find(r => r.id === resultId);
     if (!result) return;
 
-    const modal = document.createElement('div');
-    modal.className = 'modal-overlay';
-    modal.innerHTML = `
-      <div class="modal-content large">
-        <div class="modal-header">
-          <h3>Test Result Details</h3>
-          <button class="modal-close">&times;</button>
-        </div>
-        <div class="modal-body">
+    // Simplified: show basic result info in the main area
+    if (this.container) {
+      this.container.innerHTML = `
+        <div class="practice-history">
+          <div class="history-header">
+            <h2>📊 Test Result Details</h2>
+            <button class="btn btn-secondary btn-sm" id="backToSummary">Back to Summary</button>
+          </div>
           <div class="result-summary">
             <div class="summary-stats">
               <div class="summary-stat">
@@ -277,52 +254,20 @@ export class PracticeHistoryComponent {
               </div>
             </div>
           </div>
-          <div class="question-results">
-            <h4>Question Details</h4>
-            <div class="questions-list">
-              ${result.questions.map((q, index) => `
-                <div class="question-result ${q.isCorrect ? 'correct' : 'incorrect'}">
-                  <div class="question-header">
-                    <span class="question-number">Q${index + 1}</span>
-                    <span class="question-status ${q.isCorrect ? 'correct' : 'incorrect'}">
-                      ${q.isCorrect ? '✓' : '✗'}
-                    </span>
-                    ${q.flagged ? '<span class="flagged">🚩</span>' : ''}
-                  </div>
-                  <div class="question-answers">
-                    <div class="answer">
-                      <span class="answer-label">Your Answer:</span>
-                      <span class="answer-value">${q.userAnswer || 'No answer'}</span>
-                    </div>
-                    <div class="answer">
-                      <span class="answer-label">Correct Answer:</span>
-                      <span class="answer-value correct">${q.correctAnswer}</span>
-                    </div>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
+          <div class="button-row">
+            <button class="btn btn-primary" id="backToSummary">Back to Summary</button>
           </div>
         </div>
-      </div>
-    `;
-
-    document.body.appendChild(modal);
-
-    // Close modal functionality
-    const closeBtn = modal.querySelector('.modal-close');
-    if (closeBtn) {
-      closeBtn.addEventListener('click', () => {
-        document.body.removeChild(modal);
-      });
-    }
-
-    // Close on overlay click
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        document.body.removeChild(modal);
+      `;
+      
+      // Add back button functionality
+      const backBtn = this.container.querySelector('#backToSummary');
+      if (backBtn) {
+        backBtn.addEventListener('click', () => {
+          this.render(this.container?.id || 'practiceHistory');
+        });
       }
-    });
+    }
   }
 
   refresh(): void {

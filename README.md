@@ -8,7 +8,7 @@ A modern, offline-capable question bank application for GPhC (General Pharmaceut
 - **🎯 Practice Mode** - Timed practice sessions with progress tracking
 - **📊 Statistics & Analytics** - Track your performance across all questions
 - **📚 Offline Capable** - Works without internet connection
-- **🎨 Modern UI/UX** - Clean design with dark mode support
+- **🎨 Modern UI/UX** - Clean design with consistent styling
 - **⚡ Performance Optimized** - Fast loading with intelligent caching
 - **🔒 Privacy First** - All data stored locally, no external tracking
 

@@ -18,14 +18,14 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@static/*": ["static/*"],
+
       "@templates/*": ["templates/*"],
       "@question-banks/*": ["question_banks/*"]
     }
   },
   "include": [
     "src/**/*",
-    "static/**/*",
+
     "templates/**/*",
     "question_banks/**/*",
     "vite.config.ts"
