@@ -187,12 +187,11 @@ function updateProgress() {
     percentageDisplay.style.cssText = `
       text-align: center;
       color: #ffffff;
-      font-size: 12px;
+      font-size: 16px;
       font-weight: 600;
       margin-top: 4px;
     `;
     const progressContainer = header.querySelector('.progress');
-    progressContainer.style.position = 'relative';
     progressContainer.parentNode.insertBefore(percentageDisplay, progressContainer.nextSibling);
   }
   percentageDisplay.textContent = Math.round(pct) + '%';
@@ -232,12 +231,14 @@ function showReviewModal() {
     const isFlagged = flagged.has(q.id);
     const isCurrent = i === index;
     
-    if (isFlagged) {
-      gridItem.classList.add('flagged');
-    } else if (isAttempted) {
+    if (isAttempted) {
       gridItem.classList.add('attempted');
     } else {
       gridItem.classList.add('not-attempted');
+    }
+    
+    if (isFlagged) {
+      gridItem.classList.add('flagged');
     }
     
     if (isCurrent) {
