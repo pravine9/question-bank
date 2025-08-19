@@ -7,272 +7,130 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
   <link rel="stylesheet" href="../static/question.css">
   <link rel="stylesheet" href="../static/practice.css">
-  <link rel="stylesheet" href="../src/styles/design-system.css">
-  <link rel="stylesheet" href="../src/styles/components.css">
-  <link rel="stylesheet" href="../src/styles/practice-enhancements.css">
 </head>
 <body>
   <div class="container">
-    <!-- Enhanced Header with Exam-like Features -->
-    <header class="exam-header">
-      <div class="header-left">
-        <div class="exam-info">
-          <span class="exam-title">GPhC Practice Test</span>
-          <span class="question-counter">
-            Question <span class="current-question">1</span> of <span class="total-questions">40</span>
-          </span>
-        </div>
+    <!-- Simple Header -->
+    <div class="header">
+      <div class="test-title"></div>
+      <div class="progress">
+        <div class="bar"></div>
       </div>
-      
-      <div class="header-center">
-        <div class="progress-container">
-          <div class="progress-bar" style="width: 0%"></div>
-        </div>
-        <div class="progress-text">
-          <span class="progress-percentage">0%</span> Complete
-        </div>
-      </div>
-      
+      <div class="timer"></div>
       <div class="header-right">
-        <div class="timer-container">
-          <div class="timer-icon">⏱️</div>
-          <div class="timer-display">
-            <span class="timer-hours">00</span>:<span class="timer-minutes">00</span>:<span class="timer-seconds">00</span>
-          </div>
-        </div>
-        <div class="header-actions">
-          <button type="button" class="btn btn-secondary btn-sm summary-btn" style="display:none">
-            <span class="btn-icon">📊</span>
-            Summary
-          </button>
-          <button type="button" class="btn btn-primary btn-sm home-top-btn" style="display:none">
-            <span class="btn-icon">🏠</span>
-            Home
-          </button>
-          <button type="button" class="btn btn-danger btn-sm finish-btn">
-            <span class="btn-icon">⏹️</span>
-            Finish Test
-          </button>
-        </div>
+        <button type="button" class="summary-btn" style="display:none">Summary</button>
+        <button type="button" class="home-top-btn" style="display:none">Home</button>
+        <button type="button" class="finish-btn">Finish Test</button>
       </div>
-    </header>
+    </div>
 
-    <!-- Enhanced Main Content Area -->
+    <!-- Main Content -->
     <div class="main">
-      <!-- Enhanced Sidebar with Better Navigation -->
-      <aside class="exam-sidebar">
-        <div class="sidebar-header">
-          <h3>Question Navigator</h3>
-          <div class="sidebar-stats">
-            <span class="stat-item">
-              <span class="stat-label">Answered:</span>
-              <span class="stat-value answered-count">0</span>
-            </span>
-            <span class="stat-item">
-              <span class="stat-label">Flagged:</span>
-              <span class="stat-value flagged-count">0</span>
-            </span>
-          </div>
-        </div>
-        
-        <div class="question-grid">
+      <!-- Simple Sidebar -->
+      <div class="sidebar">
+        <ul class="nav">
           <!-- Question numbers will be populated dynamically -->
-        </div>
-        
-        <div class="sidebar-legend">
-          <div class="legend-item">
-            <span class="legend-color answered"></span>
-            <span class="legend-text">Answered</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-color flagged"></span>
-            <span class="legend-text">Flagged</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-color current"></span>
-            <span class="legend-text">Current</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-color unanswered"></span>
-            <span class="legend-text">Unanswered</span>
-          </div>
-        </div>
-      </aside>
-
-      <!-- Enhanced Question Area -->
-      <section class="question-area">
-        <div class="question-header">
-          <div class="question-meta">
-            <span class="question-type calculation-type" style="display:none">
-              <span class="type-icon">🧮</span>
-              Calculation Question
-            </span>
-            <span class="question-type mcq-type" style="display:none">
-              <span class="type-icon">📝</span>
-              Multiple Choice
-            </span>
-          </div>
-          <div class="question-actions">
-            <button type="button" class="btn btn-outline btn-sm flag-btn" title="Flag for Review">
-              <span class="flag-icon">🚩</span>
-              <span class="flag-text">Flag</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="question-content">
-          <div class="question-text" id="qText"></div>
-          <div class="question-title" id="qTitle"></div>
-          
-          <!-- Enhanced Image Display -->
-          <div class="question-image-container" id="qImgContainer" style="display:none">
-            <img id="qImg" alt="Question image" class="question-image">
-            <button type="button" class="image-zoom-btn" title="Zoom Image">
-              <span class="zoom-icon">🔍</span>
-            </button>
-          </div>
-
-          <!-- Enhanced Answer Options -->
-          <div class="answer-section">
-            <div class="answer-options" id="answerOptions"></div>
-            
-            <!-- Enhanced Calculator Input -->
-            <div class="calculator-container" style="display:none">
-              <div class="calculator-header">
-                <span class="calculator-icon">🧮</span>
-                <span class="calculator-title">Enter Your Answer</span>
-              </div>
-              <div class="calculator-input-group">
-                <input type="number" id="calcInput" class="calculator-input" placeholder="Enter answer">
-                <span class="unit-display" id="answerUnit"></span>
-              </div>
-              <div class="calculator-help">
-                <span class="help-text">Enter numerical value only</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Enhanced Action Buttons -->
-          <div class="question-actions-bottom">
-            <button type="button" class="btn btn-primary check-btn">
-              <span class="btn-icon">✓</span>
-              Check Answer
-            </button>
-          </div>
-
-          <!-- Enhanced Feedback Area -->
-          <div class="feedback-area" id="feedback" style="display:none">
-            <div class="feedback-content"></div>
-          </div>
-
-          <!-- Enhanced Details Area (Post-Answer) -->
-          <div class="details-area" style="display:none">
-            <div class="answer-explanation" id="answer"></div>
-            <div class="detailed-explanation" id="explanation"></div>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <!-- Enhanced Footer Navigation -->
-    <footer class="exam-footer">
-      <div class="footer-navigation">
-        <button type="button" class="btn btn-secondary back-btn" disabled>
-          <span class="btn-icon">←</span>
-          Previous
-        </button>
-        
-        <div class="navigation-info">
-          <span class="nav-text">Use arrow keys or click buttons to navigate</span>
-        </div>
-        
-        <button type="button" class="btn btn-primary next-btn">
-          Next
-          <span class="btn-icon">→</span>
-        </button>
-      </div>
-    </footer>
-
-    <!-- Enhanced Summary Section -->
-    <section class="exam-summary" style="display:none">
-      <div class="summary-header">
-        <h2>Test Summary</h2>
-        <div class="summary-stats">
-          <div class="summary-stat">
-            <span class="stat-number" id="finalScore">0</span>
-            <span class="stat-label">Score (%)</span>
-          </div>
-          <div class="summary-stat">
-            <span class="stat-number" id="correctAnswers">0</span>
-            <span class="stat-label">Correct</span>
-          </div>
-          <div class="summary-stat">
-            <span class="stat-number" id="totalQuestions">0</span>
-            <span class="stat-label">Total</span>
-          </div>
-          <div class="summary-stat">
-            <span class="stat-number" id="timeTaken">00:00</span>
-            <span class="stat-label">Time</span>
-          </div>
-        </div>
+        </ul>
       </div>
 
-      <div class="summary-table-container">
-        <table class="summary-table">
-          <thead>
-            <tr>
-              <th>Question</th>
-              <th>Your Answer</th>
-              <th>Correct Answer</th>
-              <th>Result</th>
-              <th>Review</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-
-      <div class="summary-actions">
-        <button type="button" class="btn btn-secondary" id="downloadResults">
-          <span class="btn-icon">📥</span>
-          Download Results
-        </button>
-        <button type="button" class="btn btn-primary" id="newTest">
-          <span class="btn-icon">🔄</span>
-          Start New Test
-        </button>
-        <button type="button" class="btn btn-outline" id="goHome">
-          <span class="btn-icon">🏠</span>
-          Go Home
-        </button>
-      </div>
-    </section>
-
-    <!-- Enhanced PDF Viewer -->
-    <div class="pdf-pane" id="pdfPane" style="display:none">
-      <div class="pdf-header">
-        <div class="pdf-title">Document Viewer</div>
-        <div class="pdf-controls">
-          <button type="button" class="btn btn-sm pdf-zoom-in" title="Zoom In">+</button>
-          <button type="button" class="btn btn-sm pdf-zoom-out" title="Zoom Out">-</button>
-          <button type="button" class="btn btn-sm pdf-close" title="Close">&times;</button>
+      <!-- Question Area -->
+      <div class="question-area">
+        <h2 class="q-number">Question 1</h2>
+        <div id="qText"></div>
+        <div id="qTitle" class="question-title"></div>
+        <img id="qImg" alt="Question image">
+        <div id="answerOptions" class="options"></div>
+        <div class="calculator" style="display:none">
+          <label>Answer</label>
+          <input type="number" id="calcInput">
+          <span class="unit" id="answerUnit"></span>
         </div>
-      </div>
-      <div class="pdf-wrapper">
-        <iframe id="pdfFrame" src="" title="PDF viewer"></iframe>
+        <div class="button-row">
+          <button id="checkBtn" class="check-btn">Check</button>
+        </div>
+        <div id="feedback"></div>
+        <div id="answer"></div>
+        <div id="explanation"></div>
       </div>
     </div>
 
-    <!-- Enhanced Image Modal -->
-    <div class="image-modal" id="imageModal" style="display:none">
+    <!-- Simple Footer -->
+    <div class="footer">
+      <div class="footer-left">
+        <button type="button" class="review-status-btn" title="Review Question Status">
+          <span class="review-icon">📋</span>
+          <span class="review-text">Review</span>
+        </button>
+      </div>
+      <div class="nav-btns">
+        <button type="button" class="flag-current-btn" title="Flag for Review">⚑</button>
+        <button type="button" class="back-btn" disabled>‹ Back</button>
+        <button type="button" class="next-btn">Next ›</button>
+      </div>
+    </div>
+
+    <!-- Review Status Modal -->
+    <div class="review-modal" id="reviewModal" style="display:none">
       <div class="modal-content">
         <div class="modal-header">
-          <span class="modal-title">Question Image</span>
+          <h3>Question Review Status</h3>
           <button type="button" class="modal-close">&times;</button>
         </div>
         <div class="modal-body">
-          <img id="modalImage" alt="Question image">
+          <div class="status-summary">
+            <div class="status-item attempted">
+              <span class="status-label">Attempted:</span>
+              <span class="status-count" id="attemptedCount">0</span>
+            </div>
+            <div class="status-item not-attempted">
+              <span class="status-label">Not Attempted:</span>
+              <span class="status-count" id="notAttemptedCount">0</span>
+            </div>
+            <div class="status-item flagged">
+              <span class="status-label">Flagged:</span>
+              <span class="status-count" id="flaggedCount">0</span>
+            </div>
+          </div>
+          <div class="question-grid-review" id="questionGridReview">
+            <!-- Question grid will be populated here -->
+          </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Summary Section -->
+    <div class="summary" style="display:none">
+      <h2>Test Summary</h2>
+      <div class="summary-score">
+        <span class="score-display" id="scoreDisplay">0/0</span>
+        <span class="percentage-display" id="percentageDisplay">(0%)</span>
+      </div>
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Question</th>
+            <th>Your Answer</th>
+            <th>Correct Answer</th>
+            <th>Result</th>
+            <th>Review</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="summary-actions">
+        <button type="button" id="goHome">Go Home</button>
+      </div>
+    </div>
+
+    <!-- PDF Viewer -->
+    <div class="pdf-pane" id="pdfPane" style="display:none">
+      <div class="pdf-controls">
+        <button type="button" class="pdf-zoom-in">+</button>
+        <button type="button" class="pdf-zoom-out">-</button>
+        <button type="button" class="pdf-close">&times;</button>
+      </div>
+      <div class="pdf-wrapper">
+        <iframe id="pdfFrame" src="" title="PDF viewer"></iframe>
       </div>
     </div>
   </div>
@@ -291,6 +149,5 @@
   <script src="../static/banks.js"></script>
   <script src="../static/question_renderer.js"></script>
   <script src="../static/practice.js"></script>
-  <script src="../src/enhancements/practice-enhancements.js"></script>
 </body>
 </html>

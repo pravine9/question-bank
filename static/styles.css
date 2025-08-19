@@ -11,13 +11,57 @@ body.standalone {
 }
 
 .container {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
 .container.standalone {
   max-width: none;
   margin: 0;
+}
+
+/* Two-column layout */
+.main-layout {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+.left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.right-column {
+  position: sticky;
+  top: 20px;
+  height: fit-content;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 1024px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .right-column {
+    position: static;
+    order: -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    max-width: 100%;
+    margin: 10px;
+  }
+  
+  .main-layout {
+    gap: 15px;
+  }
 }
 
 #bankSelect,
@@ -40,11 +84,51 @@ button:hover {
   background-color: #0053a8;
 }
 
+/* Practice section styling */
+.practice-section {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.practice-section h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.practice-section label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #555;
+}
+
+.practice-section select,
+.practice-section input {
+  width: 100%;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.button-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.button-row button {
+  flex: 1;
+  min-width: 120px;
+}
+
 #questionArea {
   display: none;
-  margin-top: 20px;
-  padding: 15px;
-  border-radius: 5px;
+  margin-top: 0;
+  padding: 20px;
+  border-radius: 8px;
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -107,11 +191,35 @@ button:hover {
 }
 
 #statsArea {
-  margin-top: 20px;
-  padding: 15px;
-  border-radius: 5px;
+  margin-top: 0;
+  padding: 20px;
+  border-radius: 8px;
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#statsArea h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+#statsArea label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #555;
+}
+
+#statsArea select {
+  width: 100%;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+#statsArea button {
+  margin-bottom: 15px;
 }
 
 #statsTable {

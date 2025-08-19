@@ -553,6 +553,7 @@
   box-shadow: var(--shadow-lg);
   padding: var(--space-6);
   margin-bottom: var(--space-6);
+  height: fit-content;
 }
 
 .history-header {
@@ -570,7 +571,7 @@
 
 .history-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--space-4);
   margin-bottom: var(--space-6);
 }
@@ -636,6 +637,25 @@
 .result-date {
   font-size: var(--font-size-sm);
   color: var(--color-gray-600);
+}
+
+/* Responsive design for practice history */
+@media (max-width: 1024px) {
+  .history-stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .history-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .result-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
 }
 
 .result-details {

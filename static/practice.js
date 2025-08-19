@@ -21,6 +21,11 @@ let persistState = true;
 function saveState() {
   try {
     if (!persistState || !questions.length) return;
+    
+    // Save scroll position
+    const questionArea = document.querySelector('.question-area');
+    const scrollPosition = questionArea ? questionArea.scrollTop : 0;
+    
     const data = {
       bank,
       questions,
@@ -30,7 +35,8 @@ function saveState() {
       startTime,
       finished,
       summary: summaryData,
-      statsRecorded
+      statsRecorded,
+      scrollPosition
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (e) {
@@ -166,14 +172,115 @@ function initNav() {
 function updateProgress() {
   const answered = responses.filter(r => r && r.answer !== null && r.answer !== '').length;
   const pct = (answered / questions.length) * 100;
-  document.querySelector('.bar').style.width = pct + '%';
+  const progressBar = document.querySelector('.bar');
+  const header = document.querySelector('.header');
+  
+  if (progressBar) {
+    progressBar.style.width = pct + '%';
+  }
+  
+  // Add percentage display under the progress bar
+  let percentageDisplay = header.querySelector('.progress-percentage');
+  if (!percentageDisplay) {
+    percentageDisplay = document.createElement('div');
+    percentageDisplay.className = 'progress-percentage';
+    percentageDisplay.style.cssText = `
+      text-align: center;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 4px;
+    `;
+    const progressContainer = header.querySelector('.progress');
+    progressContainer.style.position = 'relative';
+    progressContainer.parentNode.insertBefore(percentageDisplay, progressContainer.nextSibling);
+  }
+  percentageDisplay.textContent = Math.round(pct) + '%';
+}
+
+function updateProgressOnAnswer() {
+  recordAnswer();
+  updateProgress();
+}
+
+function showReviewModal() {
+  const modal = document.getElementById('reviewModal');
+  if (!modal) return;
+  
+  // Calculate counts
+  const attempted = responses.filter(r => r && r.answer !== null && r.answer !== '').length;
+  const notAttempted = questions.length - attempted;
+  const flaggedQuestions = Array.from(flagged).length;
+  
+  // Update counts
+  document.getElementById('attemptedCount').textContent = attempted;
+  document.getElementById('notAttemptedCount').textContent = notAttempted;
+  document.getElementById('flaggedCount').textContent = flaggedQuestions;
+  
+  // Generate question grid
+  const gridContainer = document.getElementById('questionGridReview');
+  gridContainer.innerHTML = '';
+  
+  questions.forEach((q, i) => {
+    const gridItem = document.createElement('div');
+    gridItem.className = 'grid-item';
+    gridItem.textContent = i + 1;
+    gridItem.dataset.index = i;
+    
+    const response = responses[i];
+    const isAttempted = response && response.answer !== null && response.answer !== '';
+    const isFlagged = flagged.has(q.id);
+    const isCurrent = i === index;
+    
+    if (isFlagged) {
+      gridItem.classList.add('flagged');
+    } else if (isAttempted) {
+      gridItem.classList.add('attempted');
+    } else {
+      gridItem.classList.add('not-attempted');
+    }
+    
+    if (isCurrent) {
+      gridItem.classList.add('current');
+    }
+    
+    gridItem.addEventListener('click', () => {
+      index = i;
+      closeReviewModal();
+      renderQuestion();
+      
+      // Reset scroll position to top for new question
+      const questionArea = document.querySelector('.question-area');
+      if (questionArea) {
+        questionArea.scrollTop = 0;
+      }
+      
+      saveState();
+    });
+    
+    gridContainer.appendChild(gridItem);
+  });
+  
+  modal.style.display = 'flex';
+}
+
+function closeReviewModal() {
+  const modal = document.getElementById('reviewModal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
 }
 
 function updateNav() {
   document.querySelectorAll('.nav li').forEach((li, i) => {
     const q = questions[i];
     const isActive = i === index;
+    const response = responses[i];
+    const isAnswered = response && response.answer !== null && response.answer !== '';
+    
     li.classList.toggle('active', isActive);
+    li.classList.toggle('answered', isAnswered);
+    
     if (isActive) {
       li.scrollIntoView({ block: 'nearest' });
     }
@@ -208,17 +315,37 @@ function renderQuestion() {
   const opts = document.getElementById('answerOptions');
   const calc = document.querySelector('.calculator');
   const input = document.getElementById('calcInput');
-  const details = document.querySelector('.details');
   const corr = document.getElementById('answer');
   const expl = document.getElementById('explanation');
+  
+  // Update flag button state
+  const flagBtn = document.querySelector('.flag-current-btn');
+  if (flagBtn) {
+    if (flagged.has(q.id)) {
+      flagBtn.classList.add('flagged');
+      flagBtn.title = 'Remove Flag';
+    } else {
+      flagBtn.classList.remove('flagged');
+      flagBtn.title = 'Flag for Review';
+    }
+  }
+  
   if (q.answers && q.answers.length) {
     calc.style.display = 'none';
     result.buttons.forEach(btn => {
       btn.onclick = () => {
         if (reviewing) return;
-        opts.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        selected = btn.dataset.num;
+        
+        // Allow deselection by clicking the same button
+        if (btn.classList.contains('selected')) {
+          btn.classList.remove('selected');
+          selected = null;
+        } else {
+          opts.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          selected = btn.dataset.num;
+        }
+        updateProgressOnAnswer();
       };
       if (responses[index] && responses[index].answer == btn.dataset.num) {
         btn.classList.add('selected');
@@ -235,6 +362,13 @@ function renderQuestion() {
     calc.style.display = 'block';
     input.value = responses[index] ? (responses[index].answer || '') : '';
     input.disabled = reviewing;
+    
+    // Add event listener for calculation input
+    if (!reviewing) {
+      input.addEventListener('input', () => {
+        updateProgressOnAnswer();
+      });
+    }
   }
   if (reviewing) {
     const fb = document.getElementById('feedback');
@@ -247,15 +381,29 @@ function renderQuestion() {
     }
     questionRenderer.revealAnswer(q, { answer: corr, explanation: expl, prefix: 'Correct answer' });
     questionRenderer.convertPdfLinks(expl);
-    details.style.display = 'block';
+    corr.style.display = 'block';
+    expl.style.display = 'block';
   } else {
     const fb = document.getElementById('feedback');
     fb.textContent = '';
     fb.className = '';
-    details.style.display = 'none';
+    corr.style.display = 'none';
+    expl.style.display = 'none';
   }
   updateProgress();
   updateNav();
+  
+  // Update navigation button states
+  const backBtn = document.querySelector('.back-btn');
+  const nextBtn = document.querySelector('.next-btn');
+  
+  if (backBtn) {
+    backBtn.disabled = index === 0;
+  }
+  
+  if (nextBtn) {
+    nextBtn.disabled = index === questions.length - 1;
+  }
 }
 
 function recordAnswer() {
@@ -291,15 +439,11 @@ function showSummary() {
   document.querySelector('.footer').style.display = 'none';
   const summaryEl = document.querySelector('.summary');
   const tbody = summaryEl.querySelector('tbody');
-  const score = summaryEl.querySelector('.score');
-  const timeEl = summaryEl.querySelector('.time-taken');
   const elapsed = summaryData?.elapsed || Math.floor((Date.now() - startTime) / 1000);
   const mins = Math.floor(elapsed / 60);
   const secs = elapsed % 60;
   const pad = num => num.toString().padStart(2, '0');
-  if (timeEl) {
-    timeEl.textContent = `Time taken: ${pad(mins)}:${pad(secs)}`;
-  }
+  
   if (!statsRecorded) {
     questions.forEach((q, i) => {
       const r = responses[i];
@@ -345,7 +489,19 @@ function showSummary() {
     tbody.appendChild(tr);
   });
   summaryData = { elapsed, correctCount };
-  score.textContent = `You answered ${correctCount} of ${questions.length} correctly (${Math.round(correctCount / questions.length * 100)}%).`;
+  
+  // Update score display
+  const scoreDisplay = document.getElementById('scoreDisplay');
+  const percentageDisplay = document.getElementById('percentageDisplay');
+  const percentage = Math.round((correctCount / questions.length) * 100);
+  
+  if (scoreDisplay) {
+    scoreDisplay.textContent = `${correctCount}/${questions.length}`;
+  }
+  if (percentageDisplay) {
+    percentageDisplay.textContent = `(${percentage}%)`;
+  }
+  
   summaryEl.style.display = 'block';
   document.querySelector('.finish-btn').style.display = 'none';
   summaryEl.querySelectorAll('button[data-idx]').forEach(btn => {
@@ -456,6 +612,13 @@ document.addEventListener('DOMContentLoaded', () => {
       index++;
       saveState();
       renderQuestion();
+      
+      // Reset scroll position to top for new question
+      const questionArea = document.querySelector('.question-area');
+      if (questionArea) {
+        questionArea.scrollTop = 0;
+      }
+      
       history.replaceState(null, '', window.location.href);
     }
   });
@@ -465,6 +628,13 @@ document.addEventListener('DOMContentLoaded', () => {
       index--;
       saveState();
       renderQuestion();
+      
+      // Reset scroll position to top for new question
+      const questionArea = document.querySelector('.question-area');
+      if (questionArea) {
+        questionArea.scrollTop = 0;
+      }
+      
       history.replaceState(null, '', window.location.href);
     }
   });
@@ -472,6 +642,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const li = document.querySelectorAll('.nav li')[index];
     const saved = toggleFlag(questions[index].id);
     li.classList.toggle('flagged', saved);
+    
+    // Update flag button state in footer
+    const flagBtn = document.querySelector('.flag-current-btn');
+    if (flagBtn) {
+      if (saved) {
+        flagBtn.classList.add('flagged');
+        flagBtn.title = 'Remove Flag';
+      } else {
+        flagBtn.classList.remove('flagged');
+        flagBtn.title = 'Flag for Review';
+      }
+    }
   });
   document.querySelector('.check-btn')?.addEventListener('click', () => {
     const q = questions[index];
@@ -525,6 +707,16 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       startTimer(state.startTime);
       renderQuestion();
+      
+      // Restore scroll position after rendering
+      if (state.scrollPosition !== undefined) {
+        setTimeout(() => {
+          const questionArea = document.querySelector('.question-area');
+          if (questionArea) {
+            questionArea.scrollTop = state.scrollPosition;
+          }
+        }, 100);
+      }
     }
   } else {
     startTimer();
@@ -533,7 +725,103 @@ document.addEventListener('DOMContentLoaded', () => {
     initNav();
     renderQuestion();
   }
+  // Review status button event listener
+  document.querySelector('.review-status-btn')?.addEventListener('click', showReviewModal);
+  document.querySelector('.review-modal .modal-close')?.addEventListener('click', closeReviewModal);
+  document.querySelector('.review-modal')?.addEventListener('click', (e) => {
+    if (e.target.classList.contains('review-modal')) {
+      closeReviewModal();
+    }
+  });
+
+  // Summary Go Home button event listener
+  document.getElementById('goHome')?.addEventListener('click', () => {
+    clearState();
+    persistState = false;
+    window.removeEventListener('beforeunload', saveState);
+    // Remember the bank so it can be preselected on the home page
+    try {
+      localStorage.setItem('lastBank', bank);
+    } catch (e) {
+      console.warn('Failed to store lastBank', e);
+    }
+    window.location.href = 'index.html';
+  });
+
   window.addEventListener('beforeunload', saveState);
+  
+  // Add keyboard shortcuts
+  document.addEventListener('keydown', (e) => {
+    if (finished) return; // Don't handle keys when test is finished
+    
+    switch (e.key) {
+              case 'ArrowLeft':
+          e.preventDefault();
+          if (index > 0) {
+            recordAnswer();
+            index--;
+            saveState();
+            renderQuestion();
+            
+            // Reset scroll position to top for new question
+            const questionArea = document.querySelector('.question-area');
+            if (questionArea) {
+              questionArea.scrollTop = 0;
+            }
+            
+            history.replaceState(null, '', window.location.href);
+          }
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          if (index < questions.length - 1) {
+            recordAnswer();
+            index++;
+            saveState();
+            renderQuestion();
+            
+            // Reset scroll position to top for new question
+            const questionArea = document.querySelector('.question-area');
+            if (questionArea) {
+              questionArea.scrollTop = 0;
+            }
+            
+            history.replaceState(null, '', window.location.href);
+          }
+          break;
+      case 'f':
+      case 'F':
+        e.preventDefault();
+        const li = document.querySelectorAll('.nav li')[index];
+        const saved = toggleFlag(questions[index].id);
+        li.classList.toggle('flagged', saved);
+        
+        // Update flag button state in footer
+        const flagBtn = document.querySelector('.flag-current-btn');
+        if (flagBtn) {
+          if (saved) {
+            flagBtn.classList.add('flagged');
+            flagBtn.title = 'Remove Flag';
+          } else {
+            flagBtn.classList.remove('flagged');
+            flagBtn.title = 'Flag for Review';
+          }
+        }
+        break;
+      case 'Enter':
+        e.preventDefault();
+        const q = questions[index];
+        const opts = document.getElementById('answerOptions');
+        const input = document.getElementById('calcInput');
+        const fb = document.getElementById('feedback');
+        const value = q.answers && q.answers.length ? selected : input.value.trim();
+        if (value) {
+          questionRenderer.evaluateAnswer(q, value, { options: opts, feedback: fb });
+          recordAnswer();
+        }
+        break;
+    }
+  });
 });
 
 

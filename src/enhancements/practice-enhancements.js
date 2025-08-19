@@ -495,7 +495,12 @@ class PracticeTestEnhancements {
 
 // Initialize enhancements when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-  window.practiceEnhancements = new PracticeTestEnhancements();
+  // Only initialize practice enhancements on the practice page with enhanced HTML
+  // Disabled for old HTML structure to avoid conflicts
+  if (false && (window.location.pathname.includes('practice.html') || 
+      window.location.pathname.includes('practice'))) {
+    window.practiceEnhancements = new PracticeTestEnhancements();
+  }
 });
 
 // Add CSS animations for notifications
