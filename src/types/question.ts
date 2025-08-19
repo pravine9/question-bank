@@ -43,17 +43,38 @@ export interface PracticeState {
   isFinished: boolean;
 }
 
+export interface TimerStats {
+  allocatedTimeMs: number;
+  allocatedTimeSeconds: number;
+  allocatedTimeMinutes: number;
+  actualTimeMs: number;
+  actualTimeSeconds: number;
+  actualTimeMinutes: number;
+  timeUsedSeconds: number;
+  timeUsedMinutes: number;
+  remainingTimeSeconds: number;
+  remainingTimeMinutes: number;
+  timeSavedSeconds: number;
+  timeSavedMinutes: number;
+  efficiency: number;
+  isFinishedEarly: boolean;
+  timeExpired: boolean;
+}
+
 export interface PracticeResult {
   id: string;
   bank: string;
   totalQuestions: number;
   correctAnswers: number;
+  wrongAnswers?: number;
+  notAnswered?: number;
   score: number;
   startTime: number;
   endTime: number;
   duration: number; // in minutes
   date: string;
   flaggedQuestions: number;
+  timerStats?: TimerStats;
   questions: {
     id: number;
     userAnswer: string;

@@ -9,7 +9,7 @@ const banks = window.banks;
 let bank;
 let questions = [], index = 0, selected = null, responses = [], reviewing = false;
 let backSummaryBtn, homeTopBtn, timerEl;
-let timerId, startTime;
+let timerId, startTime, practiceTimer;
 const flagged = new Set();
 let finished = false;
 let summaryData = null;
@@ -62,6 +62,10 @@ function clearState() {
   }
 }
 
+function getNotAnsweredCount() {
+  return responses.filter(r => !r || r.answer === null || r.answer === '').length;
+}
+
 function toggleFlag(id) {
   if (flagged.has(id)) {
     flagged.delete(id);
@@ -75,17 +79,28 @@ function toggleFlag(id) {
 
 function startTimer(savedStart) {
   startTime = savedStart || Date.now();
-  function pad(num) {
-    return num.toString().padStart(2, '0');
-  }
-  function update() {
-    const elapsed = Math.floor((Date.now() - startTime) / 1000);
-    const mins = Math.floor(elapsed / 60);
-    const secs = elapsed % 60;
-    timerEl.textContent = `${pad(mins)}:${pad(secs)}`;
-  }
-  update();
-  timerId = setInterval(update, 1000);
+  
+  // Initialize countdown timer
+  practiceTimer = new PracticeTimer(
+    questions.length,
+    handleTimerExpiry,
+    handleTimerWarning
+  );
+  
+  practiceTimer.start(savedStart);
+}
+
+function handleTimerExpiry() {
+  // Auto-finish test when timer expires
+  recordAnswer();
+  const modal = new TimerExpiryModal(() => {
+    showSummary();
+  });
+  modal.show();
+}
+
+function handleTimerWarning(warning) {
+  TimerNotification.show(warning.message, warning.type, 4000);
 }
 
 function computeCorrectText(q) {
@@ -431,7 +446,12 @@ function recordAnswer() {
 }
 
 function showSummary() {
+  // Stop timer
+  if (practiceTimer) {
+    practiceTimer.stop();
+  }
   clearInterval(timerId);
+  
   reviewing = false;
   finished = true;
   questionRenderer.closePdf();
@@ -441,6 +461,9 @@ function showSummary() {
   document.querySelector('.footer').style.display = 'none';
   const summaryEl = document.querySelector('.summary');
   const tbody = summaryEl.querySelector('tbody');
+  
+  // Get timer statistics
+  const timerStats = practiceTimer ? practiceTimer.getStats() : null;
   const elapsed = summaryData?.elapsed || Math.floor((Date.now() - startTime) / 1000);
   const mins = Math.floor(elapsed / 60);
   const secs = elapsed % 60;
@@ -490,9 +513,18 @@ function showSummary() {
     tr.appendChild(reviewTd);
     tbody.appendChild(tr);
   });
-  summaryData = { elapsed, correctCount };
+  const notAnsweredCount = getNotAnsweredCount();
+  const wrongCount = questions.length - correctCount - notAnsweredCount;
   
-  // Update score display
+  summaryData = { 
+    elapsed, 
+    correctCount, 
+    wrongCount,
+    notAnsweredCount,
+    timerStats 
+  };
+  
+  // Update score display with enhanced statistics
   const scoreDisplay = document.getElementById('scoreDisplay');
   const percentageDisplay = document.getElementById('percentageDisplay');
   const percentage = Math.round((correctCount / questions.length) * 100);
@@ -503,6 +535,9 @@ function showSummary() {
   if (percentageDisplay) {
     percentageDisplay.textContent = `(${percentage}%)`;
   }
+  
+  // Add enhanced statistics display
+  addEnhancedSummaryStats(timerStats, correctCount, wrongCount, notAnsweredCount);
   
   summaryEl.style.display = 'block';
   document.querySelector('.finish-btn').style.display = 'none';
@@ -526,6 +561,73 @@ function showSummary() {
   savePracticeResult();
 }
 
+function addEnhancedSummaryStats(timerStats, correctCount, wrongCount, notAnsweredCount) {
+  // Find or create enhanced stats container
+  let statsContainer = document.querySelector('.enhanced-summary-stats');
+  if (!statsContainer) {
+    statsContainer = document.createElement('div');
+    statsContainer.className = 'enhanced-summary-stats';
+    
+    // Insert after score display
+    const summaryEl = document.querySelector('.summary');
+    const scoreContainer = summaryEl.querySelector('.summary-score');
+    if (scoreContainer && scoreContainer.nextSibling) {
+      summaryEl.insertBefore(statsContainer, scoreContainer.nextSibling);
+    } else if (scoreContainer) {
+      scoreContainer.parentNode.insertBefore(statsContainer, scoreContainer.nextSibling);
+    }
+  }
+  
+  // Build stats HTML
+  let statsHTML = `
+    <div class="stats-grid">
+      <div class="stat-item correct">
+        <div class="stat-value">${correctCount}</div>
+        <div class="stat-label">Correct</div>
+      </div>
+      <div class="stat-item wrong">
+        <div class="stat-value">${wrongCount}</div>
+        <div class="stat-label">Wrong</div>
+      </div>
+      <div class="stat-item not-answered">
+        <div class="stat-value">${notAnsweredCount}</div>
+        <div class="stat-label">Not Answered</div>
+      </div>
+  `;
+  
+  if (timerStats) {
+    const timeUsed = timerStats.formatTime ? timerStats.formatTime(timerStats.timeUsedSeconds) : 
+                   `${Math.floor(timerStats.timeUsedSeconds / 60)}:${(timerStats.timeUsedSeconds % 60).toString().padStart(2, '0')}`;
+    const timeAllocated = timerStats.formatTime ? timerStats.formatTime(timerStats.allocatedTimeSeconds) :
+                         `${Math.floor(timerStats.allocatedTimeSeconds / 60)}:${(timerStats.allocatedTimeSeconds % 60).toString().padStart(2, '0')}`;
+    
+    statsHTML += `
+      <div class="stat-item time-used">
+        <div class="stat-value">${timeUsed}</div>
+        <div class="stat-label">Time Used</div>
+      </div>
+      <div class="stat-item time-allocated">
+        <div class="stat-value">${timeAllocated}</div>
+        <div class="stat-label">Time Allocated</div>
+      </div>
+    `;
+    
+    if (timerStats.isFinishedEarly) {
+      const timeSaved = timerStats.formatTime ? timerStats.formatTime(timerStats.timeSavedSeconds) :
+                       `${Math.floor(timerStats.timeSavedSeconds / 60)}:${(timerStats.timeSavedSeconds % 60).toString().padStart(2, '0')}`;
+      statsHTML += `
+        <div class="stat-item time-saved">
+          <div class="stat-value">${timeSaved}</div>
+          <div class="stat-label">Time Saved</div>
+        </div>
+      `;
+    }
+  }
+  
+  statsHTML += `</div>`;
+  statsContainer.innerHTML = statsHTML;
+}
+
 // Function to save practice test result
 function savePracticeResult() {
   try {
@@ -533,20 +635,26 @@ function savePracticeResult() {
     const correctCount = summaryData?.correctCount || 0;
     const totalQuestions = questions.length;
     const score = Math.round((correctCount / totalQuestions) * 100);
+    const timerStats = practiceTimer ? practiceTimer.getStats() : null;
     const duration = Math.floor((Date.now() - startTime) / 1000 / 60); // in minutes
     const flaggedCount = Array.from(flagged).length;
+    const notAnsweredCount = getNotAnsweredCount();
+    const wrongCount = questions.length - correctCount - notAnsweredCount;
 
     const practiceResult = {
       id: resultId,
       bank: bank,
       totalQuestions: totalQuestions,
       correctAnswers: correctCount,
+      wrongAnswers: wrongCount,
+      notAnswered: notAnsweredCount,
       score: score,
       startTime: startTime,
       endTime: Date.now(),
       duration: duration,
       date: new Date().toISOString(),
       flaggedQuestions: flaggedCount,
+      timerStats: timerStats,
       questions: questions.map((q, index) => {
         const response = responses[index] || {};
         return {
@@ -593,6 +701,146 @@ function savePracticeResult() {
   } catch (error) {
     console.warn('Failed to save practice result:', error);
   }
+}
+
+// Enhanced notification system
+function showNotification(message, type = 'info', duration = 3000) {
+  TimerNotification.show(message, type, duration);
+}
+
+// Enhanced accessibility features
+function setupAccessibility() {
+  // Add ARIA labels and roles
+  const questionArea = document.querySelector('.question-area');
+  if (questionArea) {
+    questionArea.setAttribute('role', 'main');
+    questionArea.setAttribute('aria-label', 'Question content area');
+  }
+
+  // Add live regions for screen readers
+  createLiveRegion('timer-updates', 'Timer updates');
+  createLiveRegion('progress-updates', 'Progress updates');
+  createLiveRegion('feedback-updates', 'Answer feedback');
+}
+
+function createLiveRegion(id, label) {
+  const existing = document.getElementById(id);
+  if (existing) return;
+  
+  const region = document.createElement('div');
+  region.id = id;
+  region.setAttribute('aria-live', 'polite');
+  region.setAttribute('aria-label', label);
+  region.style.position = 'absolute';
+  region.style.left = '-10000px';
+  region.style.width = '1px';
+  region.style.height = '1px';
+  region.style.overflow = 'hidden';
+  document.body.appendChild(region);
+}
+
+function updateLiveRegion(id, message) {
+  const region = document.getElementById(id);
+  if (region) {
+    region.textContent = message;
+  }
+}
+
+// Enhanced keyboard navigation
+function setupKeyboardShortcuts() {
+  document.addEventListener('keydown', (e) => {
+    if (finished) return; // Don't handle keys when test is finished
+    
+    // Handle number keys for option selection
+    if (e.key >= '1' && e.key <= '5') {
+      e.preventDefault();
+      const optionIndex = parseInt(e.key) - 1;
+      const options = document.querySelectorAll('#answerOptions button');
+      if (optionIndex >= 0 && optionIndex < options.length) {
+        options[optionIndex].click();
+      }
+      return;
+    }
+    
+    switch (e.key) {
+      case 'ArrowLeft':
+        e.preventDefault();
+        if (index > 0) {
+          recordAnswer();
+          index--;
+          saveState();
+          renderQuestion();
+          resetScrollPosition();
+          history.replaceState(null, '', window.location.href);
+        }
+        break;
+      case 'ArrowRight':
+        e.preventDefault();
+        if (index < questions.length - 1) {
+          recordAnswer();
+          index++;
+          saveState();
+          renderQuestion();
+          resetScrollPosition();
+          history.replaceState(null, '', window.location.href);
+        }
+        break;
+      case 'f':
+      case 'F':
+        e.preventDefault();
+        const li = document.querySelectorAll('.nav li')[index];
+        const saved = toggleFlag(questions[index].id);
+        li.classList.toggle('flagged', saved);
+        
+        // Update flag button state in footer
+        const flagBtn = document.querySelector('.flag-current-btn');
+        if (flagBtn) {
+          if (saved) {
+            flagBtn.classList.add('flagged');
+            flagBtn.title = 'Remove Flag';
+          } else {
+            flagBtn.classList.remove('flagged');
+            flagBtn.title = 'Flag for Review';
+          }
+        }
+        break;
+      case 'Enter':
+        e.preventDefault();
+        const q = questions[index];
+        const opts = document.getElementById('answerOptions');
+        const input = document.getElementById('calcInput');
+        const fb = document.getElementById('feedback');
+        const value = q.answers && q.answers.length ? selected : input.value.trim();
+        if (value) {
+          questionRenderer.evaluateAnswer(q, value, { options: opts, feedback: fb });
+          recordAnswer();
+        }
+        break;
+      case 'r':
+      case 'R':
+        e.preventDefault();
+        showReviewModal();
+        break;
+    }
+  });
+}
+
+function resetScrollPosition() {
+  const questionArea = document.querySelector('.question-area');
+  if (questionArea) {
+    questionArea.scrollTop = 0;
+  }
+}
+
+// Prevent accidental navigation
+function setupNavigationProtection() {
+  window.addEventListener('beforeunload', (e) => {
+    if (!finished && questions.length > 0) {
+      e.preventDefault();
+      e.returnValue = 'Are you sure you want to leave? Your progress will be lost.';
+      return e.returnValue;
+    }
+  });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -752,78 +1000,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('beforeunload', saveState);
   
-  // Add keyboard shortcuts
-  document.addEventListener('keydown', (e) => {
-    if (finished) return; // Don't handle keys when test is finished
-    
-    switch (e.key) {
-              case 'ArrowLeft':
-          e.preventDefault();
-          if (index > 0) {
-            recordAnswer();
-            index--;
-            saveState();
-            renderQuestion();
-            
-            // Reset scroll position to top for new question
-            const questionArea = document.querySelector('.question-area');
-            if (questionArea) {
-              questionArea.scrollTop = 0;
-            }
-            
-            history.replaceState(null, '', window.location.href);
-          }
-          break;
-        case 'ArrowRight':
-          e.preventDefault();
-          if (index < questions.length - 1) {
-            recordAnswer();
-            index++;
-            saveState();
-            renderQuestion();
-            
-            // Reset scroll position to top for new question
-            const questionArea = document.querySelector('.question-area');
-            if (questionArea) {
-              questionArea.scrollTop = 0;
-            }
-            
-            history.replaceState(null, '', window.location.href);
-          }
-          break;
-      case 'f':
-      case 'F':
-        e.preventDefault();
-        const li = document.querySelectorAll('.nav li')[index];
-        const saved = toggleFlag(questions[index].id);
-        li.classList.toggle('flagged', saved);
-        
-        // Update flag button state in footer
-        const flagBtn = document.querySelector('.flag-current-btn');
-        if (flagBtn) {
-          if (saved) {
-            flagBtn.classList.add('flagged');
-            flagBtn.title = 'Remove Flag';
-          } else {
-            flagBtn.classList.remove('flagged');
-            flagBtn.title = 'Flag for Review';
-          }
-        }
-        break;
-      case 'Enter':
-        e.preventDefault();
-        const q = questions[index];
-        const opts = document.getElementById('answerOptions');
-        const input = document.getElementById('calcInput');
-        const fb = document.getElementById('feedback');
-        const value = q.answers && q.answers.length ? selected : input.value.trim();
-        if (value) {
-          questionRenderer.evaluateAnswer(q, value, { options: opts, feedback: fb });
-          recordAnswer();
-        }
-        break;
-    }
-  });
+  // Initialize enhancements
+  setupAccessibility();
+  setupKeyboardShortcuts();
+  setupNavigationProtection();
 });
 
 

@@ -106,8 +106,20 @@ class PracticeHistoryComponent {
               <span class="stat-value">${result.correctAnswers}/${result.totalQuestions}</span>
               <span class="stat-label">Correct</span>
             </div>
+            ${result.wrongAnswers !== undefined ? `
+              <div class="stat">
+                <span class="stat-value">${result.wrongAnswers}</span>
+                <span class="stat-label">Wrong</span>
+              </div>
+            ` : ''}
+            ${result.notAnswered !== undefined ? `
+              <div class="stat">
+                <span class="stat-value">${result.notAnswered}</span>
+                <span class="stat-label">Not Answered</span>
+              </div>
+            ` : ''}
             <div class="stat">
-              <span class="stat-value">${result.duration}m</span>
+              <span class="stat-value">${this.formatDuration(result)}</span>
               <span class="stat-label">Time</span>
             </div>
             ${result.flaggedQuestions > 0 ? `
@@ -136,6 +148,26 @@ class PracticeHistoryComponent {
       'clinical_therapeutics': 'Clinical Therapeutics'
     };
     return bankNames[bank] || bank;
+  }
+
+  formatDuration(result) {
+    // Enhanced duration display with timer statistics
+    if (result.timerStats) {
+      const timeUsed = Math.floor(result.timerStats.timeUsedSeconds / 60);
+      const timeAllocated = Math.floor(result.timerStats.allocatedTimeSeconds / 60);
+      
+      if (result.timerStats.isFinishedEarly) {
+        const timeSaved = Math.floor(result.timerStats.timeSavedSeconds / 60);
+        return `${timeUsed}m/${timeAllocated}m (-${timeSaved}m)`;
+      } else if (result.timerStats.timeExpired) {
+        return `${timeAllocated}m (expired)`;
+      } else {
+        return `${timeUsed}m/${timeAllocated}m`;
+      }
+    }
+    
+    // Fallback to original duration display
+    return `${result.duration}m`;
   }
 
   attachEventListeners() {
