@@ -3,95 +3,108 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Question Bank</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap">
+  <title>GPhC Question Bank</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
   <link rel="stylesheet" href="../static/question.css">
   <link rel="stylesheet" href="../static/styles.css">
+  <link rel="stylesheet" href="../src/styles/design-system.css">
+  <link rel="stylesheet" href="../src/styles/components.css">
 </head>
 <body>
   <div class="container">
-    <h1>Question Bank</h1>
-    <label for="bankSelect">Select Bank:</label>
-    <select id="bankSelect">
-      <option value="">-- Choose --</option>
-    </select>
-    <label for="numInput">Number of questions:</label>
-    <input type="number" id="numInput" value="1" min="1">
-    <div class="button-row">
-      <button id="loadBtn">Load Random Question</button>
-      <button id="practiceBtn">Start Practice</button>
+    <h1>GPhC Question Bank</h1>
+    
+    <!-- Practice History Section -->
+    <div id="practiceHistory"></div>
+    
+    <!-- Practice Section -->
+    <div class="practice-section">
+      <h2>Start Practice</h2>
+      <label for="bankSelect">Select Bank:</label>
+      <select id="bankSelect">
+        <option value="">-- Choose --</option>
+      </select>
+      <label for="numInput">Number of questions:</label>
+      <input type="number" id="numInput" value="1" min="1">
+      <div class="button-row">
+        <button id="loadBtn">Load Random Question</button>
+        <button id="practiceBtn">Start Practice</button>
+      </div>
     </div>
 
-      <div id="questionArea">
-        <div id="qText"></div>
-        <div id="qTitle" class="question-title"></div>
-        <img id="qImg" alt="Question image">
-        <div id="answerOptions" class="options"></div>
-        <div class="calculator" style="display:none">
-          <label>Answer</label>
-          <input type="number" id="calcInput">
-          <span class="unit" id="answerUnit"></span>
-        </div>
-        <div class="button-row">
-          <button id="checkBtn">Check</button>
-          <button id="revealBtn">Reveal</button>
-          <button id="saveBtn">Save for review</button>
-        </div>
-        <div id="feedback"></div>
-        <div id="answer"></div>
-        <div id="explanation"></div>
+    <!-- Single Question Section -->
+    <div id="questionArea">
+      <div id="qText"></div>
+      <div id="qTitle" class="question-title"></div>
+      <img id="qImg" alt="Question image">
+      <div id="answerOptions" class="options"></div>
+      <div class="calculator" style="display:none">
+        <label>Answer</label>
+        <input type="number" id="calcInput">
+        <span class="unit" id="answerUnit"></span>
       </div>
-
-      <div class="pdf-pane" id="pdfPane" style="display:none">
-        <div class="pdf-controls">
-          <button type="button" class="pdf-zoom-in">+</button>
-          <button type="button" class="pdf-zoom-out">-</button>
-          <button type="button" class="pdf-close">&times;</button>
-        </div>
-        <div class="pdf-wrapper">
-          <iframe id="pdfFrame" src="" title="PDF viewer"></iframe>
-        </div>
+      <div class="button-row">
+        <button id="checkBtn">Check</button>
+        <button id="revealBtn">Reveal</button>
+        <button id="saveBtn">Save for review</button>
       </div>
+      <div id="feedback"></div>
+      <div id="answer"></div>
+      <div id="explanation"></div>
+    </div>
 
-      <div id="statsArea">
-        <h2>Question Statistics</h2>
-        <label for="statsBankSelect">Select Bank:</label>
-        <select id="statsBankSelect">
-          <option value="">-- Choose --</option>
-        </select>
-        <button id="loadStatsBtn">Load Stats</button>
-        <table id="statsTable">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Attempts</th>
-              <th>Right</th>
-              <th>Wrong</th>
-              <th>View</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-        <!-- Modal for displaying a single stats question -->
-        <div id="statsModal" class="modal-overlay">
-          <div class="modal-content">
-            <button id="sqCloseBtn" class="close">&times;</button>
-            <div id="sqText"></div>
-            <p id="sqTitle" class="question-title"></p>
-            <img id="sqImg" alt="Question image">
-            <div id="sqOptions" class="options"></div>
-            <div class="calculator" style="display:none">
-              <label>Answer</label>
-              <input type="number" id="sqCalcInput">
-              <span class="unit" id="sqAnswerUnit"></span>
-            </div>
-            <button id="sqRevealBtn">Reveal Answer</button>
-            <div id="sqAnswer"></div>
-            <div id="sqExplanation"></div>
+    <!-- PDF Viewer -->
+    <div class="pdf-pane" id="pdfPane" style="display:none">
+      <div class="pdf-controls">
+        <button type="button" class="pdf-zoom-in">+</button>
+        <button type="button" class="pdf-zoom-out">-</button>
+        <button type="button" class="pdf-close">&times;</button>
+      </div>
+      <div class="pdf-wrapper">
+        <iframe id="pdfFrame" src="" title="PDF viewer"></iframe>
+      </div>
+    </div>
+
+    <!-- Statistics Section -->
+    <div id="statsArea">
+      <h2>Question Statistics</h2>
+      <label for="statsBankSelect">Select Bank:</label>
+      <select id="statsBankSelect">
+        <option value="">-- Choose --</option>
+      </select>
+      <button id="loadStatsBtn">Load Stats</button>
+      <table id="statsTable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Attempts</th>
+            <th>Right</th>
+            <th>Wrong</th>
+            <th>View</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <!-- Modal for displaying a single stats question -->
+      <div id="statsModal" class="modal-overlay">
+        <div class="modal-content">
+          <button id="sqCloseBtn" class="close">&times;</button>
+          <div id="sqText"></div>
+          <p id="sqTitle" class="question-title"></p>
+          <img id="sqImg" alt="Question image">
+          <div id="sqOptions" class="options"></div>
+          <div class="calculator" style="display:none">
+            <label>Answer</label>
+            <input type="number" id="sqCalcInput">
+            <span class="unit" id="sqAnswerUnit"></span>
           </div>
+          <button id="sqRevealBtn">Reveal Answer</button>
+          <div id="sqAnswer"></div>
+          <div id="sqExplanation"></div>
         </div>
       </div>
     </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify@2.3.10/dist/purify.min.js"></script>
@@ -107,5 +120,15 @@
   <script src="../static/banks.js"></script>
   <script src="../static/question_renderer.js"></script>
   <script src="../static/main.js"></script>
+  <script src="../src/test-enhancements.js"></script>
+  <script src="../src/components/practiceHistory.js"></script>
+  <script>
+    // Initialize practice history component
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.practiceHistoryComponent) {
+        window.practiceHistoryComponent.render('practiceHistory');
+      }
+    });
+  </script>
 </body>
 </html>

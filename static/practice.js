@@ -363,6 +363,78 @@ function showSummary() {
   });
   flagged.clear();
   saveState();
+
+  // Save practice result to history
+  savePracticeResult();
+}
+
+// Function to save practice test result
+function savePracticeResult() {
+  try {
+    const resultId = `test_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const correctCount = summaryData?.correctCount || 0;
+    const totalQuestions = questions.length;
+    const score = Math.round((correctCount / totalQuestions) * 100);
+    const duration = Math.floor((Date.now() - startTime) / 1000 / 60); // in minutes
+    const flaggedCount = Array.from(flagged).length;
+
+    const practiceResult = {
+      id: resultId,
+      bank: bank,
+      totalQuestions: totalQuestions,
+      correctAnswers: correctCount,
+      score: score,
+      startTime: startTime,
+      endTime: Date.now(),
+      duration: duration,
+      date: new Date().toISOString(),
+      flaggedQuestions: flaggedCount,
+      questions: questions.map((q, index) => {
+        const response = responses[index] || {};
+        return {
+          id: q.id,
+          userAnswer: response.text || '',
+          correctAnswer: response.correctAnswer || '',
+          isCorrect: response.correct || false,
+          flagged: flagged.has(q.id)
+        };
+      })
+    };
+
+    // Get existing history
+    const existingHistory = localStorage.getItem('practice_history');
+    let history = existingHistory ? JSON.parse(existingHistory) : { results: [] };
+    
+    // Add new result to beginning of array
+    history.results.unshift(practiceResult);
+    
+    // Keep only last 50 results to prevent storage bloat
+    if (history.results.length > 50) {
+      history.results = history.results.slice(0, 50);
+    }
+
+    // Calculate updated stats
+    const totalTests = history.results.length;
+    const totalScore = history.results.reduce((sum, result) => sum + result.score, 0);
+    const averageScore = totalTests > 0 ? Math.round((totalScore / totalTests) * 100) / 100 : 0;
+    const bestScore = history.results.length > 0 ? Math.max(...history.results.map(r => r.score)) : 0;
+    const totalTime = history.results.reduce((sum, result) => sum + result.duration, 0);
+
+    const updatedHistory = {
+      results: history.results,
+      totalTests,
+      averageScore,
+      bestScore,
+      totalTime
+    };
+
+    // Save to localStorage
+    localStorage.setItem('practice_history', JSON.stringify(updatedHistory));
+    
+    console.log('✅ Practice result saved to history:', practiceResult);
+  } catch (error) {
+    console.warn('Failed to save practice result:', error);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
