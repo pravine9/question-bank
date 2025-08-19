@@ -190,6 +190,7 @@ function updateProgress() {
       font-size: 16px;
       font-weight: 600;
       margin-top: 4px;
+      padding-right: 10px;
     `;
     const progressContainer = header.querySelector('.progress');
     progressContainer.parentNode.insertBefore(percentageDisplay, progressContainer.nextSibling);
