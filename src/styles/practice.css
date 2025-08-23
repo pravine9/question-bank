@@ -1,14 +1,3 @@
-body {
-  margin: 0;
-  font-family: 'Nunito', Arial, sans-serif;
-  background: #ecf0f1;
-}
-
-.container {
-  max-width: 900px;
-  margin: 0 auto;
-}
-
 .header {
   display: flex;
   align-items: center;
