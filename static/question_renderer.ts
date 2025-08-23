@@ -187,10 +187,9 @@ function initPdfViewer(): void {
 }
 
 // Create the question renderer object
-const questionRenderer: QuestionRenderer = {
+export const questionRenderer: QuestionRenderer = {
   initPdfViewer,
   renderQuestion
 };
 
-// Make it available globally
-(window as any).questionRenderer = questionRenderer;
+export default questionRenderer;

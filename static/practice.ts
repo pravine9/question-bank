@@ -8,10 +8,12 @@ import type {
 import { formatBankName } from '@/utils/bankNames';
 import { EMPTY_HISTORY } from '@/utils/history';
 import { evaluateAnswer, getCorrectAnswerText } from '@/utils/answers';
+import { banks } from './banks';
+import { questionRenderer } from './question_renderer';
 
 // Timer functionality removed - practice mode runs without time constraints
 
-class PracticeManager {
+export class PracticeManager {
   private state: PracticeState | null = null;
   private isFinished: boolean = false;
   private sessionKey: string = '';
@@ -26,7 +28,7 @@ class PracticeManager {
     const numQuestions = parseInt(params.get('num') || '10');
     const resume = params.get('resume') === 'true';
 
-    if (!bank || !(window as any).banks || !(window as any).banks[bank]) {
+    if (!bank || !banks || !banks[bank]) {
       alert('No valid question bank selected');
       window.location.href = 'index.html';
     return;
@@ -51,7 +53,7 @@ class PracticeManager {
   }
 
   private setupPracticeSession(bank: string, numQuestions: number): void {
-    const bankData = (window as any).banks![bank];
+    const bankData = banks[bank];
     if (!bankData || !bankData.length) {
       alert('Question bank is empty');
     return;
@@ -173,8 +175,8 @@ class PracticeManager {
     }
 
     // Render question using global renderer
-    if ((window as any).questionRenderer) {
-      (window as any).questionRenderer.renderQuestion(question, {
+    if (questionRenderer) {
+      questionRenderer.renderQuestion(question, {
         text: '#qText',
         title: '#qTitle',
         img: '#qImg',
@@ -555,7 +557,7 @@ class PracticeManager {
       }
       
       // Reconstruct questions from IDs
-      const bankData = (window as any).banks![data.bank];
+    const bankData = banks[data.bank];
       const allQuestions: Question[] = [];
       bankData.forEach((questionArray: Question[]) => {
         allQuestions.push(...questionArray);
@@ -605,13 +607,4 @@ class PracticeManager {
   }
 }
 
-// Initialize practice manager when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('Practice mode initializing...');
-  const practiceManager = new PracticeManager();
-  practiceManager.init();
-});
-
-// Make classes available globally if needed
-(window as any).PracticeManager = PracticeManager;
 // Timer class removed - no longer needed

@@ -171,12 +171,12 @@
   <script src="/question_banks/clinical_therapeutics_high_questions.js"></script>
   <script src="/question_banks/clinical_therapeutics_low_questions.js"></script>
   <script src="/question_banks/clinical_therapeutics_medium_questions.js"></script>
-  <script type="module" src="/static/banks.ts"></script>
-  <script type="module" src="/static/question_renderer.ts"></script>
-  <script type="module" src="/static/main.ts"></script>
   <script type="module">
-    import practiceHistoryComponent from '/src/components/practiceHistory.ts';
-    practiceHistoryComponent.render('practiceHistory');
+    import { init } from '/static/main.ts';
+    import { PracticeHistoryComponent } from '/src/components/practiceHistory.ts';
+    init();
+    const practiceHistory = new PracticeHistoryComponent();
+    practiceHistory.render('practiceHistory');
   </script>
 </body>
 </html>

@@ -33,29 +33,6 @@ export interface BankLabels {
   [key: string]: string;
 }
 
-// Global window interface extensions
-declare global {
-  interface Window {
-    // Question bank data (loaded by question bank JS files)
-    calculations?: Question[];
-    clinicalMepLow?: Question[];
-    clinicalMixedHigh?: Question[];
-    clinicalMixedLow?: Question[];
-    clinicalMixedMedium?: Question[];
-    clinicalOtcLow?: Question[];
-    clinicalTherapeuticsHigh?: Question[];
-    clinicalTherapeuticsLow?: Question[];
-    clinicalTherapeuticsMedium?: Question[];
-    
-    // Application state
-    banks?: QuestionBank;
-      populateBankSelects?: (banks: QuestionBank) => void;
-      questionRenderer?: QuestionRenderer;
-      toggleFlag?: (id: number) => boolean;
-      // Timer functionality removed
-    }
-  }
-
 export interface QuestionStats {
   [questionId: number]: {
     attempts: number;
