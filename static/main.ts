@@ -1,18 +1,14 @@
-import React from 'react';
-import { createRoot, type Root } from 'react-dom/client';
 import type { Question, QuestionBank, BankData } from '@/types/question';
 import { formatBankName } from '@/utils/bankNames';
 import { evaluateAnswer, getCorrectAnswerText } from '@/utils/answers';
-import QuestionRenderer from '@/components/QuestionRenderer';
 import { banks } from './banks';
+import { questionRenderer } from './question_renderer';
 
 const bankFiles: QuestionBank = banks;
 let banksPopulated = false;
 
 // Add event handlers for question buttons
 let currentQuestion: Question | null = null;
-let questionRoot: Root | null = null;
-let selectedAnswer = '';
 
 export function init(): void {
   const loadBtn = document.getElementById('loadBtn') as HTMLButtonElement | null;
@@ -49,11 +45,6 @@ export function init(): void {
     }
   }
 
-  const container = document.getElementById('questionRoot');
-  if (container) {
-    questionRoot = createRoot(container);
-  }
-
   populateBankSelects(bankFiles);
 
   try {
@@ -67,6 +58,8 @@ export function init(): void {
   } catch (e) {
     console.warn('Failed to load lastBank', e);
   }
+
+  questionRenderer.initPdfViewer();
 }
 
 function populateBankSelects(data: QuestionBank): void {
@@ -145,7 +138,6 @@ function loadQuestion(): void {
 function renderQuestion(question: Question): void {
   // Store current question for button actions
   currentQuestion = question;
-  selectedAnswer = '';
 
   // Store the selected bank for next time
   try {
@@ -159,16 +151,19 @@ function renderQuestion(question: Question): void {
     console.warn('Failed to save lastBank', e);
   }
 
-  if (questionRoot) {
-    questionRoot.render(
-      React.createElement(QuestionRenderer, {
-        question,
-        variant: 'index',
-        onAnswerChange: (val: string) => {
-          selectedAnswer = val;
-        }
-      })
-    );
+  // Render the question using the question renderer
+  if (questionRenderer) {
+    questionRenderer.renderQuestion(question, {
+      text: '#qText',
+      title: '#qTitle',
+      img: '#qImg',
+      options: '#answerOptions',
+      input: '.calculator',
+      unit: '#answerUnit',
+      feedback: '#feedback',
+      answer: '#answer',
+      explanation: '#explanation',
+    });
   }
 
   // Show the question area
@@ -240,11 +235,14 @@ function checkAnswer(): void {
     }
     userAnswer = calcInput.value;
   } else {
-    if (!selectedAnswer) {
+    const selectedOption = document.querySelector(
+      'input[name="answer"]:checked'
+    ) as HTMLInputElement;
+    if (!selectedOption) {
       alert('Please select an answer first');
       return;
     }
-    userAnswer = selectedAnswer;
+    userAnswer = selectedOption.value;
   }
 
   const isCorrect = evaluateAnswer(currentQuestion, userAnswer);
