@@ -74,21 +74,3 @@ export interface PracticeHistory {
   bestScore: number;
   totalTime: number; // in minutes
 }
-
-export interface RenderOptions {
-  text?: string;
-  title?: string;
-  img?: string;
-  options?: string;
-  input?: string;
-  unit?: string;
-  feedback?: string;
-  answer?: string;
-  explanation?: string;
-  showInput?: boolean;
-}
-
-export interface QuestionRenderer {
-  initPdfViewer(): void;
-  renderQuestion(question: Question, config?: RenderOptions): void;
-}
