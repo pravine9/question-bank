@@ -1,7 +1,8 @@
 // Summary Page Logic - Dedicated Implementation
 
-import type { Question, PracticeResult } from '@/types/question';
+import type { PracticeResult } from '@/types/question';
 import { EMPTY_HISTORY } from '@/utils/history';
+import { evaluateAnswer, getCorrectAnswerText } from '@/utils/answers';
 
 class SummaryManager {
   private testResult: PracticeResult | null = null;
@@ -68,7 +69,8 @@ class SummaryManager {
     for (let i = 0; i < this.testResult.questions.length; i++) {
       const question = this.testResult.questions[i];
       const userAnswer = this.testResult.answers[i] || 'No answer';
-      const isCorrect = userAnswer !== 'No answer' && this.evaluateAnswer(question, userAnswer);
+      const isCorrect =
+        userAnswer !== 'No answer' && evaluateAnswer(question, userAnswer);
       const isFlagged = this.testResult.flagged.includes(i);
       
       if (isCorrect) {
@@ -90,7 +92,7 @@ class SummaryManager {
           ${isFlagged ? '<div class="flag-indicator">⚑</div>' : ''}
         </td>
         <td class="answer-cell">${userAnswer}</td>
-        <td class="correct-answer-cell">${this.getCorrectAnswerText(question)}</td>
+        <td class="correct-answer-cell">${getCorrectAnswerText(question)}</td>
         <td class="status-cell ${statusClass}">${statusText}${flagIcon}</td>
         <td>
           <button class="btn btn-sm review-question" data-question="${i}">
@@ -166,41 +168,6 @@ class SummaryManager {
     }
   }
 
-  private evaluateAnswer(question: Question, userAnswer: string): boolean {
-    if (!question || !userAnswer) return false;
-
-    if (question.is_free) {
-      return userAnswer.toLowerCase().trim() === question.correct_answer.toLowerCase().trim();
-    }
-    
-    if (question.is_calculation) {
-      const userNum = parseFloat(userAnswer);
-      const correctNum = question.correct_answer_number || parseFloat(question.correct_answer);
-      if (isNaN(userNum) || isNaN(correctNum)) return false;
-      
-      const tolerance = Math.abs(correctNum * 0.05); // 5% tolerance
-      return Math.abs(userNum - correctNum) <= tolerance;
-    }
-    
-    // Multiple choice
-    const correctAnswerNumber = question.correct_answer_number;
-    if (correctAnswerNumber === undefined || correctAnswerNumber === null) return false;
-    return parseInt(userAnswer) === correctAnswerNumber;
-  }
-
-  private getCorrectAnswerText(question: Question): string {
-    if (question.is_calculation) {
-      return question.correct_answer || 'Calculation required';
-    } else {
-      // For multiple choice, show the text of the correct answer
-      const correctAnswerNumber = question.correct_answer_number;
-      if (correctAnswerNumber && question.answers) {
-        const correctAnswer = question.answers.find(a => a.answer_number === correctAnswerNumber);
-        return correctAnswer ? correctAnswer.text : question.correct_answer || 'Unknown';
-      }
-      return question.correct_answer || 'Unknown';
-    }
-  }
 
   private startReviewMode(mode: 'all' | 'incorrect' | 'flagged'): void {
     if (!this.testResult) return;
@@ -213,7 +180,7 @@ class SummaryManager {
     if (mode === 'incorrect') {
       for (let i = 0; i < this.testResult.questions.length; i++) {
         const userAnswer = this.testResult.answers[i];
-        if (userAnswer && !this.evaluateAnswer(this.testResult.questions[i], userAnswer)) {
+        if (userAnswer && !evaluateAnswer(this.testResult.questions[i], userAnswer)) {
           firstQuestion = i;
           break;
         }
@@ -268,7 +235,7 @@ class SummaryManager {
     // Show correct answer
     const reviewCorrectAnswer = document.getElementById('reviewCorrectAnswer');
     if (reviewCorrectAnswer) {
-      reviewCorrectAnswer.textContent = this.getCorrectAnswerText(question);
+      reviewCorrectAnswer.textContent = getCorrectAnswerText(question);
     }
 
     // Show explanation
@@ -317,7 +284,7 @@ class SummaryManager {
     if (this.reviewMode === 'incorrect') {
       while (nextQuestion >= 0 && nextQuestion < this.testResult.questions.length) {
         const userAnswer = this.testResult.answers[nextQuestion];
-        if (userAnswer && !this.evaluateAnswer(this.testResult.questions[nextQuestion], userAnswer)) {
+        if (userAnswer && !evaluateAnswer(this.testResult.questions[nextQuestion], userAnswer)) {
           break;
         }
         nextQuestion += direction;
