@@ -3,8 +3,9 @@
 import type { PracticeResult } from '@/types/question';
 import { EMPTY_HISTORY } from '@/utils/history';
 import { evaluateAnswer, getCorrectAnswerText } from '@/utils/answers';
+import { questionRenderer } from './question_renderer';
 
-class SummaryManager {
+export class SummaryManager {
   private testResult: PracticeResult | null = null;
   private currentReviewQuestion: number = 0;
   private reviewMode: 'all' | 'incorrect' | 'flagged' = 'all';
@@ -210,9 +211,9 @@ class SummaryManager {
       modalTitle.textContent = `Question ${questionNum + 1} Review`;
     }
 
-    // Render question using global renderer
-    if ((window as any).questionRenderer) {
-      (window as any).questionRenderer.renderQuestion(question, {
+    // Render question using renderer
+    if (questionRenderer) {
+      questionRenderer.renderQuestion(question, {
         text: '#reviewQuestionText',
         title: '#reviewQuestionTitle',
         img: '#reviewQuestionImage',
@@ -305,11 +306,4 @@ class SummaryManager {
   }
 }
 
-// Initialize summary manager when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('Summary page initializing...');
-  new SummaryManager();
-});
-
-// Make class available globally if needed
-(window as any).SummaryManager = SummaryManager;
+// SummaryManager is exported and should be instantiated by the page script

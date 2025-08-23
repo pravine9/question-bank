@@ -1,38 +1,65 @@
 import type { Question, QuestionBank, BankData } from '@/types/question';
 import { formatBankName } from '@/utils/bankNames';
 import { evaluateAnswer, getCorrectAnswerText } from '@/utils/answers';
+import { banks } from './banks';
+import { questionRenderer } from './question_renderer';
 
-let bankFiles: QuestionBank = (window as any).banks || {};
-const flagged = new Set<number>();
+const bankFiles: QuestionBank = banks;
 let banksPopulated = false;
-
-const loadBtn = document.getElementById('loadBtn') as HTMLButtonElement | null;
-if (loadBtn) {
-  loadBtn.addEventListener('click', loadQuestion);
-}
-
-const practiceBtn = document.getElementById(
-  'practiceBtn'
-) as HTMLButtonElement | null;
-if (practiceBtn) {
-  practiceBtn.addEventListener('click', startPractice);
-}
 
 // Add event handlers for question buttons
 let currentQuestion: Question | null = null;
 
-const checkBtn = document.getElementById(
-  'checkBtn'
-) as HTMLButtonElement | null;
-if (checkBtn) {
-  checkBtn.addEventListener('click', checkAnswer);
-}
+export function init(): void {
+  const loadBtn = document.getElementById('loadBtn') as HTMLButtonElement | null;
+  if (loadBtn) {
+    loadBtn.addEventListener('click', loadQuestion);
+  }
 
-const revealBtn = document.getElementById(
-  'revealBtn'
-) as HTMLButtonElement | null;
-if (revealBtn) {
-  revealBtn.addEventListener('click', revealAnswer);
+  const practiceBtn = document.getElementById('practiceBtn') as HTMLButtonElement | null;
+  if (practiceBtn) {
+    practiceBtn.addEventListener('click', startPractice);
+  }
+
+  const checkBtn = document.getElementById('checkBtn') as HTMLButtonElement | null;
+  if (checkBtn) {
+    checkBtn.addEventListener('click', checkAnswer);
+  }
+
+  const revealBtn = document.getElementById('revealBtn') as HTMLButtonElement | null;
+  if (revealBtn) {
+    revealBtn.addEventListener('click', revealAnswer);
+  }
+
+  const statsModal = document.getElementById('statsModal');
+  if (statsModal) {
+    statsModal.classList.remove('show');
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('isStandAlone') === 'true') {
+    document.body.classList.add('standalone');
+    const container = document.querySelector('.container');
+    if (container) {
+      container.classList.add('standalone');
+    }
+  }
+
+  populateBankSelects(bankFiles);
+
+  try {
+    const last = localStorage.getItem('lastBank');
+    if (last) {
+      const bankSelect = document.getElementById('bankSelect') as HTMLSelectElement | null;
+      if (bankSelect && bankFiles[last]) {
+        bankSelect.value = last;
+      }
+    }
+  } catch (e) {
+    console.warn('Failed to load lastBank', e);
+  }
+
+  questionRenderer.initPdfViewer();
 }
 
 function populateBankSelects(data: QuestionBank): void {
@@ -95,64 +122,6 @@ function getSelectedBank(id: string): BankData | null {
   return { bank, files };
 }
 
-function toggleFlag(id: number): boolean {
-  if (flagged.has(id)) {
-    flagged.delete(id);
-    return false;
-  }
-  flagged.add(id);
-  return true;
-}
-
-(window as any).toggleFlag = toggleFlag;
-
-// Make populateBankSelects available globally
-(window as any).populateBankSelects = populateBankSelects;
-
-// Adjust layout when loaded in standalone mode
-document.addEventListener('DOMContentLoaded', function () {
-  // Ensure statsModal is hidden by default
-  const statsModal = document.getElementById('statsModal');
-  if (statsModal) {
-    statsModal.classList.remove('show');
-  }
-
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('isStandAlone') === 'true') {
-    document.body.classList.add('standalone');
-    const container = document.querySelector('.container');
-    if (container) {
-      container.classList.add('standalone');
-    }
-  }
-
-  // Update bankFiles if banks have been loaded
-  if ((window as any).banks) {
-    bankFiles = (window as any).banks;
-    populateBankSelects(bankFiles);
-  } else {
-    console.warn('No banks found in window yet');
-  }
-
-  // Preselect the last used bank if available
-  try {
-    const last = localStorage.getItem('lastBank');
-    if (last) {
-      const bankSelect = document.getElementById(
-        'bankSelect'
-      ) as HTMLSelectElement | null;
-      if (bankSelect && bankFiles[last]) {
-        bankSelect.value = last;
-      }
-    }
-  } catch (e) {
-    console.warn('Failed to load lastBank', e);
-  }
-
-  if ((window as any).questionRenderer) {
-    (window as any).questionRenderer.initPdfViewer();
-  }
-});
 
 function loadQuestion(): void {
   const data = getSelectedBank('bankSelect');
@@ -183,8 +152,8 @@ function renderQuestion(question: Question): void {
   }
 
   // Render the question using the question renderer
-  if ((window as any).questionRenderer) {
-    (window as any).questionRenderer.renderQuestion(question, {
+  if (questionRenderer) {
+    questionRenderer.renderQuestion(question, {
       text: '#qText',
       title: '#qTitle',
       img: '#qImg',
@@ -324,6 +293,3 @@ function revealAnswer(): void {
     feedbackEl.className = 'feedback';
   }
 }
-
-// Functions are available globally via window object
-// No need to export since we're not using ES modules in HTML

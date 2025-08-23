@@ -142,6 +142,3 @@ export class PracticeHistoryComponent {
     }
   }
 }
-
-const practiceHistoryComponent = new PracticeHistoryComponent();
-export default practiceHistoryComponent;
