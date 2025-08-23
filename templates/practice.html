@@ -7,113 +7,9 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
   <link rel="stylesheet" href="../src/styles/consolidated.css">
   <link rel="stylesheet" href="../src/styles/practice.css">
-  <link rel="stylesheet" href="../src/styles/summary.css">
 </head>
 <body>
-  <div class="container">
-    <!-- Simple Header -->
-    <div class="header">
-      <div class="test-title"></div>
-      <div class="progress">
-        <div class="bar"></div>
-      </div>
-      <!-- Timer removed -->
-      <div class="header-right">
-        <button type="button" class="btn btn-warning" style="display:none">Summary</button>
-        <button type="button" class="btn btn-warning" style="display:none">Home</button>
-        <button type="button" class="btn btn-danger finish-btn">Finish Test</button>
-      </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="main">
-      <!-- Simple Sidebar -->
-      <div class="sidebar">
-        <ul class="nav">
-          <!-- Question numbers will be populated dynamically -->
-        </ul>
-      </div>
-
-      <!-- Question Area -->
-      <div class="question-area">
-        <h2 class="q-number">Question 1 <span class="flag-icon" id="questionFlag" style="display:none;">⚑</span></h2>
-        <div id="qText"></div>
-        <div id="qTitle" class="question-title"></div>
-        <img id="qImg" class="question-image" alt="Question image" style="display:none;">
-        <div id="answerOptions" class="options"></div>
-        <div class="calculator" style="display:none">
-          <label>Answer</label>
-          <input type="number" id="calcInput">
-          <span class="unit" id="answerUnit"></span>
-        </div>
-        <div class="button-row">
-          <button id="checkBtn" class="check-btn">Check</button>
-        </div>
-        <div id="feedback" class="feedback"></div>
-        <div id="answer"></div>
-        <div id="explanation"></div>
-      </div>
-    </div>
-
-    <!-- Simple Footer -->
-    <div class="footer">
-      <div class="footer-left">
-        <button type="button" class="review-status-btn" title="Review Question Status">
-          <span class="review-icon">📋</span>
-          <span class="review-text">Review</span>
-        </button>
-      </div>
-      <div class="nav-btns">
-        <button type="button" class="flag-current-btn" title="Flag for Review">⚑</button>
-        <button type="button" class="back-btn" disabled>‹ Back</button>
-        <button type="button" class="next-btn">Next ›</button>
-      </div>
-    </div>
-
-    <!-- Review Status Modal -->
-    <div class="review-modal" id="reviewModal" style="display:none">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3>Question Review Status</h3>
-          <button type="button" class="modal-close">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="status-summary">
-            <div class="status-item attempted">
-              <span class="status-label">Attempted:</span>
-              <span class="status-count" id="attemptedCount">0</span>
-            </div>
-            <div class="status-item not-attempted">
-              <span class="status-label">Not Attempted:</span>
-              <span class="status-count" id="notAttemptedCount">0</span>
-            </div>
-            <div class="status-item flagged">
-              <span class="status-label">Flagged:</span>
-              <span class="status-count" id="flaggedCount">0</span>
-            </div>
-          </div>
-          <div class="question-grid-review" id="questionGridReview">
-            <!-- Question grid will be populated here -->
-          </div>
-        </div>
-      </div>
-    </div>
-
-
-
-    <!-- PDF Viewer -->
-    <div class="pdf-pane" id="pdfPane" style="display:none">
-      <div class="pdf-controls">
-        <button type="button" class="pdf-zoom-in">+</button>
-        <button type="button" class="pdf-zoom-out">-</button>
-        <button type="button" class="pdf-close">&times;</button>
-      </div>
-      <div class="pdf-wrapper">
-        <iframe id="pdfFrame" src="" title="PDF viewer"></iframe>
-      </div>
-    </div>
-  </div>
-
+  <div id="root"></div>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify@2.3.10/dist/purify.min.js"></script>
   <script src="../question_banks/calculations_questions.js"></script>
@@ -126,9 +22,13 @@
   <script src="../question_banks/clinical_therapeutics_low_questions.js"></script>
   <script src="../question_banks/clinical_therapeutics_medium_questions.js"></script>
   <script type="module">
-    import { PracticeManager } from '/static/practice.ts';
-    const practiceManager = new PracticeManager();
-    practiceManager.init();
+    import React from 'react';
+    import { createRoot } from 'react-dom/client';
+    import PracticeApp from '/src/pages/PracticeApp.tsx';
+    const container = document.getElementById('root');
+    if (container) {
+      createRoot(container).render(<PracticeApp />);
+    }
   </script>
 </body>
 </html>

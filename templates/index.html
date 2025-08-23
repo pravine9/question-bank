@@ -173,10 +173,14 @@
   <script src="/question_banks/clinical_therapeutics_medium_questions.js"></script>
   <script type="module">
     import { init } from '/static/main.ts';
-    import { PracticeHistoryComponent } from '/src/components/practiceHistory.ts';
+    import React from 'react';
+    import { createRoot } from 'react-dom/client';
+    import PracticeHistory from '/src/components/PracticeHistory.tsx';
     init();
-    const practiceHistory = new PracticeHistoryComponent();
-    practiceHistory.render('practiceHistory');
+    const container = document.getElementById('practiceHistory');
+    if (container) {
+      createRoot(container).render(<PracticeHistory />);
+    }
   </script>
 </body>
 </html>

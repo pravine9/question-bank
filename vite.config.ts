@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import legacy from '@vitejs/plugin-legacy';
+import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import { copyFileSync, mkdirSync, existsSync, readdirSync } from 'fs';
 
@@ -21,6 +22,7 @@ export default defineConfig({
     copyPublicDir: true
   },
   plugins: [
+    react(),
     legacy({
       targets: ['defaults', 'not IE 11']
     }),
