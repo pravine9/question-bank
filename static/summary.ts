@@ -1,6 +1,7 @@
 // Summary Page Logic - Dedicated Implementation
 
 import type { Question, PracticeResult } from '@/types/question';
+import { EMPTY_HISTORY } from '@/utils/history';
 
 class SummaryManager {
   private testResult: PracticeResult | null = null;
@@ -28,7 +29,7 @@ class SummaryManager {
 
     try {
       const existingHistory = localStorage.getItem('practice_history');
-      const history = existingHistory ? JSON.parse(existingHistory) : { results: [] };
+      const history = existingHistory ? JSON.parse(existingHistory) : { ...EMPTY_HISTORY };
       
       const result = history.results.find((r: any) => r.id === resultId);
       if (!result) {
