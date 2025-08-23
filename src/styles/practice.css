@@ -26,42 +26,7 @@
 
 /* Timer styles removed */
 
-.finish-btn {
-  background: #e74c3c;
-  color: #ffffff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-right: 10px;
-  font-size: 16px;
-  font-weight: 600;
-  transition: all 0.2s ease;
-}
-
-.finish-btn:hover {
-  background: #c0392b;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.summary-btn,
-.home-top-btn {
-  background: #f39c12;
-  color: #ffffff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-right: 10px;
-  font-size: 16px;
-  font-weight: 600;
-  transition: all 0.2s ease;
-}
-
-.summary-btn:hover,
-.home-top-btn:hover {
-  background: #e67e22;
+.header-right .btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
@@ -713,6 +678,7 @@
 .header-right {
   display: flex;
   align-items: center;
+  gap: 10px;
 }
 
 /* PDF viewer pane */
