@@ -24,6 +24,30 @@ export interface QuestionBank {
   [key: string]: Question[][];
 }
 
+// Global window interface extensions
+declare global {
+  interface Window {
+    // Question bank data (loaded by question bank JS files)
+    calculations?: Question[];
+    clinicalMepLow?: Question[];
+    clinicalMixedHigh?: Question[];
+    clinicalMixedLow?: Question[];
+    clinicalMixedMedium?: Question[];
+    clinicalOtcLow?: Question[];
+    clinicalTherapeuticsHigh?: Question[];
+    clinicalTherapeuticsLow?: Question[];
+    clinicalTherapeuticsMedium?: Question[];
+    
+    // Application state
+    banks?: QuestionBank;
+    populateBankSelects?: (banks: QuestionBank) => void;
+    questionRenderer?: any;
+    toggleFlag?: (id: number) => boolean;
+    practiceHistoryComponent?: any;
+    Timer?: any;
+  }
+}
+
 export interface QuestionStats {
   [questionId: number]: {
     attempts: number;
