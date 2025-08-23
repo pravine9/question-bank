@@ -32,13 +32,22 @@
   color: white;
   font-size: 1.5rem;
   font-weight: 600;
-  margin-bottom: 15px;
+  margin-bottom: 0;
+}
+
+.score-section {
+  text-align: center;
+  margin-bottom: 25px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
 }
 
 .score-text {
   font-size: 1.2rem;
   font-weight: 500;
-  color: white;
+  color: #1a1a1a;
   margin-bottom: 10px;
 }
 
@@ -367,20 +376,14 @@
   font-weight: 600;
   margin-bottom: 6px;
   margin-top: 12px;
-  text-align: center;
+  text-align: left;
 }
 
 .review-answers h4:first-child {
   margin-top: 0;
 }
 
-.your-answer {
-  background: #f8f9fa;
-  padding: 8px;
-  border-radius: 3px;
-  margin-bottom: 8px;
-  border-left: 2px solid #007bff;
-}
+
 
 .correct-answer {
   background: #f8f9fa;
@@ -452,6 +455,7 @@
   font-weight: 600;
   color: #333;
   margin-bottom: 10px;
+  text-align: center;
 }
 
 .modal-body .question-image {
@@ -482,11 +486,6 @@
   background: #e9ecef;
 }
 
-.modal-body .options input[type="radio"] {
-  margin-right: 6px;
-  pointer-events: none;
-}
-
 /* Review mode specific styling */
 .modal-body .options label.user-selected {
   background: #fff3cd;
@@ -498,18 +497,13 @@
   background: #d4edda;
 }
 
-.modal-body .options label.incorrect-answer {
-  border: 2px solid #dc3545;
-  background: #f8d7da;
-}
-
 .modal-body .options label.user-selected.correct-answer {
-  background: #d4edda;
+  background: #fff3cd;
   border: 2px solid #28a745;
 }
 
 .modal-body .options label.user-selected.incorrect-answer {
-  background: #f8d7da;
+  background: #fff3cd;
   border: 2px solid #dc3545;
 }
 

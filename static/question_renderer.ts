@@ -67,9 +67,7 @@ function renderQuestion(question: Question, config: RenderOptions = {}): void {
     unit: unitSelector = '#answerUnit',
     feedback: feedbackSelector = '#feedback',
     answer: answerSelector = '#answer',
-    explanation: explanationSelector = '#explanation',
-    reviewMode = false,
-    userAnswer = ''
+    explanation: explanationSelector = '#explanation'
   } = config;
 
   const textEl = get(textSelector);
@@ -82,6 +80,8 @@ function renderQuestion(question: Question, config: RenderOptions = {}): void {
   const answerEl = get(answerSelector);
   const explanationEl = get(explanationSelector);
   const showInput = config.showInput !== false;
+  const reviewMode = config.reviewMode || false;
+  const userAnswer = config.userAnswer || '';
 
   if (titleEl) {
     const rawTitle = question.title || '';
@@ -118,45 +118,38 @@ function renderQuestion(question: Question, config: RenderOptions = {}): void {
     optionsEl.innerHTML = '';
     optionsEl.style.display = '';
     
-    // Find correct answer for review mode
-    const correctAnswerNumber = question.correct_answer_number;
-    
     question.answers.forEach((answer) => {
       const label = document.createElement('label');
-      const radio = document.createElement('input');
-      radio.type = 'radio';
-      radio.name = 'answer';
-      radio.value = answer.answer_number.toString();
-      radio.dataset.answer = answer.text;
-      
       const span = document.createElement('span');
       span.textContent = answer.text;
       
-      label.appendChild(radio);
       label.appendChild(span);
       
-      if (reviewMode) {
-        // In review mode, disable radio buttons and apply styling
-        radio.disabled = true;
-        radio.style.pointerEvents = 'none';
+             if (reviewMode) {
+         // In review mode, highlight answers based on user selection and correctness
+         const isUserSelected = userAnswer === answer.answer_number.toString();
+         const isCorrect = question.correct_answer_number === answer.answer_number;
+         
+         if (isUserSelected) {
+           label.classList.add('user-selected');
+         }
+         
+         if (isCorrect) {
+           label.classList.add('correct-answer');
+         } else if (isUserSelected) {
+           label.classList.add('incorrect-answer');
+         }
+       } else {
+        // Normal mode - add radio button and click handlers
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'answer';
+        radio.value = answer.answer_number.toString();
+        radio.dataset.answer = answer.text;
         
-        // Check if this is the user's selected answer
-        if (userAnswer === answer.answer_number.toString()) {
-          label.classList.add('user-selected');
-          radio.checked = true;
-        }
+        label.insertBefore(radio, span);
         
-        // Check if this is the correct answer
-        if (correctAnswerNumber && answer.answer_number === correctAnswerNumber) {
-          label.classList.add('correct-answer');
-        }
-        
-        // If user selected wrong answer, mark it as incorrect
-        if (userAnswer === answer.answer_number.toString() && correctAnswerNumber && answer.answer_number !== correctAnswerNumber) {
-          label.classList.add('incorrect-answer');
-        }
-      } else {
-        // Normal mode - add click handler for the new styling with deselection
+        // Add click handler for the new styling with deselection
         label.addEventListener('click', (e) => {
           e.preventDefault();
           

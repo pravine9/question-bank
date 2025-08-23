@@ -17,12 +17,14 @@
         <div class="summary-header">
           <div class="summary-header-left">
             <h1>Test Results</h1>
-            <div class="score-text" id="scoreText">You scored 0/0 (0%)</div>
           </div>
           <div class="summary-header-actions">
-            <button type="button" id="reviewWrongBtn" class="btn btn-primary">Review</button>
-            <button type="button" id="goHomeBtn" class="btn btn-secondary">Home</button>
+            <button type="button" id="goHomeBtn" class="btn btn-secondary">Go Home</button>
           </div>
+        </div>
+        
+        <div class="score-section">
+          <div class="score-text" id="scoreText">You scored 0/0 (0%)</div>
         </div>
         
         <div class="filter-section">
@@ -72,10 +74,6 @@
           <img id="reviewQuestionImage" class="question-image" alt="Question image" style="display:none;">
           <div id="reviewAnswerOptions" class="options"></div>
           <div class="review-answers">
-            <div class="your-answer">
-              <h4>Your Answer</h4>
-              <div id="reviewYourAnswer"></div>
-            </div>
             <div class="correct-answer">
               <h4>Correct Answer</h4>
               <div id="reviewCorrectAnswer"></div>

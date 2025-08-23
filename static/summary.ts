@@ -59,8 +59,6 @@ export class SummaryManager {
     if (!tbody) return;
 
     let correctCount = 0;
-    let incorrectCount = 0;
-    let unansweredCount = 0;
     tbody.innerHTML = '';
     this.filteredRows = [];
 
@@ -72,10 +70,6 @@ export class SummaryManager {
       
       if (isCorrect) {
         correctCount++;
-      } else if (userAnswer !== 'No answer') {
-        incorrectCount++;
-      } else {
-        unansweredCount++;
       }
 
       const row = tbody.insertRow();
@@ -123,17 +117,12 @@ export class SummaryManager {
   }
 
   private setupEventListeners(): void {
-    const reviewWrongBtn = document.getElementById('reviewWrongBtn');
     const goHomeBtn = document.getElementById('goHomeBtn');
     const modalClose = document.querySelector('.modal-close');
     const closeReviewBtn = document.getElementById('closeReviewBtn');
     const prevQuestionBtn = document.getElementById('prevQuestionBtn');
     const nextQuestionBtn = document.getElementById('nextQuestionBtn');
     const clearFilterBtn = document.querySelector('.clear-filter-btn');
-
-    if (reviewWrongBtn) {
-      reviewWrongBtn.addEventListener('click', () => this.startReviewMode('incorrect'));
-    }
     if (goHomeBtn) {
       goHomeBtn.addEventListener('click', () => {
         window.location.href = 'index.html';
@@ -282,16 +271,7 @@ export class SummaryManager {
       });
     }
 
-    // Show user's answer
-    const reviewYourAnswer = document.getElementById('reviewYourAnswer');
-    if (reviewYourAnswer) {
-      if (question.is_calculation) {
-        reviewYourAnswer.textContent = userAnswer !== 'No answer' ? userAnswer : 'No answer provided';
-      } else {
-        const selectedAnswer = question.answers.find(a => a.answer_number.toString() === userAnswer);
-        reviewYourAnswer.textContent = selectedAnswer ? selectedAnswer.text : 'No answer provided';
-      }
-    }
+
 
     // Show correct answer
     const reviewCorrectAnswer = document.getElementById('reviewCorrectAnswer');
