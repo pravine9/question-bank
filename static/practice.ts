@@ -37,6 +37,7 @@ interface PracticeState {
 class PracticeManager {
   private state: PracticeState | null = null;
   private isFinished: boolean = false;
+  private sessionKey: string = '';
 
   constructor() {
     // Timer functionality removed
@@ -46,6 +47,7 @@ class PracticeManager {
     const params = new URLSearchParams(window.location.search);
     const bank = params.get('bank');
     const numQuestions = parseInt(params.get('num') || '10');
+    const resume = params.get('resume') === 'true';
 
     if (!bank || !(window as any).banks || !(window as any).banks[bank]) {
       alert('No valid question bank selected');
@@ -53,9 +55,22 @@ class PracticeManager {
     return;
   }
   
-    this.setupPracticeSession(bank, numQuestions);
+    this.sessionKey = `practice_session_${bank}_${numQuestions}`;
+    
+    // Try to resume existing session
+    if (resume || this.loadExistingSession()) {
+      console.log('Resuming existing practice session');
+    } else {
+      this.setupPracticeSession(bank, numQuestions);
+    }
+    
     this.setupEventListeners();
     this.renderCurrentQuestion();
+    
+    // Add auto-save on page unload
+    window.addEventListener('beforeunload', () => {
+      this.saveSession();
+    });
   }
 
   private setupPracticeSession(bank: string, numQuestions: number): void {
@@ -191,7 +206,7 @@ class PracticeManager {
         title: '#qTitle',
         img: '#qImg',
         options: '#answerOptions',
-        input: '#calcInput',
+        input: '.calculator',
         unit: '#answerUnit',
         feedback: '#feedback',
         answer: '#answer',
@@ -213,6 +228,7 @@ class PracticeManager {
 
     this.updateNavigation();
     this.updateProgress();
+    this.saveSession(); // Auto-save on question change
   }
 
   private formatBankName(bank: string): string {
@@ -243,6 +259,7 @@ class PracticeManager {
     if (answer) {
       this.state.answers[this.state.currentQuestion] = answer;
       this.updateNavigation();
+      this.saveSession(); // Auto-save when answer changes
     }
   }
 
@@ -404,6 +421,7 @@ class PracticeManager {
     }
 
     this.calculateResults();
+    this.clearSession(); // Clear session when test is completed
     this.showSummary();
   }
 
@@ -599,6 +617,95 @@ class PracticeManager {
       localStorage.setItem('practice_history', JSON.stringify(history));
     } catch (error) {
       console.warn('Failed to save practice result:', error);
+    }
+  }
+
+  private saveSession(): void {
+    if (!this.state || this.isFinished) {
+      return;
+    }
+    
+    try {
+      const sessionData = {
+        currentQuestion: this.state.currentQuestion,
+        answers: this.state.answers,
+        flagged: Array.from(this.state.flagged),
+        startTime: this.state.startTime,
+        bank: this.state.bank,
+        totalQuestions: this.state.totalQuestions,
+        questions: this.state.questions.map(q => q.id), // Store only IDs to save space
+        timestamp: Date.now()
+      };
+      
+      sessionStorage.setItem(this.sessionKey, JSON.stringify(sessionData));
+      console.log('Session saved:', this.sessionKey);
+    } catch (error) {
+      console.warn('Failed to save session:', error);
+    }
+  }
+
+  private loadExistingSession(): boolean {
+    try {
+      const sessionData = sessionStorage.getItem(this.sessionKey);
+      if (!sessionData) {
+        return false;
+      }
+      
+      const data = JSON.parse(sessionData);
+      
+      // Check if session is too old (more than 24 hours)
+      if (Date.now() - data.timestamp > 24 * 60 * 60 * 1000) {
+        sessionStorage.removeItem(this.sessionKey);
+        return false;
+      }
+      
+      // Reconstruct questions from IDs
+      const bankData = (window as any).banks![data.bank];
+      const allQuestions: Question[] = [];
+      bankData.forEach((questionArray: Question[]) => {
+        allQuestions.push(...questionArray);
+      });
+      
+      const questions = data.questions.map((id: number) => 
+        allQuestions.find(q => q.id === id)
+      ).filter(q => q !== undefined);
+      
+      if (questions.length !== data.totalQuestions) {
+        console.warn('Question mismatch, starting new session');
+        return false;
+      }
+      
+      this.state = {
+        currentQuestion: data.currentQuestion,
+        questions: questions,
+        answers: data.answers || {},
+        flagged: new Set(data.flagged || []),
+        startTime: data.startTime,
+        bank: data.bank,
+        totalQuestions: data.totalQuestions
+      };
+      
+      // Update UI
+      const titleEl = document.querySelector('.test-title');
+      if (titleEl) {
+        titleEl.textContent = `${this.formatBankName(data.bank)} - ${questions.length} Questions`;
+      }
+      
+      this.setupNavigation();
+      console.log('Session loaded successfully');
+      return true;
+    } catch (error) {
+      console.warn('Failed to load session:', error);
+      return false;
+    }
+  }
+
+  private clearSession(): void {
+    try {
+      sessionStorage.removeItem(this.sessionKey);
+      console.log('Session cleared:', this.sessionKey);
+    } catch (error) {
+      console.warn('Failed to clear session:', error);
     }
   }
 }

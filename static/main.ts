@@ -32,6 +32,7 @@ interface BankLabels {
 
 let bankFiles: QuestionBank = (window as any).banks || {};
 const flagged = new Set<number>();
+let banksPopulated = false;
 
 const bankLabels: BankLabels = {
   calculations: 'Calculations',
@@ -56,11 +57,16 @@ if (checkBtn) {checkBtn.addEventListener('click', checkAnswer);}
 const revealBtn = document.getElementById('revealBtn') as HTMLButtonElement | null;
 if (revealBtn) {revealBtn.addEventListener('click', revealAnswer);}
 
-const saveBtn = document.getElementById('saveBtn') as HTMLButtonElement | null;
-if (saveBtn) {saveBtn.addEventListener('click', saveForReview);}
+
 
 function populateBankSelects(data: QuestionBank): void {
   console.log('populateBankSelects called with:', data);
+  
+  // Prevent duplicate population
+  if (banksPopulated) {
+    console.log('Banks already populated, skipping...');
+    return;
+  }
   
   const bankSelect = document.getElementById('bankSelect') as HTMLSelectElement | null;
   const statsSelect = document.getElementById('statsBankSelect') as HTMLSelectElement | null;
@@ -91,6 +97,10 @@ function populateBankSelects(data: QuestionBank): void {
       statsSelect.appendChild(opt2);
     }
   });
+  
+  // Mark as populated to prevent duplicates
+  banksPopulated = true;
+  console.log('Banks population completed');
 }
 
 function getSelectedBank(id: string): BankData | null {
@@ -196,7 +206,7 @@ function renderQuestion(question: Question): void {
       title: '#qTitle',
       img: '#qImg',
       options: '#answerOptions',
-      input: '#calcInput',
+      input: '.calculator',
       unit: '#answerUnit',
       feedback: '#feedback',
       answer: '#answer',
@@ -228,6 +238,23 @@ function startPractice(): void {
   // Get number of questions
   const numInput = document.getElementById('numInput') as HTMLInputElement;
   const numQuestions = numInput ? parseInt(numInput.value) || 10 : 10;
+  
+  // Check for existing session
+  const sessionKey = `practice_session_${data.bank}_${numQuestions}`;
+  const existingSession = sessionStorage.getItem(sessionKey);
+  
+  if (existingSession) {
+    const confirmResume = confirm(
+      'You have an unfinished practice session for this bank. Would you like to resume where you left off?'
+    );
+    if (confirmResume) {
+      window.location.href = `practice.html?bank=${encodeURIComponent(data.bank)}&num=${numQuestions}&resume=true`;
+      return;
+    } else {
+      // User wants to start fresh, clear the old session
+      sessionStorage.removeItem(sessionKey);
+    }
+  }
   
   // Store the selected bank for next time
   try {
@@ -341,27 +368,7 @@ function revealAnswer(): void {
   }
 }
 
-function saveForReview(): void {
-  if (!currentQuestion) {
-    return;
-  }
-  
-  try {
-    const savedQuestions = JSON.parse(localStorage.getItem('savedQuestions') || '[]');
-    const exists = savedQuestions.some((q: Question) => q.id === currentQuestion!.id);
-    
-    if (!exists) {
-      savedQuestions.push(currentQuestion);
-      localStorage.setItem('savedQuestions', JSON.stringify(savedQuestions));
-      alert('Question saved for review!');
-    } else {
-      alert('Question already saved for review');
-    }
-  } catch (e) {
-    console.warn('Failed to save question for review', e);
-    alert('Failed to save question for review');
-  }
-}
+
 
 // Functions are available globally via window object
 // No need to export since we're not using ES modules in HTML
