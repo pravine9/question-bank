@@ -2,7 +2,7 @@
 
 /* ===== QUESTION TEXT & TITLE ===== */
 .question-text {
-  font-size: var(--font-size-lg);
+  font-size: 1.2rem;
   line-height: var(--line-height-relaxed);
   color: var(--color-gray-900);
   margin-bottom: var(--space-4);
@@ -34,23 +34,26 @@
   position: relative;
   display: block;
   max-width: 100%;
+  width: 100%;
   border-radius: var(--radius-lg);
   overflow: hidden;
   margin: var(--space-4) 0;
+  box-sizing: border-box;
 }
 
 .question-image {
   max-width: 100%;
   max-height: 400px;
-  width: auto;
-  height: auto;
+  width: auto !important;
+  height: auto !important;
   display: block;
-  margin: 15px 0;
+  margin: 15px auto;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transition: transform 0.2s ease;
   object-fit: contain;
+  box-sizing: border-box;
 }
 
 .question-image:hover {
@@ -73,7 +76,7 @@
   margin: 20px 0;
 }
 
-.question-options label {
+.question-options > label {
   display: flex;
   align-items: center;
   padding: 15px 20px;
@@ -83,7 +86,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: tahoma, geneva, sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.4;
   word-wrap: break-word;
   color: black;
@@ -91,11 +94,11 @@
   min-height: 50px;
 }
 
-.question-options label:hover {
+.question-options > label:hover {
   border-color: #eab326;
 }
 
-.question-options label.selected {
+.question-options > label.selected {
   background-color: #f7d78c;
   border-color: #3D505A;
 }
@@ -240,6 +243,19 @@
   border-left: 2px solid #ffc107;
 }
 
+/* ===== UNIVERSAL IMAGE CONSTRAINTS ===== */
+/* Ensure all images within question content are properly constrained */
+.question-area img,
+.question-content img,
+.modal-body img,
+.explanation img,
+.answer img,
+img {
+  max-width: 100% !important;
+  height: auto !important;
+  box-sizing: border-box !important;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .question-image {
@@ -248,5 +264,11 @@
   
   .question-title {
     font-size: 16pt;
+  }
+  
+  .question-area img,
+  .question-content img,
+  .modal-body img {
+    max-height: 250px !important;
   }
 }
