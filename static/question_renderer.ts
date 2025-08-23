@@ -1,33 +1,8 @@
-interface Question {
-  id: number;
-  text: string;
-  title: string;
-  answers: { text: string; answer_number: number; }[];
-  is_calculation: boolean;
-  answer_unit?: string;
-  resource_image?: string | null | undefined;
-  explanation?: string;
-  correct_answer: string;
-  correct_answer_number?: number | null | undefined;
-}
-
-interface RenderConfig {
-  text?: string;
-  title?: string;
-  img?: string;
-  options?: string;
-  input?: string;
-  unit?: string;
-  feedback?: string;
-  answer?: string;
-  explanation?: string;
-  showInput?: boolean;
-}
-
-interface QuestionRenderer {
-  initPdfViewer(): void;
-  renderQuestion(question: Question, config?: RenderConfig): void;
-}
+import type {
+  Question,
+  RenderOptions,
+  QuestionRenderer,
+} from '@/types/question';
 
 function sanitize(content: string, inline: boolean = false): string {
   if (typeof (window as any).DOMPurify !== 'undefined' && typeof (window as any).marked !== 'undefined') {
@@ -66,7 +41,7 @@ function enhanceLinksAndImages(element: HTMLElement): void {
 }
 
 // Main render function
-function renderQuestion(question: Question, config: RenderConfig = {}): void {
+function renderQuestion(question: Question, config: RenderOptions = {}): void {
   const {
     text: textSelector = '#questionText',
     title: titleSelector = '#questionTitle',

@@ -1,38 +1,9 @@
 // Summary Page Logic - Dedicated Implementation
 
-interface Question {
-  id: number;
-  bank: string;
-  title: string;
-  text: string;
-  why: string;
-  resource_image?: string | null;
-  visible: boolean;
-  is_calculation: boolean;
-  correct_answer: string;
-  answer_unit?: string;
-  correct_answer_number?: number | null;
-  weighting?: number | null;
-  answers: Array<{text: string; answer_number: number}>;
-  is_free: boolean;
-}
-
-interface TestResult {
-  id: string;
-  bank: string;
-  totalQuestions: number;
-  correctAnswers: number;
-  score: number;
-  duration: number;
-  date: string;
-  flaggedQuestions: number;
-  questions: Question[];
-  answers: { [key: number]: string };
-  flagged: number[];
-}
+import type { Question, PracticeResult } from '@/types/question';
 
 class SummaryManager {
-  private testResult: TestResult | null = null;
+  private testResult: PracticeResult | null = null;
   private currentReviewQuestion: number = 0;
   private reviewMode: 'all' | 'incorrect' | 'flagged' = 'all';
 
@@ -264,7 +235,6 @@ class SummaryManager {
     this.currentReviewQuestion = questionNum;
     const question = this.testResult.questions[questionNum];
     const userAnswer = this.testResult.answers[questionNum] || 'No answer';
-    const isCorrect = userAnswer !== 'No answer' && this.evaluateAnswer(question, userAnswer);
 
     // Update modal title
     const modalTitle = document.getElementById('reviewQuestionTitle');
@@ -370,7 +340,7 @@ class SummaryManager {
 // Initialize summary manager when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
   console.log('Summary page initializing...');
-  const summaryManager = new SummaryManager();
+  new SummaryManager();
 });
 
 // Make class available globally if needed

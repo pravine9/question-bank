@@ -25,12 +25,12 @@
   },
   "include": [
     "src/**/*",
+    "static/**/*",
     "vite.config.ts"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "static",
     "templates",
     "question_banks"
   ]

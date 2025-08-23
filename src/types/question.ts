@@ -24,6 +24,15 @@ export interface QuestionBank {
   [key: string]: Question[][];
 }
 
+export interface BankData {
+  bank: string;
+  files: Question[][];
+}
+
+export interface BankLabels {
+  [key: string]: string;
+}
+
 // Global window interface extensions
 declare global {
   interface Window {
@@ -41,7 +50,7 @@ declare global {
     // Application state
     banks?: QuestionBank;
     populateBankSelects?: (banks: QuestionBank) => void;
-    questionRenderer?: any;
+    questionRenderer?: QuestionRenderer;
     toggleFlag?: (id: number) => boolean;
     practiceHistoryComponent?: any;
     // Timer functionality removed
@@ -57,14 +66,13 @@ export interface QuestionStats {
 }
 
 export interface PracticeState {
-  bank: string;
+  currentQuestion: number;
   questions: Question[];
-  currentIndex: number;
   answers: Record<number, string>;
   flagged: Set<number>;
   startTime: number;
-  endTime?: number;
-  isFinished: boolean;
+  bank: string;
+  totalQuestions: number;
 }
 
 // TimerStats interface removed - timer functionality no longer needed
@@ -74,22 +82,13 @@ export interface PracticeResult {
   bank: string;
   totalQuestions: number;
   correctAnswers: number;
-  wrongAnswers?: number;
-  notAnswered?: number;
   score: number;
-  startTime: number;
-  endTime: number;
-  duration: number; // in minutes
+  duration: number;
   date: string;
   flaggedQuestions: number;
-  // timerStats removed - no longer tracking timer statistics
-  questions: {
-    id: number;
-    userAnswer: string;
-    correctAnswer: string;
-    isCorrect: boolean;
-    flagged: boolean;
-  }[];
+  questions: Question[];
+  answers: Record<number, string>;
+  flagged: number[];
 }
 
 export interface PracticeHistory {
@@ -101,13 +100,19 @@ export interface PracticeHistory {
 }
 
 export interface RenderOptions {
-  text: string;
-  options: string;
-  input: string;
-  unit: string;
-  feedback: string;
-  answer: string;
-  explanation: string;
-  showInput: boolean;
-  title?: string; // Add missing title property
+  text?: string;
+  title?: string;
+  img?: string;
+  options?: string;
+  input?: string;
+  unit?: string;
+  feedback?: string;
+  answer?: string;
+  explanation?: string;
+  showInput?: boolean;
+}
+
+export interface QuestionRenderer {
+  initPdfViewer(): void;
+  renderQuestion(question: Question, config?: RenderOptions): void;
 }

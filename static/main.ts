@@ -1,34 +1,9 @@
-// Type definitions moved inline to avoid import issues
-
-interface Question {
-  id: number;
-  bank: string;
-  title: string;
-  text: string;
-  why: string;
-  resource_image?: string | null;
-  visible: boolean;
-  is_calculation: boolean;
-  correct_answer: string;
-  answer_unit?: string;
-  correct_answer_number?: number | null;
-  weighting?: number | null;
-  answers: Array<{text: string; answer_number: number}>;
-  is_free: boolean;
-}
-
-interface QuestionBank {
-  [key: string]: Question[][];
-}
-
-interface BankData {
-  bank: string;
-  files: Question[][];
-}
-
-interface BankLabels {
-  [key: string]: string;
-}
+import type {
+  Question,
+  QuestionBank,
+  BankData,
+  BankLabels,
+} from '@/types/question';
 
 let bankFiles: QuestionBank = (window as any).banks || {};
 const flagged = new Set<number>();
