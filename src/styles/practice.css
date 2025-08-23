@@ -642,18 +642,18 @@ body {
   min-width: 50px;
 }
 
-.flag-current-btn:hover {
+.footer .nav-btns .flag-current-btn:hover {
   background: #2c5a78;
   transform: translateY(-1px) scale(1.05);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-.flag-current-btn.flagged {
+.footer .nav-btns .flag-current-btn.flagged {
   background: #e74c3c;
   color: #ffffff;
 }
 
-.flag-current-btn.flagged:hover {
+.footer .nav-btns .flag-current-btn.flagged:hover {
   background: #c0392b;
   transform: translateY(-1px) scale(1.05);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
@@ -925,4 +925,218 @@ body {
 
 .stat-item.time-saved .stat-value {
   color: #059669;
+}
+
+/* Multiple Choice Answer Options - Image Style */
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.options label {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: white;
+  border: 3px solid #3D505A;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: tahoma, geneva, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  word-wrap: break-word;
+  color: black;
+  text-align: left;
+  min-height: 50px;
+}
+
+.options label:hover {
+  border-color: #eab326;
+}
+
+.options label.selected {
+  background-color: #f7d78c;
+  border-color: #3D505A;
+}
+
+/* Hide radio buttons */
+.options input[type="radio"] {
+  display: none;
+}
+
+/* Remove any existing radio button styling */
+.options input[type="radio"] + span {
+  display: block;
+  width: 100%;
+}
+
+/* Enhanced Summary Table Styling */
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: white;
+}
+
+.summary-table th {
+  background: #2c3e50;
+  color: white;
+  padding: 15px 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.summary-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e9ecef;
+  vertical-align: top;
+}
+
+.summary-table tr:hover {
+  background-color: #f8f9fa;
+}
+
+.summary-table .question-number {
+  font-weight: bold;
+  color: #2c3e50;
+  position: relative;
+}
+
+.summary-table .flag-indicator {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  font-size: 12px;
+  color: #e74c3c;
+}
+
+.summary-table .answer-cell {
+  font-family: tahoma, geneva, sans-serif;
+  color: #495057;
+}
+
+.summary-table .correct-answer-cell {
+  font-family: tahoma, geneva, sans-serif;
+  color: #28a745;
+  font-weight: 500;
+}
+
+.summary-table .status-cell {
+  font-weight: 600;
+  text-align: center;
+}
+
+.summary-table .status-cell.correct {
+  color: #28a745;
+  background-color: #d4edda;
+  border-radius: 4px;
+  padding: 4px 8px;
+}
+
+.summary-table .status-cell.incorrect {
+  color: #dc3545;
+  background-color: #f8d7da;
+  border-radius: 4px;
+  padding: 4px 8px;
+}
+
+.summary-table .status-cell.unanswered {
+  color: #6c757d;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  padding: 4px 8px;
+}
+
+.summary-table .review-question {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.summary-table .review-question:hover {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+.summary-table .review-icon {
+  font-size: 12px;
+}
+
+/* Enhanced Summary Actions */
+.summary-actions {
+  margin-top: 30px;
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.summary-actions .btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  min-width: 140px;
+}
+
+.summary-actions .btn-primary {
+  background: #007bff;
+  color: white;
+}
+
+.summary-actions .btn-primary:hover {
+  background: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.summary-actions .btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.summary-actions .btn-secondary:hover {
+  background: #545b62;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+}
+
+.summary-actions .btn-warning {
+  background: #ffc107;
+  color: #212529;
+}
+
+.summary-actions .btn-warning:hover {
+  background: #e0a800;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+}
+
+.summary-actions .btn-success {
+  background: #28a745;
+  color: white;
+}
+
+.summary-actions .btn-success:hover {
+  background: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
 }

@@ -1,20 +1,14 @@
-// Type definitions moved inline to avoid import issues
-
 interface Question {
   id: number;
-  bank: string;
-  title: string;
   text: string;
-  why: string;
-  resource_image?: string | null;
-  visible: boolean;
+  title: string;
+  answers: { text: string; answer_number: number; }[];
   is_calculation: boolean;
-  correct_answer: string;
   answer_unit?: string;
-  correct_answer_number?: number | null;
-  weighting?: number | null;
-  answers: Array<{text: string; answer_number: number}>;
-  is_free: boolean;
+  resource_image?: string | null | undefined;
+  explanation?: string;
+  correct_answer: string;
+  correct_answer_number?: number | null | undefined;
 }
 
 interface RenderConfig {
@@ -35,69 +29,65 @@ interface QuestionRenderer {
   renderQuestion(question: Question, config?: RenderConfig): void;
 }
 
-function sanitize(text: string, inline: boolean): string {
-  text = (text || '')
-    .replace(/\r\n/g, '\n')
-    .replace(/\r/g, '\n')
-    .replace(/\u2028/g, '\n')
-    .replace(/\n{2,}/g, '\n')
-    .replace(/\u00a0/g, ' ')
-    .replace(/\u200b/g, '')
-    .trim();
-
-  // Strip unmatched leading/trailing asterisks
-  let prev: string;
-  do {
-    prev = text;
-    if (text.startsWith('**') && !text.slice(2).includes('**')) {
-      text = text.slice(2).trim();
-    } else if (text.startsWith('*') && !text.slice(1).includes('*')) {
-      text = text.slice(1).trim();
-    } else if (text.endsWith('**') && !text.slice(0, -2).includes('**')) {
-      text = text.slice(0, -2).trim();
-    } else if (text.endsWith('*') && !text.slice(0, -1).includes('*')) {
-      text = text.slice(0, -1).trim();
-    }
-  } while (text !== prev);
-  
+function sanitize(content: string, inline: boolean = false): string {
   if (typeof (window as any).DOMPurify !== 'undefined' && typeof (window as any).marked !== 'undefined') {
-    (window as any).marked.setOptions({ breaks: true });
-    const parsed = inline ? (window as any).marked.parseInline(text) : (window as any).marked.parse(text);
-    return (window as any).DOMPurify.sanitize(parsed);
+    try {
+      const rawHtml = inline ? 
+        (window as any).marked.parseInline(content) : 
+        (window as any).marked.parse(content);
+      return (window as any).DOMPurify.sanitize(rawHtml);
+    } catch (e) {
+      console.warn('Error processing markdown:', e);
+      return content;
+    }
   }
-  return text;
+  return content;
 }
 
-function enhanceLinksAndImages(el: HTMLElement): void {
-  if (!el) {return;}
-  
-  el.querySelectorAll('a').forEach((a: HTMLAnchorElement) => {
-    a.target = '_blank';
-    a.rel = 'noopener noreferrer';
+function get(selector?: string): HTMLElement | null {
+  return selector ? document.querySelector(selector) : null;
+}
+
+function enhanceLinksAndImages(element: HTMLElement): void {
+  // Handle internal resource images
+  const images = element.querySelectorAll('img[src^="resources/"]');
+  images.forEach((img) => {
+    const imgEl = img as HTMLImageElement;
+    imgEl.style.cursor = 'pointer';
+    imgEl.onclick = () => window.open(imgEl.src, '_blank');
   });
-  
-  el.querySelectorAll('img').forEach((img: HTMLImageElement) => {
-    img.style.cursor = 'pointer';
-    img.addEventListener('click', () => {
-      window.open(img.src, '_blank', 'noopener,noreferrer');
-    });
+
+  // Handle links that should open PDFs
+  const links = element.querySelectorAll('a[href$=".pdf"]');
+  links.forEach((link) => {
+    const linkEl = link as HTMLAnchorElement;
+    linkEl.target = '_blank';
   });
 }
 
-
-
+// Main render function
 function renderQuestion(question: Question, config: RenderConfig = {}): void {
-  const get = (sel?: string): HTMLElement | null => (sel ? document.querySelector(sel) : null);
+  const {
+    text: textSelector = '#questionText',
+    title: titleSelector = '#questionTitle',
+    img: imgSelector = '#questionImage',
+    options: optionsSelector = '#answerOptions',
+    input: inputSelector = '#calculatorInput',
+    unit: unitSelector = '#answerUnit',
+    feedback: feedbackSelector = '#feedback',
+    answer: answerSelector = '#answer',
+    explanation: explanationSelector = '#explanation'
+  } = config;
 
-  const textEl = get(config.text);
-  const titleEl = get(config.title);
-  const imgEl = get(config.img);
-  const optionsEl = get(config.options);
-  const inputEl = get(config.input);
-  const unitEl = get(config.unit);
-  const feedbackEl = get(config.feedback);
-  const answerEl = get(config.answer);
-  const explanationEl = get(config.explanation);
+  const textEl = get(textSelector);
+  const titleEl = get(titleSelector);
+  const imgEl = get(imgSelector);
+  const optionsEl = get(optionsSelector);
+  const inputEl = get(inputSelector);
+  const unitEl = get(unitSelector);
+  const feedbackEl = get(feedbackSelector);
+  const answerEl = get(answerSelector);
+  const explanationEl = get(explanationSelector);
   const showInput = config.showInput !== false;
 
   if (titleEl) {
@@ -148,6 +138,36 @@ function renderQuestion(question: Question, config: RenderConfig = {}): void {
       
       label.appendChild(radio);
       label.appendChild(span);
+      
+      // Add click handler for the new styling with deselection
+      label.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        // Check if this label is already selected
+        const isCurrentlySelected = label.classList.contains('selected');
+        
+        // Remove selected class from all labels
+        const allLabels = optionsEl.querySelectorAll('label');
+        allLabels.forEach(l => l.classList.remove('selected'));
+        
+        if (!isCurrentlySelected) {
+          // Add selected class to clicked label
+          label.classList.add('selected');
+          
+          // Check the radio button (for compatibility with existing code)
+          radio.checked = true;
+          
+          // Trigger change event for existing handlers
+          radio.dispatchEvent(new Event('change', { bubbles: true }));
+        } else {
+          // Deselect the radio button
+          radio.checked = false;
+          
+          // Trigger change event for existing handlers
+          radio.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      });
+      
       optionsEl!.appendChild(label);
     });
   }
@@ -189,4 +209,4 @@ const questionRenderer: QuestionRenderer = {
 };
 
 // Make it available globally
-window.questionRenderer = questionRenderer;
+(window as any).questionRenderer = questionRenderer;

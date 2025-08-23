@@ -218,7 +218,14 @@ class PracticeManager {
         if (input) {input.value = savedAnswer;}
       } else {
         const radio = document.querySelector(`input[name="answer"][value="${savedAnswer}"]`) as HTMLInputElement;
-        if (radio) {radio.checked = true;}
+        if (radio) {
+          radio.checked = true;
+          // Also update the visual selected state
+          const label = radio.closest('label');
+          if (label) {
+            label.classList.add('selected');
+          }
+        }
       }
     }
 
@@ -265,6 +272,13 @@ class PracticeManager {
     if (answer) {
       this.state.answers[this.state.currentQuestion] = answer;
       this.updateNavigation();
+      this.updateProgress();
+      this.saveSession(); // Auto-save when answer changes
+    } else {
+      // If answer is empty, remove it from answers
+      delete this.state.answers[this.state.currentQuestion];
+      this.updateNavigation();
+      this.updateProgress();
       this.saveSession(); // Auto-save when answer changes
     }
   }
@@ -494,6 +508,7 @@ class PracticeManager {
     if (summary) {summary.style.display = 'block';}
 
     this.populateSummaryTable();
+    this.updateSummaryNavigation();
   }
 
   private populateSummaryTable(): void {
@@ -512,16 +527,30 @@ class PracticeManager {
       const question = this.state.questions[i];
       const userAnswer = this.state.answers[i] || 'No answer';
       const isCorrect = userAnswer !== 'No answer' && this.evaluateAnswer(question, userAnswer);
+      const isFlagged = this.state.flagged.has(i);
       
-      if (isCorrect) {correctCount++;}
+      if (isCorrect) {
+        correctCount++;
+      }
 
       const row = tbody.insertRow();
+      const statusClass = isCorrect ? 'correct' : (userAnswer !== 'No answer' ? 'incorrect' : 'unanswered');
+      const statusText = isCorrect ? '✓ Correct' : (userAnswer !== 'No answer' ? '✗ Incorrect' : '○ Unanswered');
+      const flagIcon = isFlagged ? ' ⚑' : '';
+      
       row.innerHTML = `
-        <td>${i + 1}</td>
-        <td>${userAnswer}</td>
-        <td>${question.correct_answer}</td>
-        <td class="${isCorrect ? 'correct' : 'incorrect'}">${isCorrect ? 'Correct' : 'Incorrect'}</td>
-        <td><button class="btn btn-sm review-question" data-question="${i}">Review</button></td>
+        <td>
+          <div class="question-number">${i + 1}</div>
+          ${isFlagged ? '<div class="flag-indicator">⚑</div>' : ''}
+        </td>
+        <td class="answer-cell">${userAnswer}</td>
+        <td class="correct-answer-cell">${this.getCorrectAnswerText(question)}</td>
+        <td class="status-cell ${statusClass}">${statusText}${flagIcon}</td>
+        <td>
+          <button class="btn btn-sm review-question" data-question="${i}">
+            <span class="review-icon">👁️</span> Review
+          </button>
+        </td>
       `;
     }
 
@@ -537,13 +566,19 @@ class PracticeManager {
         this.reviewQuestion(questionNum);
       }
     });
+  }
 
-    // Add go home handler
-    const goHomeBtn = document.getElementById('goHome') as HTMLButtonElement;
-    if (goHomeBtn) {
-      goHomeBtn.addEventListener('click', () => {
-        window.location.href = 'index.html';
-      });
+  private getCorrectAnswerText(question: any): string {
+    if (question.is_calculation) {
+      return question.correct_answer || 'Calculation required';
+    } else {
+      // For multiple choice, show the text of the correct answer
+      const correctAnswerNumber = question.correct_answer_number;
+      if (correctAnswerNumber && question.answers) {
+        const correctAnswer = question.answers.find((a: any) => a.answer_number === correctAnswerNumber);
+        return correctAnswer ? correctAnswer.text : question.correct_answer || 'Unknown';
+      }
+      return question.correct_answer || 'Unknown';
     }
   }
 
@@ -620,6 +655,130 @@ class PracticeManager {
     const modal = document.getElementById('reviewModal');
     if (modal) {
       modal.style.display = 'none';
+    }
+  }
+
+  private updateSummaryNavigation(): void {
+    if (!this.state) {return;}
+
+    // Update summary navigation buttons
+    const summaryActions = document.querySelector('.summary-actions') as HTMLElement;
+    if (summaryActions) {
+      summaryActions.innerHTML = `
+        <button type="button" id="reviewAllBtn" class="btn btn-primary">Review All Questions</button>
+        <button type="button" id="reviewIncorrectBtn" class="btn btn-secondary">Review Incorrect</button>
+        <button type="button" id="reviewFlaggedBtn" class="btn btn-warning">Review Flagged</button>
+        <button type="button" id="goHomeBtn" class="btn btn-success">Go Home</button>
+      `;
+
+      // Add event listeners for new buttons
+      const reviewAllBtn = document.getElementById('reviewAllBtn');
+      const reviewIncorrectBtn = document.getElementById('reviewIncorrectBtn');
+      const reviewFlaggedBtn = document.getElementById('reviewFlaggedBtn');
+      const goHomeBtn = document.getElementById('goHomeBtn');
+
+      if (reviewAllBtn) {
+        reviewAllBtn.addEventListener('click', () => this.startReviewMode('all'));
+      }
+      if (reviewIncorrectBtn) {
+        reviewIncorrectBtn.addEventListener('click', () => this.startReviewMode('incorrect'));
+      }
+      if (reviewFlaggedBtn) {
+        reviewFlaggedBtn.addEventListener('click', () => this.startReviewMode('flagged'));
+      }
+      if (goHomeBtn) {
+        goHomeBtn.addEventListener('click', () => {
+          window.location.href = 'index.html';
+        });
+      }
+    }
+  }
+
+  private startReviewMode(mode: 'all' | 'incorrect' | 'flagged'): void {
+    if (!this.state) {return;}
+
+    // Hide summary and show main content
+    const main = document.querySelector('.main') as HTMLElement;
+    const header = document.querySelector('.header') as HTMLElement;
+    const footer = document.querySelector('.footer') as HTMLElement;
+    const summary = document.querySelector('.summary') as HTMLElement;
+
+    if (main) {main.style.display = 'block';}
+    if (header) {header.style.display = 'block';}
+    if (footer) {footer.style.display = 'block';}
+    if (summary) {summary.style.display = 'none';}
+
+    // Find first question to review based on mode
+    let firstQuestion = 0;
+    
+    if (mode === 'incorrect') {
+      for (let i = 0; i < this.state.questions.length; i++) {
+        const userAnswer = this.state.answers[i];
+        if (userAnswer && !this.evaluateAnswer(this.state.questions[i], userAnswer)) {
+          firstQuestion = i;
+          break;
+        }
+      }
+    } else if (mode === 'flagged') {
+      for (let i = 0; i < this.state.questions.length; i++) {
+        if (this.state.flagged.has(i)) {
+          firstQuestion = i;
+          break;
+        }
+      }
+    }
+
+    // Go to first question and enable review mode
+    this.goToQuestion(firstQuestion);
+    this.enableReviewMode(mode);
+  }
+
+  private enableReviewMode(mode: 'all' | 'incorrect' | 'flagged'): void {
+    // Update footer buttons for review mode
+    const backBtn = document.querySelector('.back-btn') as HTMLButtonElement;
+    const nextBtn = document.querySelector('.next-btn') as HTMLButtonElement;
+    const finishBtn = document.querySelector('.finish-btn') as HTMLButtonElement;
+
+    if (backBtn) {
+      backBtn.textContent = '‹ Previous';
+      backBtn.onclick = () => this.navigateReviewQuestion(-1, mode);
+    }
+    if (nextBtn) {
+      nextBtn.textContent = 'Next ›';
+      nextBtn.onclick = () => this.navigateReviewQuestion(1, mode);
+    }
+    if (finishBtn) {
+      finishBtn.textContent = 'Back to Summary';
+      finishBtn.onclick = () => this.showSummary();
+    }
+  }
+
+  private navigateReviewQuestion(direction: number, mode: 'all' | 'incorrect' | 'flagged'): void {
+    if (!this.state) {return;}
+
+    let nextQuestion = this.state.currentQuestion + direction;
+    
+    // Find next question based on mode
+    if (mode === 'incorrect') {
+      while (nextQuestion >= 0 && nextQuestion < this.state.questions.length) {
+        const userAnswer = this.state.answers[nextQuestion];
+        if (userAnswer && !this.evaluateAnswer(this.state.questions[nextQuestion], userAnswer)) {
+          break;
+        }
+        nextQuestion += direction;
+      }
+    } else if (mode === 'flagged') {
+      while (nextQuestion >= 0 && nextQuestion < this.state.questions.length) {
+        if (this.state.flagged.has(nextQuestion)) {
+          break;
+        }
+        nextQuestion += direction;
+      }
+    }
+
+    // Ensure we stay within bounds
+    if (nextQuestion >= 0 && nextQuestion < this.state.questions.length) {
+      this.goToQuestion(nextQuestion);
     }
   }
 
