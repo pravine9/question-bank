@@ -5,6 +5,7 @@ import type {
   PracticeState,
   PracticeResult,
 } from '@/types/question';
+import { formatBankName } from '@/utils/bankNames';
 
 // Timer functionality removed - practice mode runs without time constraints
 
@@ -83,7 +84,7 @@ class PracticeManager {
   // Update UI
     const titleEl = document.querySelector('.test-title');
     if (titleEl) {
-      titleEl.textContent = `${this.formatBankName(bank)} - ${selectedQuestions.length} Questions`;
+      titleEl.textContent = `${formatBankName(bank)} - ${selectedQuestions.length} Questions`;
     }
 
     this.setupNavigation();
@@ -216,17 +217,6 @@ class PracticeManager {
     this.updateNavigation();
     this.updateProgress();
     this.saveSession(); // Auto-save on question change
-  }
-
-  private formatBankName(bank: string): string {
-    const bankNames: { [key: string]: string } = {
-      'calculations': 'Calculations',
-      'clinical_mep': 'Clinical MEP',
-      'clinical_mixed': 'Clinical Mixed',
-      'clinical_otc': 'Clinical OTC',
-      'clinical_therapeutics': 'Clinical Therapeutics'
-    };
-    return bankNames[bank] || bank;
   }
 
   private saveAnswer(): void {
@@ -657,7 +647,7 @@ class PracticeManager {
       // Update UI
       const titleEl = document.querySelector('.test-title');
       if (titleEl) {
-        titleEl.textContent = `${this.formatBankName(data.bank)} - ${questions.length} Questions`;
+        titleEl.textContent = `${formatBankName(data.bank)} - ${questions.length} Questions`;
       }
       
       this.setupNavigation();

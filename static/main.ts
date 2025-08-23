@@ -2,20 +2,13 @@ import type {
   Question,
   QuestionBank,
   BankData,
-  BankLabels,
 } from '@/types/question';
+import { formatBankName } from '@/utils/bankNames';
 
 let bankFiles: QuestionBank = (window as any).banks || {};
 const flagged = new Set<number>();
 let banksPopulated = false;
 
-const bankLabels: BankLabels = {
-  calculations: 'Calculations',
-  clinical_mep: 'Clinical MEP',
-  clinical_mixed: 'Clinical Mixed',
-  clinical_otc: 'Clinical OTC',
-  clinical_therapeutics: 'Clinical Therapeutics'
-};
 
 const loadBtn = document.getElementById('loadBtn') as HTMLButtonElement | null;
 if (loadBtn) {loadBtn.addEventListener('click', loadQuestion);}
@@ -61,14 +54,14 @@ function populateBankSelects(data: QuestionBank): void {
     if (bankSelect) {
       const opt1 = document.createElement('option');
       opt1.value = name;
-      opt1.textContent = bankLabels[name] || name;
+      opt1.textContent = formatBankName(name);
       bankSelect.appendChild(opt1);
       console.log('Added option:', name);
     }
     if (statsSelect) {
       const opt2 = document.createElement('option');
       opt2.value = name;
-      opt2.textContent = bankLabels[name] || name;
+      opt2.textContent = formatBankName(name);
       statsSelect.appendChild(opt2);
     }
   });
