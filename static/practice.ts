@@ -517,10 +517,16 @@ class PracticeManager {
     const tbody = document.querySelector('.summary-table tbody') as HTMLTableSectionElement;
     const scoreDisplay = document.getElementById('scoreDisplay') as HTMLElement;
     const percentageDisplay = document.getElementById('percentageDisplay') as HTMLElement;
+    const correctCountEl = document.getElementById('correctCount') as HTMLElement;
+    const incorrectCountEl = document.getElementById('incorrectCount') as HTMLElement;
+    const unansweredCountEl = document.getElementById('unansweredCount') as HTMLElement;
+    const passFailEl = document.getElementById('passFail') as HTMLElement;
 
     if (!tbody) {return;}
 
     let correctCount = 0;
+    let incorrectCount = 0;
+    let unansweredCount = 0;
     tbody.innerHTML = '';
 
     for (let i = 0; i < this.state.questions.length; i++) {
@@ -531,6 +537,10 @@ class PracticeManager {
       
       if (isCorrect) {
         correctCount++;
+      } else if (userAnswer !== 'No answer') {
+        incorrectCount++;
+      } else {
+        unansweredCount++;
       }
 
       const row = tbody.insertRow();
@@ -555,8 +565,20 @@ class PracticeManager {
     }
 
     const score = Math.round((correctCount / this.state.totalQuestions) * 100);
+    const isPass = score >= 70; // 70% pass threshold
+
+    // Update score display
     if (scoreDisplay) {scoreDisplay.textContent = `${correctCount}/${this.state.totalQuestions}`;}
-    if (percentageDisplay) {percentageDisplay.textContent = `(${score}%)`;}
+    if (percentageDisplay) {percentageDisplay.textContent = `${score}%`;}
+    if (correctCountEl) {correctCountEl.textContent = correctCount.toString();}
+    if (incorrectCountEl) {incorrectCountEl.textContent = incorrectCount.toString();}
+    if (unansweredCountEl) {unansweredCountEl.textContent = unansweredCount.toString();}
+    
+    // Update pass/fail indicator
+    if (passFailEl) {
+      passFailEl.textContent = isPass ? 'Pass' : 'Fail';
+      passFailEl.className = `pass-fail ${isPass ? 'pass' : 'fail'}`;
+    }
 
     // Add review handlers
     tbody.addEventListener('click', (e) => {
@@ -594,8 +616,13 @@ class PracticeManager {
     if (footer) {footer.style.display = 'block';}
     if (summary) {summary.style.display = 'none';}
 
-    // Go to the question
+    // Go to the question and ensure it renders properly
     this.goToQuestion(questionNum);
+    
+    // Force re-render the question to ensure content appears
+    setTimeout(() => {
+      this.renderCurrentQuestion();
+    }, 100);
 
     // Auto-reveal the answer for review
     const question = this.state!.questions[questionNum];
@@ -661,36 +688,17 @@ class PracticeManager {
   private updateSummaryNavigation(): void {
     if (!this.state) {return;}
 
-    // Update summary navigation buttons
-    const summaryActions = document.querySelector('.summary-actions') as HTMLElement;
-    if (summaryActions) {
-      summaryActions.innerHTML = `
-        <button type="button" id="reviewAllBtn" class="btn btn-primary">Review All Questions</button>
-        <button type="button" id="reviewIncorrectBtn" class="btn btn-secondary">Review Incorrect</button>
-        <button type="button" id="reviewFlaggedBtn" class="btn btn-warning">Review Flagged</button>
-        <button type="button" id="goHomeBtn" class="btn btn-success">Go Home</button>
-      `;
+    // Add event listeners for simplified buttons
+    const reviewWrongBtn = document.getElementById('reviewWrongBtn');
+    const goHomeBtn = document.getElementById('goHomeBtn');
 
-      // Add event listeners for new buttons
-      const reviewAllBtn = document.getElementById('reviewAllBtn');
-      const reviewIncorrectBtn = document.getElementById('reviewIncorrectBtn');
-      const reviewFlaggedBtn = document.getElementById('reviewFlaggedBtn');
-      const goHomeBtn = document.getElementById('goHomeBtn');
-
-      if (reviewAllBtn) {
-        reviewAllBtn.addEventListener('click', () => this.startReviewMode('all'));
-      }
-      if (reviewIncorrectBtn) {
-        reviewIncorrectBtn.addEventListener('click', () => this.startReviewMode('incorrect'));
-      }
-      if (reviewFlaggedBtn) {
-        reviewFlaggedBtn.addEventListener('click', () => this.startReviewMode('flagged'));
-      }
-      if (goHomeBtn) {
-        goHomeBtn.addEventListener('click', () => {
-          window.location.href = 'index.html';
-        });
-      }
+    if (reviewWrongBtn) {
+      reviewWrongBtn.addEventListener('click', () => this.startReviewMode('incorrect'));
+    }
+    if (goHomeBtn) {
+      goHomeBtn.addEventListener('click', () => {
+        window.location.href = 'index.html';
+      });
     }
   }
 

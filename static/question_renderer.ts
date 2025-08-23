@@ -189,9 +189,18 @@ function renderQuestion(question: Question, config: RenderConfig = {}): void {
   }
 
   // Reset feedback elements
-  if (feedbackEl) {feedbackEl.textContent = '';}
-  if (answerEl) {answerEl.style.display = 'none';}
-  if (explanationEl) {explanationEl.style.display = 'none';}
+  if (feedbackEl) {
+    feedbackEl.textContent = '';
+    feedbackEl.className = 'feedback';
+  }
+  if (answerEl) {
+    answerEl.innerHTML = '';
+    answerEl.className = 'answer';
+  }
+  if (explanationEl) {
+    explanationEl.innerHTML = '';
+    explanationEl.className = 'explanation';
+  }
 }
 
 

@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
   <link rel="stylesheet" href="../src/styles/consolidated.css">
   <link rel="stylesheet" href="../src/styles/practice.css">
+  <link rel="stylesheet" href="../src/styles/summary.css">
 </head>
 <body>
   <div class="container">
@@ -48,7 +49,7 @@
         <div class="button-row">
           <button id="checkBtn" class="check-btn">Check</button>
         </div>
-        <div id="feedback"></div>
+        <div id="feedback" class="feedback"></div>
         <div id="answer"></div>
         <div id="explanation"></div>
       </div>
@@ -100,25 +101,57 @@
 
     <!-- Summary Section -->
     <div class="summary" style="display:none">
-      <h2>Test Summary</h2>
-      <div class="summary-score">
-        <span class="score-display" id="scoreDisplay">0/0</span>
-        <span class="percentage-display" id="percentageDisplay">(0%)</span>
-      </div>
-      <table class="summary-table">
-        <thead>
-          <tr>
-            <th>Question</th>
-            <th>Your Answer</th>
-            <th>Correct Answer</th>
-            <th>Result</th>
-            <th>Review</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-      <div class="summary-actions">
-        <button type="button" id="goHome">Go Home</button>
+      <div class="summary-container">
+        <div class="summary-header">
+          <h1>Test Complete!</h1>
+          <div class="score-circle">
+            <div class="score-number" id="scoreDisplay">0/0</div>
+            <div class="score-percentage" id="percentageDisplay">0%</div>
+          </div>
+          <div class="pass-fail" id="passFail">Pass</div>
+        </div>
+        
+        <div class="summary-stats">
+          <div class="stat correct">
+            <div class="stat-icon">✓</div>
+            <div class="stat-content">
+              <div class="stat-number" id="correctCount">0</div>
+              <div class="stat-label">Correct</div>
+            </div>
+          </div>
+          <div class="stat incorrect">
+            <div class="stat-icon">✗</div>
+            <div class="stat-content">
+              <div class="stat-number" id="incorrectCount">0</div>
+              <div class="stat-label">Incorrect</div>
+            </div>
+          </div>
+          <div class="stat unanswered">
+            <div class="stat-icon">○</div>
+            <div class="stat-content">
+              <div class="stat-number" id="unansweredCount">0</div>
+              <div class="stat-label">Unanswered</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-actions">
+          <button type="button" id="reviewWrongBtn" class="btn btn-primary">Review Wrong Answers</button>
+          <button type="button" id="goHomeBtn" class="btn btn-secondary">Go Home</button>
+        </div>
+
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th>Question</th>
+              <th>Your Answer</th>
+              <th>Correct Answer</th>
+              <th>Result</th>
+              <th>Review</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
     </div>
 

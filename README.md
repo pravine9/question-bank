@@ -10,6 +10,7 @@ All changes/improvements should be aim to keep code base lean and code lines min
 - Practice mode with timed sessions
 - Performance tracking
 - Offline capable
+- Clean, modern test summary with focus on user experience
 
 ## Quick Start
 
@@ -45,6 +46,14 @@ Front End:
 3. Navigate through questions
 4. Flag questions for review
 5. Click "Finish Test" for results
+
+### Test Summary
+After completing a practice test, users see a clean, focused summary:
+- **Immediate score feedback** with pass/fail indicator (70% threshold)
+- **Visual score circle** with percentage and fraction display
+- **Quick stats** showing correct, incorrect, and unanswered counts
+- **Detailed table** with question number, your answer, correct answer, result, and review button
+- **Simple actions** to review wrong answers or go home
 
 ## Adding Questions
 
