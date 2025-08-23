@@ -2,6 +2,8 @@
 
 A question bank application for GPhC exam preparation. Built with TypeScript and Vite.
 
+All changes/improvements should be aim to keep code base lean and code lines minimal and avoid overcomplicating/overengineering things or removing large features/functionality unless clear functional and fundamental errors or improvments are identified.
+
 ## Features
 
 - Multiple question categories (calculations, clinical therapeutics, etc.)

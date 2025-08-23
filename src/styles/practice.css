@@ -122,20 +122,20 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 60px;
-  height: 35px;
-  border-radius: 6px;
+  width: 50px;
+  height: 30px;
+  border-radius: 5px;
   border: none;
   background-color: #49698d;
   color: #ffffff;
   font-weight: bold;
-  font-size: 15px;
+  font-size: 13px;
   cursor: pointer;
   position: relative;
   box-sizing: border-box;
   transition: all 0.2s ease;
   font-family: 'Nunito', Arial, sans-serif;
-  margin: 4px 0;
+  margin: 3px 0;
   padding: 0;
 }
 
@@ -150,14 +150,14 @@ body {
 .nav li.active::after {
   content: '';
   position: absolute;
-  right: -12px;
+  right: -10px;
   top: 50%;
   transform: translateY(-50%);
   width: 0;
   height: 0;
-  border-left: 15px solid;
-  border-top: 17.5px solid transparent;
-  border-bottom: 17.5px solid transparent;
+  border-left: 12px solid;
+  border-top: 15px solid transparent;
+  border-bottom: 15px solid transparent;
   z-index: 10;
   border-left-color: #49698d;
 }
@@ -206,7 +206,7 @@ body {
   border: none;
   padding: 0;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1;
 }
 
@@ -634,10 +634,10 @@ body {
   opacity: 0.7;
 }
 
-.flag-current-btn {
+.footer .nav-btns .flag-current-btn {
   background: #346888;
   color: #ffffff;
-  font-size: 20px;
+  font-size: 20px !important;
   transition: all 0.2s ease;
   min-width: 50px;
 }

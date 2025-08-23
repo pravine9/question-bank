@@ -125,20 +125,16 @@ class PracticeManager {
     nav.innerHTML = '';
     for (let i = 0; i < this.state.totalQuestions; i++) {
       const li = document.createElement('li');
-      li.innerHTML = `
-        <button class="nav-btn" data-question="${i}">
-          <span class="question-number">${i + 1}</span>
-          <span class="status-indicator"></span>
-        </button>
-      `;
+      li.dataset.question = i.toString();
+      li.textContent = (i + 1).toString();
       nav.appendChild(li);
     }
 
     // Add click handlers
     nav.addEventListener('click', (e) => {
-      const btn = (e.target as HTMLElement).closest('.nav-btn') as HTMLButtonElement;
-      if (btn) {
-        const questionNum = parseInt(btn.dataset.question || '0');
+      const li = (e.target as HTMLElement).closest('li') as HTMLLIElement;
+      if (li && li.dataset.question) {
+        const questionNum = parseInt(li.dataset.question);
         this.goToQuestion(questionNum);
       }
     });
@@ -226,6 +222,16 @@ class PracticeManager {
       }
     }
 
+    // Update flag icon visibility
+    const questionFlag = document.getElementById('questionFlag');
+    if (questionFlag) {
+      if (this.state.flagged.has(this.state.currentQuestion)) {
+        questionFlag.style.display = 'inline';
+      } else {
+        questionFlag.style.display = 'none';
+      }
+    }
+
     this.updateNavigation();
     this.updateProgress();
     this.saveSession(); // Auto-save on question change
@@ -294,19 +300,25 @@ class PracticeManager {
     }
 
     // Update sidebar navigation
-    const navBtns = document.querySelectorAll('.nav-btn');
-    navBtns.forEach((btn, index) => {
-      const button = btn as HTMLButtonElement;
-      button.classList.remove('current', 'answered', 'flagged');
+    const navItems = document.querySelectorAll('.sidebar .nav li');
+    navItems.forEach((item, index) => {
+      const li = item as HTMLLIElement;
+      li.classList.remove('active', 'answered', 'flagged');
+      
+      // Set base content with flag icon if flagged
+      const questionNumber = index + 1;
+      if (this.state!.flagged.has(index)) {
+        li.innerHTML = `${questionNumber} <span class="flag-btn">⚑</span>`;
+        li.classList.add('flagged');
+      } else {
+        li.textContent = questionNumber.toString();
+      }
       
       if (index === this.state!.currentQuestion) {
-        button.classList.add('current');
+        li.classList.add('active');
       }
       if (this.state!.answers[index]) {
-        button.classList.add('answered');
-      }
-      if (this.state!.flagged.has(index)) {
-        button.classList.add('flagged');
+        li.classList.add('answered');
       }
     });
   }
@@ -332,13 +344,22 @@ class PracticeManager {
     if (!this.state) {return;}
 
     const questionNum = this.state.currentQuestion;
+    const questionFlag = document.getElementById('questionFlag');
+    
     if (this.state.flagged.has(questionNum)) {
       this.state.flagged.delete(questionNum);
+      if (questionFlag) {
+        questionFlag.style.display = 'none';
+      }
     } else {
       this.state.flagged.add(questionNum);
+      if (questionFlag) {
+        questionFlag.style.display = 'inline';
+      }
     }
 
     this.updateNavigation();
+    this.saveSession(); // Auto-save when flag changes
   }
 
   private checkAnswer(): void {

@@ -359,6 +359,10 @@ body {
 .legend-color.current { background-color: var(--color-primary); }
 .legend-color.unanswered { background-color: var(--color-gray-200); }
 
+
+
+
+
 /* Question Area */
 .question-area {
   flex: 1;
