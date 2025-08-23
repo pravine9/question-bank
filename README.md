@@ -62,10 +62,7 @@ npm run dev          # Start development server
 npm run build        # Build for production
 npm run preview      # Preview production build
 
-# Testing
-npm run test         # Run unit tests
-npm run test:ui      # Run tests with UI
-npm run test:coverage # Run tests with coverage
+# Development
 
 # Code Quality
 npm run lint         # Run ESLint
@@ -83,32 +80,27 @@ npm run analyze      # Analyze bundle size
 gphc-scraper/
 ├── src/                    # Source code
 │   ├── types/             # TypeScript type definitions
-│   ├── utils/             # Utility functions
 │   ├── styles/            # CSS and design system
-│   └── tests/             # Unit tests
-├── static/                # Static assets
-│   ├── main.js           # Main application logic
-│   ├── practice.js       # Practice mode logic
-│   ├── question_renderer.js # Question rendering
-│   └── banks.js          # Question bank registry
+│   └── components/        # Reusable components
+├── static/                # Static TypeScript modules
+│   ├── main.ts           # Main application logic
+│   ├── practice.ts       # Practice mode logic
+│   ├── question_renderer.ts # Question rendering
+│   ├── banks.ts          # Question bank registry
+│   └── practice.css      # Practice-specific styles
 ├── templates/             # HTML templates
 │   ├── index.html        # Main page
 │   └── practice.html     # Practice mode page
-├── question_banks/        # Question data
-├── public/               # Public assets
-│   ├── sw.js            # Service worker
-│   └── icons/           # Application icons
-├── dist/                 # Build output
-└── Burp/                 # Scraping scripts (legacy)
+├── question_banks/        # Question data (JS files)
+└── dist/                 # Build output
 ```
 
 ### Technology Stack
 
 - **Frontend**: TypeScript, Vite, Modern CSS
 - **Build Tool**: Vite
-- **Testing**: Vitest with jsdom
 - **Code Quality**: ESLint, Prettier, TypeScript
-- **Offline**: Service Worker for offline functionality
+
 - **Styling**: CSS Custom Properties, Utility Classes
 
 ## 📚 Question Banks
@@ -210,24 +202,6 @@ The application uses CSS Custom Properties for easy theming:
   --color-error: #ef4444;
   /* ... more variables */
 }
-```
-
-## 🧪 Testing
-
-### Running Tests
-
-```bash
-# Run all tests
-npm test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Run tests with coverage
-npm run test:coverage
-
-# Run tests with UI
-npm run test:ui
 ```
 
 ## 🔌 Offline Functionality
