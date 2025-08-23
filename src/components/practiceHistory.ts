@@ -1,14 +1,17 @@
-// Practice History Component - JavaScript Version
 import { EMPTY_HISTORY } from '../utils/history';
+import type { PracticeHistory, PracticeResult } from '@/types/question';
 
-class PracticeHistoryComponent {
+export class PracticeHistoryComponent {
+  private container: HTMLDivElement | null;
+  private history: PracticeHistory;
+
   constructor() {
     this.container = null;
     this.history = this.getPracticeHistory();
   }
 
-  render(containerId) {
-    this.container = document.getElementById(containerId);
+  render(containerId: string): void {
+    this.container = document.getElementById(containerId) as HTMLDivElement | null;
     if (!this.container) {
       console.warn('Practice history container not found:', containerId);
       return;
@@ -18,7 +21,7 @@ class PracticeHistoryComponent {
     this.attachEventListeners();
   }
 
-  generateHTML() {
+  private generateHTML(): string {
     if (this.history.totalTests === 0) {
       return `
         <div class="practice-history-empty">
@@ -61,37 +64,38 @@ class PracticeHistoryComponent {
     `;
   }
 
-  attachEventListeners() {
-    if (!this.container) {return;}
+  private attachEventListeners(): void {
+    if (!this.container) {
+      return;
+    }
 
     // Clear history button
-    const clearBtn = this.container.querySelector('#clearHistory');
+    const clearBtn = this.container.querySelector<HTMLButtonElement>('#clearHistory');
     if (clearBtn) {
       clearBtn.addEventListener('click', () => {
         if (confirm('Are you sure you want to clear all practice history? This cannot be undone.')) {
           this.clearPracticeHistory();
           this.history = this.getPracticeHistory();
-          this.render(this.container.id);
+          this.render(this.container!.id);
         }
       });
     }
 
     // Start first test button
-    const startFirstBtn = this.container.querySelector('#startFirstTest');
+    const startFirstBtn = this.container.querySelector<HTMLButtonElement>('#startFirstTest');
     if (startFirstBtn) {
       startFirstBtn.addEventListener('click', () => {
         // Focus on the practice section
-        const practiceBtn = document.getElementById('practiceBtn');
+        const practiceBtn = document.getElementById('practiceBtn') as HTMLButtonElement | null;
         if (practiceBtn) {
           practiceBtn.scrollIntoView({ behavior: 'smooth' });
         }
       });
     }
-
   }
 
   // Storage methods
-  getPracticeHistory() {
+  private getPracticeHistory(): PracticeHistory {
     try {
       const history = localStorage.getItem('practice_history');
       if (!history) {
@@ -106,7 +110,7 @@ class PracticeHistoryComponent {
     }
   }
 
-  calculateHistoryStats(results) {
+  private calculateHistoryStats(results: PracticeResult[]): PracticeHistory {
     const totalTests = results.length;
     const totalScore = results.reduce((sum, result) => sum + result.score, 0);
     const averageScore = totalTests > 0 ? Math.round((totalScore / totalTests) * 100) / 100 : 0;
@@ -118,11 +122,11 @@ class PracticeHistoryComponent {
       totalTests,
       averageScore,
       bestScore,
-      totalTime
+      totalTime,
     };
   }
 
-  clearPracticeHistory() {
+  private clearPracticeHistory(): void {
     try {
       localStorage.removeItem('practice_history');
       this.history = { ...EMPTY_HISTORY };
@@ -131,7 +135,7 @@ class PracticeHistoryComponent {
     }
   }
 
-  refresh() {
+  refresh(): void {
     this.history = this.getPracticeHistory();
     if (this.container) {
       this.render(this.container.id);
@@ -139,5 +143,5 @@ class PracticeHistoryComponent {
   }
 }
 
-// Make it available globally
-window.practiceHistoryComponent = new PracticeHistoryComponent();
+const practiceHistoryComponent = new PracticeHistoryComponent();
+export default practiceHistoryComponent;

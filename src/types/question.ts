@@ -49,13 +49,12 @@ declare global {
     
     // Application state
     banks?: QuestionBank;
-    populateBankSelects?: (banks: QuestionBank) => void;
-    questionRenderer?: QuestionRenderer;
-    toggleFlag?: (id: number) => boolean;
-    practiceHistoryComponent?: any;
-    // Timer functionality removed
+      populateBankSelects?: (banks: QuestionBank) => void;
+      questionRenderer?: QuestionRenderer;
+      toggleFlag?: (id: number) => boolean;
+      // Timer functionality removed
+    }
   }
-}
 
 export interface QuestionStats {
   [questionId: number]: {
