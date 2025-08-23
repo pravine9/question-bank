@@ -1,4 +1,6 @@
 // Practice History Component - JavaScript Version
+import { formatBankName } from '../utils/bankNames';
+
 class PracticeHistoryComponent {
   constructor() {
     this.container = null;
@@ -93,7 +95,7 @@ class PracticeHistoryComponent {
     return `
       <div class="result-card" data-result-id="${result.id}">
         <div class="result-header">
-          <div class="result-bank">${this.formatBankName(result.bank)}</div>
+          <div class="result-bank">${formatBankName(result.bank)}</div>
           <div class="result-date">${date} at ${time}</div>
         </div>
         <div class="result-details">
@@ -125,17 +127,6 @@ class PracticeHistoryComponent {
         </div>
       </div>
     `;
-  }
-
-  formatBankName(bank) {
-    const bankNames = {
-      'calculations': 'Calculations',
-      'clinical_mep': 'Clinical MEP',
-      'clinical_mixed': 'Clinical Mixed',
-      'clinical_otc': 'Clinical OTC',
-      'clinical_therapeutics': 'Clinical Therapeutics'
-    };
-    return bankNames[bank] || bank;
   }
 
   attachEventListeners() {
@@ -226,7 +217,7 @@ class PracticeHistoryComponent {
             <div class="summary-stats">
               <div class="summary-stat">
                 <span class="stat-label">Bank:</span>
-                <span class="stat-value">${this.formatBankName(result.bank)}</span>
+                <span class="stat-value">${formatBankName(result.bank)}</span>
               </div>
               <div class="summary-stat">
                 <span class="stat-label">Score:</span>
