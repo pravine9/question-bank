@@ -276,7 +276,9 @@ export class SummaryManager {
         title: '#reviewQuestionTitle',
         img: '#reviewQuestionImage',
         options: '#reviewAnswerOptions',
-        showInput: false // Don't show input in review mode
+        showInput: false, // Don't show input in review mode
+        reviewMode: true,
+        userAnswer: userAnswer
       });
     }
 

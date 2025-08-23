@@ -194,6 +194,7 @@
   font-weight: 600;
   font-size: 0.8rem;
   border-bottom: 1px solid #dee2e6;
+  white-space: nowrap;
 }
 
 .summary-table td {
@@ -210,7 +211,8 @@
   font-weight: 600;
   color: #333;
   font-size: 0.9rem;
-  width: 40px;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .summary-table .answer-cell {
@@ -218,8 +220,9 @@
   color: #333;
   font-weight: 500;
   font-size: 0.85rem;
-  max-width: 200px;
   word-wrap: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .summary-table .correct-answer-cell {
@@ -227,8 +230,9 @@
   color: #333;
   font-weight: 500;
   font-size: 0.85rem;
-  max-width: 200px;
   word-wrap: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .summary-table .status-cell {
@@ -261,7 +265,7 @@
 
 .summary-table .review-cell {
   text-align: center;
-  width: 80px;
+  white-space: nowrap;
 }
 
 .summary-table .review-question {
@@ -275,7 +279,7 @@
   font-weight: 500;
   transition: all 0.2s ease;
   display: inline-block;
-  min-width: 60px;
+  white-space: nowrap;
 }
 
 .summary-table .review-question:hover {
@@ -294,32 +298,36 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  padding: 20px;
 }
 
 .modal-content {
   background: white;
-  border-radius: 4px;
-  max-width: 700px;
+  border-radius: 8px;
+  max-width: 800px;
   width: 90%;
-  max-height: 85vh;
+  max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  position: relative;
 }
 
 .modal-header {
-  padding: 15px;
+  padding: 20px;
   border-bottom: 1px solid #dee2e6;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: #f8f9fa;
 }
 
 .modal-header h3 {
   margin: 0;
   color: #333;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 600;
   text-align: center;
+  flex: 1;
 }
 
 .modal-close {
@@ -467,6 +475,7 @@
   border-radius: 3px;
   cursor: default;
   transition: all 0.2s ease;
+  position: relative;
 }
 
 .modal-body .options label:hover {
@@ -475,6 +484,33 @@
 
 .modal-body .options input[type="radio"] {
   margin-right: 6px;
+  pointer-events: none;
+}
+
+/* Review mode specific styling */
+.modal-body .options label.user-selected {
+  background: #fff3cd;
+  border-color: #ffeaa7;
+}
+
+.modal-body .options label.correct-answer {
+  border: 2px solid #28a745;
+  background: #d4edda;
+}
+
+.modal-body .options label.incorrect-answer {
+  border: 2px solid #dc3545;
+  background: #f8d7da;
+}
+
+.modal-body .options label.user-selected.correct-answer {
+  background: #d4edda;
+  border: 2px solid #28a745;
+}
+
+.modal-body .options label.user-selected.incorrect-answer {
+  background: #f8d7da;
+  border: 2px solid #dc3545;
 }
 
 /* Responsive modal */

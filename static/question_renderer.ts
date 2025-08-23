@@ -11,6 +11,8 @@ interface RenderOptions {
   answer?: string;
   explanation?: string;
   showInput?: boolean;
+  reviewMode?: boolean;
+  userAnswer?: string;
 }
 
 interface QuestionRenderer {
@@ -65,7 +67,9 @@ function renderQuestion(question: Question, config: RenderOptions = {}): void {
     unit: unitSelector = '#answerUnit',
     feedback: feedbackSelector = '#feedback',
     answer: answerSelector = '#answer',
-    explanation: explanationSelector = '#explanation'
+    explanation: explanationSelector = '#explanation',
+    reviewMode = false,
+    userAnswer = ''
   } = config;
 
   const textEl = get(textSelector);
@@ -114,6 +118,9 @@ function renderQuestion(question: Question, config: RenderOptions = {}): void {
     optionsEl.innerHTML = '';
     optionsEl.style.display = '';
     
+    // Find correct answer for review mode
+    const correctAnswerNumber = question.correct_answer_number;
+    
     question.answers.forEach((answer) => {
       const label = document.createElement('label');
       const radio = document.createElement('input');
@@ -128,34 +135,56 @@ function renderQuestion(question: Question, config: RenderOptions = {}): void {
       label.appendChild(radio);
       label.appendChild(span);
       
-      // Add click handler for the new styling with deselection
-      label.addEventListener('click', (e) => {
-        e.preventDefault();
+      if (reviewMode) {
+        // In review mode, disable radio buttons and apply styling
+        radio.disabled = true;
+        radio.style.pointerEvents = 'none';
         
-        // Check if this label is already selected
-        const isCurrentlySelected = label.classList.contains('selected');
-        
-        // Remove selected class from all labels
-        const allLabels = optionsEl.querySelectorAll('label');
-        allLabels.forEach(l => l.classList.remove('selected'));
-        
-        if (!isCurrentlySelected) {
-          // Add selected class to clicked label
-          label.classList.add('selected');
-          
-          // Check the radio button (for compatibility with existing code)
+        // Check if this is the user's selected answer
+        if (userAnswer === answer.answer_number.toString()) {
+          label.classList.add('user-selected');
           radio.checked = true;
-          
-          // Trigger change event for existing handlers
-          radio.dispatchEvent(new Event('change', { bubbles: true }));
-        } else {
-          // Deselect the radio button
-          radio.checked = false;
-          
-          // Trigger change event for existing handlers
-          radio.dispatchEvent(new Event('change', { bubbles: true }));
         }
-      });
+        
+        // Check if this is the correct answer
+        if (correctAnswerNumber && answer.answer_number === correctAnswerNumber) {
+          label.classList.add('correct-answer');
+        }
+        
+        // If user selected wrong answer, mark it as incorrect
+        if (userAnswer === answer.answer_number.toString() && correctAnswerNumber && answer.answer_number !== correctAnswerNumber) {
+          label.classList.add('incorrect-answer');
+        }
+      } else {
+        // Normal mode - add click handler for the new styling with deselection
+        label.addEventListener('click', (e) => {
+          e.preventDefault();
+          
+          // Check if this label is already selected
+          const isCurrentlySelected = label.classList.contains('selected');
+          
+          // Remove selected class from all labels
+          const allLabels = optionsEl.querySelectorAll('label');
+          allLabels.forEach(l => l.classList.remove('selected'));
+          
+          if (!isCurrentlySelected) {
+            // Add selected class to clicked label
+            label.classList.add('selected');
+            
+            // Check the radio button (for compatibility with existing code)
+            radio.checked = true;
+            
+            // Trigger change event for existing handlers
+            radio.dispatchEvent(new Event('change', { bubbles: true }));
+          } else {
+            // Deselect the radio button
+            radio.checked = false;
+            
+            // Trigger change event for existing handlers
+            radio.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        });
+      }
       
       optionsEl!.appendChild(label);
     });
