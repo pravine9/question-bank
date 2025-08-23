@@ -1,6 +1,8 @@
 import type { Question, RenderOptions } from '../types/question';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
+import { domUtils } from './domUtils';
+import { DOM_SELECTORS, CSS_CLASSES } from './constants';
 
 export class QuestionRenderer {
   private static instance: QuestionRenderer;
@@ -57,77 +59,61 @@ export class QuestionRenderer {
     let input: HTMLInputElement | HTMLTextAreaElement | null = null;
 
     try {
-      // Render question text
-      const textElement = document.querySelector(options.text);
-      if (textElement) {
-        textElement.innerHTML = await this.renderMarkdown(question.text);
-      }
-
-      // Render question title
-      const titleElement = document.querySelector('#qTitle');
-      if (titleElement) {
-        titleElement.innerHTML = await this.renderMarkdown(question.title);
-      }
+      // Render question text and title using utility functions
+      domUtils.updateElement(options.text, await this.renderMarkdown(question.text));
+      domUtils.updateElement(DOM_SELECTORS.QUESTION_TITLE, await this.renderMarkdown(question.title));
 
       // Handle question image
-      const imgElement = document.querySelector('#qImg') as HTMLImageElement;
-      if (imgElement && question.resource_image) {
-        imgElement.src = question.resource_image;
-        imgElement.style.display = 'block';
-        imgElement.alt = 'Question resource image';
-        imgElement.loading = 'lazy';
-      } else if (imgElement) {
-        imgElement.style.display = 'none';
+      const imgElement = document.querySelector(DOM_SELECTORS.QUESTION_IMAGE) as HTMLImageElement;
+      if (imgElement) {
+        if (question.resource_image) {
+          imgElement.src = question.resource_image;
+          imgElement.style.display = 'block';
+          imgElement.alt = 'Question resource image';
+          imgElement.loading = 'lazy';
+        } else {
+          imgElement.style.display = 'none';
+        }
       }
 
       // Render answer options for multiple choice
       const optionsElement = document.querySelector(options.options);
-      if (optionsElement && question.answers && question.answers.length > 0) {
-        optionsElement.innerHTML = '';
-        question.answers.forEach((answer, index) => {
-          const button = document.createElement('button');
-          button.type = 'button';
-          button.className = 'option-btn';
-          button.textContent = answer.text;
-          button.dataset.value = answer.answer_number.toString();
-          button.dataset.value = answer.answer_number.toString();
-          optionsElement.appendChild(button);
-          buttons.push(button);
-        });
-      } else if (optionsElement) {
-        optionsElement.innerHTML = '';
+      if (optionsElement) {
+        if (question.answers && question.answers.length > 0) {
+          domUtils.clearElement(options.options);
+          question.answers.forEach((answer) => {
+            const button = domUtils.createButton(answer.text, CSS_CLASSES.OPTION_BUTTON, {
+              value: answer.answer_number.toString()
+            });
+            optionsElement.appendChild(button);
+            buttons.push(button);
+          });
+        } else {
+          domUtils.clearElement(options.options);
+        }
       }
 
       // Handle calculation questions
       if (question.is_calculation) {
-        const calculatorElement = document.querySelector('.calculator');
+        const calculatorElement = document.querySelector(DOM_SELECTORS.CALCULATOR);
         if (calculatorElement) {
-          input = document.createElement('input');
-          input.type = 'text';
-          input.className = 'calc-input';
-          input.placeholder = 'Enter your answer';
-
+          input = domUtils.createInput('text', CSS_CLASSES.CALC_INPUT, 'Enter your answer');
           calculatorElement.appendChild(input);
         }
       }
 
       // Handle free text questions
       if (question.is_free) {
-        const freeTextElement = document.querySelector('.free-text-input');
+        const freeTextElement = document.querySelector(DOM_SELECTORS.FREE_TEXT_INPUT);
         if (freeTextElement) {
-          const textarea = document.createElement('textarea');
-          textarea.className = 'free-text-area';
-          textarea.placeholder = 'Enter your answer';
-
-          textarea.rows = 4;
-          freeTextElement.appendChild(textarea);
-          input = textarea;
+          input = domUtils.createTextarea(CSS_CLASSES.FREE_TEXT_AREA, 'Enter your answer', 4);
+          freeTextElement.appendChild(input);
         }
       }
 
       // Handle unit display for calculation questions
       if (question.answer_unit && question.is_calculation) {
-        const unitElement = document.querySelector('.unit-display') as HTMLElement;
+        const unitElement = document.querySelector(DOM_SELECTORS.UNIT_DISPLAY) as HTMLElement;
         if (unitElement) {
           unitElement.textContent = question.answer_unit;
           unitElement.style.display = 'block';
@@ -231,44 +217,24 @@ export class QuestionRenderer {
 
   clearQuestion(): void {
     try {
-      // Clear question text
-      const textElement = document.querySelector('#qText');
-      if (textElement) textElement.innerHTML = '';
-
-      // Clear title
-      const titleElement = document.querySelector('#qTitle');
-      if (titleElement) titleElement.innerHTML = '';
-
-      // Clear image
-      const imgElement = document.querySelector('#qImg') as HTMLImageElement;
+      // Clear all elements using utility functions
+      domUtils.clearElement(DOM_SELECTORS.QUESTION_TEXT);
+      domUtils.clearElement(DOM_SELECTORS.QUESTION_TITLE);
+      domUtils.clearElement(DOM_SELECTORS.ANSWER_OPTIONS);
+      domUtils.clearElement(DOM_SELECTORS.CALCULATOR);
+      domUtils.clearElement(DOM_SELECTORS.FREE_TEXT_INPUT);
+      
+      // Hide elements
+      domUtils.hideElement(DOM_SELECTORS.QUESTION_IMAGE);
+      domUtils.hideElement(DOM_SELECTORS.UNIT_DISPLAY);
+      domUtils.hideElement(DOM_SELECTORS.CORRECT_ANSWER);
+      domUtils.hideElement(DOM_SELECTORS.EXPLANATION);
+      
+      // Reset image src
+      const imgElement = document.querySelector(DOM_SELECTORS.QUESTION_IMAGE) as HTMLImageElement;
       if (imgElement) {
         imgElement.src = '';
-        imgElement.style.display = 'none';
       }
-
-      // Clear options
-      const optionsElement = document.querySelector('#answerOptions');
-      if (optionsElement) optionsElement.innerHTML = '';
-
-      // Clear calculator
-      const calculatorElement = document.querySelector('.calculator');
-      if (calculatorElement) calculatorElement.innerHTML = '';
-
-      // Clear free text input
-      const freeTextElement = document.querySelector('.free-text-input');
-      if (freeTextElement) freeTextElement.innerHTML = '';
-
-      // Clear unit display
-      const unitElement = document.querySelector('.unit-display') as HTMLElement;
-      if (unitElement) unitElement.style.display = 'none';
-
-      // Clear correct answer
-      const answerElement = document.querySelector('#correctAnswer') as HTMLElement;
-      if (answerElement) answerElement.style.display = 'none';
-
-      // Clear explanation
-      const explanationElement = document.querySelector('#explanation') as HTMLElement;
-      if (explanationElement) explanationElement.style.display = 'none';
 
     } catch (error) {
       console.error('Error clearing question:', error);

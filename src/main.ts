@@ -2,10 +2,21 @@
 import { questionRenderer } from './utils/questionRenderer';
 import { storage } from './utils/storage';
 
-// Extend Window interface to include questionRenderer
+// Extend Window interface to include global variables
 declare global {
   interface Window {
     questionRenderer?: any;
+    toggleFlag?: (id: number) => boolean;
+    banks?: any;
+    calculations?: any[];
+    clinicalMepLow?: any[];
+    clinicalMixedHigh?: any[];
+    clinicalMixedLow?: any[];
+    clinicalMixedMedium?: any[];
+    clinicalOtcLow?: any[];
+    clinicalTherapeuticsHigh?: any[];
+    clinicalTherapeuticsLow?: any[];
+    clinicalTherapeuticsMedium?: any[];
   }
 }
 

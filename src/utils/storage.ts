@@ -1,4 +1,5 @@
 import type { QuestionStats, PracticeState, PracticeResult, PracticeHistory } from '../types/question';
+import { STORAGE_LIMITS } from './constants';
 
 const STORAGE_KEYS = {
   QUESTION_STATS: 'questionStats',
@@ -22,7 +23,7 @@ export class StorageManager {
 
   private isStorageAvailable(): boolean {
     try {
-      const test = '__storage_test__';
+      const test = STORAGE_LIMITS.STORAGE_TEST_KEY;
       localStorage.setItem(test, test);
       localStorage.removeItem(test);
       return true;
@@ -31,30 +32,33 @@ export class StorageManager {
     }
   }
 
-  getQuestionStats(): QuestionStats {
-    if (!this.isStorageAvailable()) {
-      return {};
-    }
-
+  // Generic storage methods to reduce repetition
+  private getItem<T>(key: string, defaultValue: T): T {
+    if (!this.isStorageAvailable()) return defaultValue;
     try {
-      const stats = localStorage.getItem(STORAGE_KEYS.QUESTION_STATS);
-      return stats ? JSON.parse(stats) : {};
+      const item = localStorage.getItem(key);
+      return item ? JSON.parse(item) : defaultValue;
     } catch (error) {
-      console.warn('Failed to load question stats:', error);
-      return {};
+      console.warn(`Failed to load ${key}:`, error);
+      return defaultValue;
     }
   }
 
-  saveQuestionStats(stats: QuestionStats): void {
-    if (!this.isStorageAvailable()) {
-      return;
-    }
-
+  private setItem(key: string, value: any): void {
+    if (!this.isStorageAvailable()) return;
     try {
-      localStorage.setItem(STORAGE_KEYS.QUESTION_STATS, JSON.stringify(stats));
+      localStorage.setItem(key, JSON.stringify(value));
     } catch (error) {
-      console.warn('Failed to save question stats:', error);
+      console.warn(`Failed to save ${key}:`, error);
     }
+  }
+
+  getQuestionStats(): QuestionStats {
+    return this.getItem(STORAGE_KEYS.QUESTION_STATS, {});
+  }
+
+  saveQuestionStats(stats: QuestionStats): void {
+    this.setItem(STORAGE_KEYS.QUESTION_STATS, stats);
   }
 
   updateQuestionStat(questionId: number, isCorrect: boolean): void {
@@ -75,110 +79,70 @@ export class StorageManager {
   }
 
   getPracticeState(): PracticeState | null {
-    if (!this.isStorageAvailable()) {
-      return null;
-    }
+    const state = this.getItem(STORAGE_KEYS.PRACTICE_STATE, null);
+    if (!state) return null;
 
     try {
-      const state = localStorage.getItem(STORAGE_KEYS.PRACTICE_STATE);
-      if (!state) return null;
-
-      const parsedState = JSON.parse(state);
       // Convert flagged array back to Set
-      parsedState.flagged = new Set(parsedState.flagged);
-      return parsedState;
+      state.flagged = new Set(state.flagged);
+      return state;
     } catch (error) {
-      console.warn('Failed to load practice state:', error);
+      console.warn('Failed to parse practice state:', error);
       return null;
     }
   }
 
   savePracticeState(state: PracticeState): void {
-    if (!this.isStorageAvailable()) {
-      return;
-    }
-
-    try {
-      // Convert Set to array for JSON serialization
-      const serializableState = {
-        ...state,
-        flagged: Array.from(state.flagged)
-      };
-      localStorage.setItem(STORAGE_KEYS.PRACTICE_STATE, JSON.stringify(serializableState));
-    } catch (error) {
-      console.warn('Failed to save practice state:', error);
-    }
+    // Convert Set to array for JSON serialization
+    const serializableState = {
+      ...state,
+      flagged: Array.from(state.flagged)
+    };
+    this.setItem(STORAGE_KEYS.PRACTICE_STATE, serializableState);
   }
 
   clearPracticeState(): void {
-    if (!this.isStorageAvailable()) {
-      return;
-    }
-
-    try {
-      localStorage.removeItem(STORAGE_KEYS.PRACTICE_STATE);
-    } catch (error) {
-      console.warn('Failed to clear practice state:', error);
+    if (this.isStorageAvailable()) {
+      try {
+        localStorage.removeItem(STORAGE_KEYS.PRACTICE_STATE);
+      } catch (error) {
+        console.warn('Failed to clear practice state:', error);
+      }
     }
   }
 
   // New methods for practice history
   getPracticeHistory(): PracticeHistory {
-    if (!this.isStorageAvailable()) {
-      return {
-        results: [],
-        totalTests: 0,
-        averageScore: 0,
-        bestScore: 0,
-        totalTime: 0
-      };
-    }
+    const defaultHistory: PracticeHistory = {
+      results: [],
+      totalTests: 0,
+      averageScore: 0,
+      bestScore: 0,
+      totalTime: 0
+    };
+
+    const history = this.getItem(STORAGE_KEYS.PRACTICE_HISTORY, null);
+    if (!history) return defaultHistory;
 
     try {
-      const history = localStorage.getItem(STORAGE_KEYS.PRACTICE_HISTORY);
-      if (!history) {
-        return {
-          results: [],
-          totalTests: 0,
-          averageScore: 0,
-          bestScore: 0,
-          totalTime: 0
-        };
-      }
-
-      const parsedHistory = JSON.parse(history);
-      return this.calculateHistoryStats(parsedHistory.results || []);
+      return this.calculateHistoryStats(history.results || []);
     } catch (error) {
-      console.warn('Failed to load practice history:', error);
-      return {
-        results: [],
-        totalTests: 0,
-        averageScore: 0,
-        bestScore: 0,
-        totalTime: 0
-      };
+      console.warn('Failed to parse practice history:', error);
+      return defaultHistory;
     }
   }
 
   savePracticeResult(result: PracticeResult): void {
-    if (!this.isStorageAvailable()) {
-      return;
+    const history = this.getPracticeHistory();
+    history.results.unshift(result); // Add to beginning of array
+    
+    // Keep only last results to prevent storage bloat
+    if (history.results.length > STORAGE_LIMITS.MAX_PRACTICE_RESULTS) {
+      history.results = history.results.slice(0, STORAGE_LIMITS.MAX_PRACTICE_RESULTS);
     }
 
-    try {
-      const history = this.getPracticeHistory();
-      history.results.unshift(result); // Add to beginning of array
-      
-      // Keep only last 50 results to prevent storage bloat
-      if (history.results.length > 50) {
-        history.results = history.results.slice(0, 50);
-      }
-
-      const updatedHistory = this.calculateHistoryStats(history.results);
-      localStorage.setItem(STORAGE_KEYS.PRACTICE_HISTORY, JSON.stringify(updatedHistory));
-    } catch (error) {
-      console.warn('Failed to save practice result:', error);
-    }
+    const updatedHistory = this.calculateHistoryStats(history.results);
+    this.setItem(STORAGE_KEYS.PRACTICE_HISTORY, updatedHistory);
   }
 
   private calculateHistoryStats(results: PracticeResult[]): PracticeHistory {
@@ -198,66 +162,29 @@ export class StorageManager {
   }
 
   clearPracticeHistory(): void {
-    if (!this.isStorageAvailable()) {
-      return;
-    }
-
-    try {
-      localStorage.removeItem(STORAGE_KEYS.PRACTICE_HISTORY);
-    } catch (error) {
-      console.warn('Failed to clear practice history:', error);
+    if (this.isStorageAvailable()) {
+      try {
+        localStorage.removeItem(STORAGE_KEYS.PRACTICE_HISTORY);
+      } catch (error) {
+        console.warn('Failed to clear practice history:', error);
+      }
     }
   }
 
   getLastBank(): string | null {
-    if (!this.isStorageAvailable()) {
-      return null;
-    }
-
-    try {
-      return localStorage.getItem(STORAGE_KEYS.LAST_BANK);
-    } catch (error) {
-      console.warn('Failed to load last bank:', error);
-      return null;
-    }
+    return this.getItem(STORAGE_KEYS.LAST_BANK, null);
   }
 
   saveLastBank(bank: string): void {
-    if (!this.isStorageAvailable()) {
-      return;
-    }
-
-    try {
-      localStorage.setItem(STORAGE_KEYS.LAST_BANK, bank);
-    } catch (error) {
-      console.warn('Failed to save last bank:', error);
-    }
+    this.setItem(STORAGE_KEYS.LAST_BANK, bank);
   }
 
   getSettings(): Record<string, any> {
-    if (!this.isStorageAvailable()) {
-      return {};
-    }
-
-    try {
-      const settings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
-      return settings ? JSON.parse(settings) : {};
-    } catch (error) {
-      console.warn('Failed to load settings:', error);
-      return {};
-    }
+    return this.getItem(STORAGE_KEYS.SETTINGS, {});
   }
 
   saveSettings(settings: Record<string, any>): void {
-    if (!this.isStorageAvailable()) {
-      return;
-    }
-
-    try {
-      localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
-    } catch (error) {
-      console.warn('Failed to save settings:', error);
-    }
+    this.setItem(STORAGE_KEYS.SETTINGS, settings);
   }
 
   clearAll(): void {
