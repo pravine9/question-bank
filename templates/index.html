@@ -16,6 +16,7 @@
   <title>GPhC Question Bank - Pharmacy Exam Preparation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
   <link rel="stylesheet" href="/src/styles/consolidated.css">
+  <link rel="stylesheet" href="/src/styles/question.css">
 </head>
 <body>
   <div class="container">
@@ -48,15 +49,7 @@
 
         <!-- Single Question Section -->
         <div id="questionArea" class="question-container" style="display:none">
-          <div id="qText" class="question-text"></div>
-          <div id="qTitle" class="question-title"></div>
-          <img id="qImg" class="question-image" alt="Question image" style="display:none;">
-          <div id="answerOptions" class="options"></div>
-          <div class="calculator" style="display:none">
-            <label>Answer</label>
-            <input type="number" id="calcInput">
-            <span class="unit" id="answerUnit"></span>
-          </div>
+          <div id="questionRoot"></div>
           <div class="button-row">
             <button id="checkBtn" class="btn btn-primary">Check</button>
             <button id="revealBtn" class="btn btn-secondary">Reveal</button>

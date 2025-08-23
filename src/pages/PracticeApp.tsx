@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import QuestionRenderer from '@/components/QuestionRenderer';
 import type { Question, PracticeResult } from '@/types/question';
 
 function loadQuestions(): Question[] {
@@ -55,21 +56,12 @@ export default function PracticeApp() {
   return (
     <div className="practice-app">
       <h2>Question {index + 1} of {questions.length}</h2>
-      <div className="question-text" dangerouslySetInnerHTML={{ __html: question.text }} />
-      <div className="options">
-        {question.answers.map(ans => (
-          <label key={ans.answer_number}>
-            <input
-              type="radio"
-              name="answer"
-              value={ans.answer_number}
-              checked={answers[question.id] === String(ans.answer_number)}
-              onChange={() => selectAnswer(String(ans.answer_number))}
-            />
-            {ans.text}
-          </label>
-        ))}
-      </div>
+      <QuestionRenderer
+        question={question}
+        variant="practice"
+        selectedAnswer={answers[question.id]}
+        onAnswerChange={selectAnswer}
+      />
       <div className="nav">
         <button onClick={back} disabled={index === 0}>Back</button>
         {index < questions.length - 1 ? (
