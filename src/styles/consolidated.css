@@ -192,6 +192,17 @@ body {
   border-color: #059669;
 }
 
+.btn-warning {
+  background-color: var(--color-warning);
+  color: var(--color-white);
+  border-color: var(--color-warning);
+}
+
+.btn-warning:hover:not(:disabled) {
+  background-color: #d97706;
+  border-color: #d97706;
+}
+
 .btn-danger {
   background-color: var(--color-error);
   color: var(--color-white);
