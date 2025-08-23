@@ -9,6 +9,7 @@ export class SummaryManager {
   private testResult: PracticeResult | null = null;
   private currentReviewQuestion: number = 0;
   private reviewMode: 'all' | 'incorrect' | 'flagged' = 'all';
+  private filteredRows: HTMLTableRowElement[] = [];
 
   constructor() {
     this.init();
@@ -53,12 +54,7 @@ export class SummaryManager {
     if (!this.testResult) return;
 
     const tbody = document.querySelector('.summary-table tbody') as HTMLTableSectionElement;
-    const scoreDisplay = document.getElementById('scoreDisplay') as HTMLElement;
-    const percentageDisplay = document.getElementById('percentageDisplay') as HTMLElement;
-    const correctCountEl = document.getElementById('correctCount') as HTMLElement;
-    const incorrectCountEl = document.getElementById('incorrectCount') as HTMLElement;
-    const unansweredCountEl = document.getElementById('unansweredCount') as HTMLElement;
-    const passFailEl = document.getElementById('passFail') as HTMLElement;
+    const scoreText = document.getElementById('scoreText') as HTMLElement;
 
     if (!tbody) return;
 
@@ -66,13 +62,13 @@ export class SummaryManager {
     let incorrectCount = 0;
     let unansweredCount = 0;
     tbody.innerHTML = '';
+    this.filteredRows = [];
 
     for (let i = 0; i < this.testResult.questions.length; i++) {
       const question = this.testResult.questions[i];
       const userAnswer = this.testResult.answers[i] || 'No answer';
       const isCorrect =
         userAnswer !== 'No answer' && evaluateAnswer(question, userAnswer);
-      const isFlagged = this.testResult.flagged.includes(i);
       
       if (isCorrect) {
         correctCount++;
@@ -83,41 +79,35 @@ export class SummaryManager {
       }
 
       const row = tbody.insertRow();
-      const statusClass = isCorrect ? 'correct' : (userAnswer !== 'No answer' ? 'incorrect' : 'unanswered');
-      const statusText = isCorrect ? '✓' : (userAnswer !== 'No answer' ? '✗' : '-');
-      const flagIcon = isFlagged ? ' F' : '';
+      this.filteredRows.push(row);
+      
+      const statusClass = isCorrect ? 'correct' : 'incorrect';
+      const statusText = isCorrect ? '✓ Correct' : '✗ Incorrect';
+      
+      // Get the actual answer text instead of just the number
+      let userAnswerText = userAnswer;
+      if (userAnswer !== 'No answer' && !question.is_calculation) {
+        const selectedAnswer = question.answers.find(a => a.answer_number.toString() === userAnswer);
+        userAnswerText = selectedAnswer ? selectedAnswer.text : userAnswer;
+      }
       
       row.innerHTML = `
         <td>
           <div class="question-number">${i + 1}</div>
-          ${isFlagged ? '<div class="flag-indicator">F</div>' : ''}
         </td>
-        <td class="answer-cell">${userAnswer}</td>
+        <td class="answer-cell">${userAnswerText}</td>
         <td class="correct-answer-cell">${getCorrectAnswerText(question)}</td>
-        <td class="status-cell ${statusClass}">${statusText}${flagIcon}</td>
-        <td>
-          <button class="btn btn-sm review-question" data-question="${i}">
-            <span class="review-icon">View</span> Review
-          </button>
+        <td class="status-cell ${statusClass}">${statusText}</td>
+        <td class="review-cell">
+          <button class="review-question" data-question="${i}">Review</button>
         </td>
       `;
     }
 
     const score = Math.round((correctCount / this.testResult.totalQuestions) * 100);
-    const isPass = score >= 70; // 70% pass threshold
 
     // Update score display
-    if (scoreDisplay) scoreDisplay.textContent = `${correctCount}/${this.testResult.totalQuestions}`;
-    if (percentageDisplay) percentageDisplay.textContent = `${score}%`;
-    if (correctCountEl) correctCountEl.textContent = correctCount.toString();
-    if (incorrectCountEl) incorrectCountEl.textContent = incorrectCount.toString();
-    if (unansweredCountEl) unansweredCountEl.textContent = unansweredCount.toString();
-    
-    // Update pass/fail indicator
-    if (passFailEl) {
-      passFailEl.textContent = isPass ? 'Pass' : 'Fail';
-      passFailEl.className = `pass-fail ${isPass ? 'pass' : 'fail'}`;
-    }
+    if (scoreText) scoreText.textContent = `You scored ${correctCount}/${this.testResult.totalQuestions} (${score}%)`;
 
     // Add review handlers
     tbody.addEventListener('click', (e) => {
@@ -127,6 +117,9 @@ export class SummaryManager {
         this.openReviewModal(questionNum);
       }
     });
+
+    // Apply initial filter (show all questions by default)
+    this.applyFilters();
   }
 
   private setupEventListeners(): void {
@@ -136,6 +129,7 @@ export class SummaryManager {
     const closeReviewBtn = document.getElementById('closeReviewBtn');
     const prevQuestionBtn = document.getElementById('prevQuestionBtn');
     const nextQuestionBtn = document.getElementById('nextQuestionBtn');
+    const clearFilterBtn = document.querySelector('.clear-filter-btn');
 
     if (reviewWrongBtn) {
       reviewWrongBtn.addEventListener('click', () => this.startReviewMode('incorrect'));
@@ -157,6 +151,24 @@ export class SummaryManager {
     if (nextQuestionBtn) {
       nextQuestionBtn.addEventListener('click', () => this.navigateReviewQuestion(1));
     }
+    if (clearFilterBtn) {
+      clearFilterBtn.addEventListener('click', () => this.clearFilters());
+    }
+
+    // Filter event listeners
+    const filterCorrect = document.getElementById('filterCorrect') as HTMLInputElement;
+    const filterIncorrect = document.getElementById('filterIncorrect') as HTMLInputElement;
+    const filterUnanswered = document.getElementById('filterUnanswered') as HTMLInputElement;
+
+    if (filterCorrect) {
+      filterCorrect.addEventListener('change', () => this.applyFilters());
+    }
+    if (filterIncorrect) {
+      filterIncorrect.addEventListener('change', () => this.applyFilters());
+    }
+    if (filterUnanswered) {
+      filterUnanswered.addEventListener('change', () => this.applyFilters());
+    }
 
     // Close modal on outside click
     const modal = document.getElementById('reviewModal');
@@ -169,6 +181,52 @@ export class SummaryManager {
     }
   }
 
+  private applyFilters(): void {
+    const filterCorrect = document.getElementById('filterCorrect') as HTMLInputElement;
+    const filterIncorrect = document.getElementById('filterIncorrect') as HTMLInputElement;
+    const filterUnanswered = document.getElementById('filterUnanswered') as HTMLInputElement;
+
+    if (!this.testResult) return;
+
+    // If no filters are selected, show all questions
+    const hasActiveFilters = (filterCorrect?.checked || filterIncorrect?.checked || filterUnanswered?.checked);
+
+    this.filteredRows.forEach((row, index) => {
+      const question = this.testResult!.questions[index];
+      const userAnswer = this.testResult!.answers[index] || 'No answer';
+      const isCorrect = userAnswer !== 'No answer' && evaluateAnswer(question, userAnswer);
+      
+      let shouldShow = false;
+      
+      if (!hasActiveFilters) {
+        // If no filters are selected, show all questions
+        shouldShow = true;
+      } else {
+        // Apply selected filters
+        if (isCorrect && filterCorrect?.checked) {
+          shouldShow = true;
+        } else if (!isCorrect && filterIncorrect?.checked) {
+          shouldShow = true;
+        } else if (userAnswer === 'No answer' && filterUnanswered?.checked) {
+          shouldShow = true;
+        }
+      }
+      
+      row.style.display = shouldShow ? '' : 'none';
+    });
+  }
+
+  private clearFilters(): void {
+    const filterCorrect = document.getElementById('filterCorrect') as HTMLInputElement;
+    const filterIncorrect = document.getElementById('filterIncorrect') as HTMLInputElement;
+    const filterUnanswered = document.getElementById('filterUnanswered') as HTMLInputElement;
+
+    if (filterCorrect) filterCorrect.checked = false;
+    if (filterIncorrect) filterIncorrect.checked = false;
+    if (filterUnanswered) filterUnanswered.checked = false;
+
+    this.applyFilters();
+  }
 
   private startReviewMode(mode: 'all' | 'incorrect' | 'flagged'): void {
     if (!this.testResult) return;

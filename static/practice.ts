@@ -487,9 +487,9 @@ export class PracticeManager {
     const filterAttempted = document.getElementById('filterAttempted') as HTMLInputElement;
     const filterFlagged = document.getElementById('filterFlagged') as HTMLInputElement;
 
-    if (filterUnattempted) filterUnattempted.checked = false;
-    if (filterAttempted) filterAttempted.checked = false;
-    if (filterFlagged) filterFlagged.checked = false;
+    if (filterUnattempted) filterUnattempted.checked = true;
+    if (filterAttempted) filterAttempted.checked = true;
+    if (filterFlagged) filterFlagged.checked = true;
 
     this.updateQuestionGrid();
   }
@@ -506,22 +506,16 @@ export class PracticeManager {
 
     gridEl.innerHTML = '';
 
-    // Check if any filters are active
-    const hasActiveFilters = filterUnattempted?.checked || filterAttempted?.checked || filterFlagged?.checked;
-
     for (let i = 0; i < this.state.totalQuestions; i++) {
       const isAttempted = !!this.state.answers[i];
       const isFlagged = this.state.flagged.has(i);
       const isCurrent = i === this.state.currentQuestion;
 
-      // Show all questions if no filters are active, otherwise show only matching questions
-      let shouldShow = true;
-      if (hasActiveFilters) {
-        shouldShow = false;
-        if (isAttempted && filterAttempted?.checked) shouldShow = true;
-        if (!isAttempted && filterUnattempted?.checked) shouldShow = true;
-        if (isFlagged && filterFlagged?.checked) shouldShow = true;
-      }
+      // Check if question should be shown based on filters
+      let shouldShow = false;
+      if (isAttempted && filterAttempted?.checked) shouldShow = true;
+      if (!isAttempted && filterUnattempted?.checked) shouldShow = true;
+      if (isFlagged && filterFlagged?.checked) shouldShow = true;
 
       if (!shouldShow) continue;
 

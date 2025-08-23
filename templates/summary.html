@@ -15,41 +15,33 @@
     <div class="summary">
       <div class="summary-container">
         <div class="summary-header">
-          <h1>Results</h1>
-          <div class="score-circle">
-            <div class="score-number" id="scoreDisplay">0/0</div>
-            <div class="score-percentage" id="percentageDisplay">0%</div>
+          <div class="summary-header-left">
+            <h1>Test Results</h1>
+            <div class="score-text" id="scoreText">You scored 0/0 (0%)</div>
           </div>
-          <div class="pass-fail" id="passFail">Pass</div>
+          <div class="summary-header-actions">
+            <button type="button" id="reviewWrongBtn" class="btn btn-primary">Review</button>
+            <button type="button" id="goHomeBtn" class="btn btn-secondary">Home</button>
+          </div>
         </div>
         
-        <div class="summary-stats">
-          <div class="stat correct">
-            <div class="stat-icon">C</div>
-            <div class="stat-content">
-              <div class="stat-number" id="correctCount">0</div>
-              <div class="stat-label">Correct</div>
-            </div>
+        <div class="filter-section">
+          <div class="filter-title">Filter by:</div>
+          <div class="filter-options">
+            <label class="filter-option">
+              <input type="checkbox" id="filterCorrect">
+              <span class="filter-text">Correct</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" id="filterIncorrect">
+              <span class="filter-text">Incorrect</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" id="filterUnanswered">
+              <span class="filter-text">Unanswered</span>
+            </label>
           </div>
-          <div class="stat incorrect">
-            <div class="stat-icon">I</div>
-            <div class="stat-content">
-              <div class="stat-number" id="incorrectCount">0</div>
-              <div class="stat-label">Incorrect</div>
-            </div>
-          </div>
-          <div class="stat unanswered">
-            <div class="stat-icon">U</div>
-            <div class="stat-content">
-              <div class="stat-number" id="unansweredCount">0</div>
-              <div class="stat-label">Unanswered</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="summary-actions">
-          <button type="button" id="reviewWrongBtn" class="btn btn-primary">Review</button>
-          <button type="button" id="goHomeBtn" class="btn btn-secondary">Home</button>
+          <button type="button" class="clear-filter-btn">Clear</button>
         </div>
 
         <table class="summary-table">
