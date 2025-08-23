@@ -126,6 +126,7 @@ export class PracticeManager {
     const flagBtn = document.querySelector('.flag-current-btn') as HTMLButtonElement;
     const finishBtn = document.querySelector('.finish-btn') as HTMLButtonElement;
     const checkBtn = document.getElementById('checkBtn') as HTMLButtonElement;
+    const revealBtn = document.getElementById('revealBtn') as HTMLButtonElement;
 
     if (backBtn) {
       backBtn.addEventListener('click', () => this.previousQuestion());
@@ -140,7 +141,10 @@ export class PracticeManager {
       finishBtn.addEventListener('click', () => this.finishTest());
     }
     if (checkBtn) {
-      checkBtn.addEventListener('click', () => this.checkAnswer());
+      checkBtn.addEventListener('click', () => this.toggleCheck());
+    }
+    if (revealBtn) {
+      revealBtn.addEventListener('click', () => this.toggleReveal());
     }
 
     // Answer selection handling
@@ -344,29 +348,74 @@ export class PracticeManager {
     this.saveSession(); // Auto-save when flag changes
   }
 
-  private checkAnswer(): void {
-    if (!this.state) {return;}
+  private toggleCheck(): void {
+    const checkBtn = document.getElementById('checkBtn') as HTMLButtonElement;
+    if (checkBtn.textContent === 'Hide') {
+      this.hideAnswer();
+    } else {
+      this.checkAnswer();
+    }
+  }
 
+  private toggleReveal(): void {
+    const revealBtn = document.getElementById('revealBtn') as HTMLButtonElement;
+    if (revealBtn.textContent === 'Hide') {
+      this.hideAnswer();
+    } else {
+      this.revealAnswerOnly();
+    }
+  }
+
+  private checkAnswer(): void {
+    if (!this.state) return;
     const question = this.state.questions[this.state.currentQuestion];
     const userAnswer = this.state.answers[this.state.currentQuestion];
-
     if (!userAnswer) {
       alert('Please select an answer first');
       return;
     }
-
     const isCorrect = evaluateAnswer(question, userAnswer);
     this.revealAnswer(question, isCorrect);
+    this.updateButtons('Check', 'Hide', 'Reveal');
   }
 
-  private revealAnswer(question: Question, isCorrect: boolean): void {
+  private revealAnswerOnly(): void {
+    if (!this.state) return;
+    const question = this.state.questions[this.state.currentQuestion];
+    this.revealAnswer(question, false, true);
+    this.updateButtons('Reveal', 'Check', 'Hide');
+  }
+
+  private hideAnswer(): void {
+    ['feedback', 'answer', 'explanation'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.textContent = '';
+        el.className = id;
+        el.style.display = 'none';
+      }
+    });
+    this.updateButtons('Hide', 'Check', 'Reveal');
+  }
+
+  private updateButtons(action: string, checkText: string, revealText: string): void {
+    const checkBtn = document.getElementById('checkBtn') as HTMLButtonElement;
+    const revealBtn = document.getElementById('revealBtn') as HTMLButtonElement;
+    if (checkBtn) checkBtn.textContent = checkText;
+    if (revealBtn) revealBtn.textContent = revealText;
+  }
+
+  private revealAnswer(question: Question, isCorrect: boolean, revealOnly: boolean = false): void {
     const feedbackEl = document.getElementById('feedback');
     const answerEl = document.getElementById('answer');
     const explanationEl = document.getElementById('explanation');
 
-    if (feedbackEl) {
+    if (feedbackEl && !revealOnly) {
       feedbackEl.textContent = isCorrect ? 'Correct!' : 'Incorrect';
       feedbackEl.className = isCorrect ? 'feedback correct' : 'feedback incorrect';
+    } else if (feedbackEl && revealOnly) {
+      feedbackEl.textContent = '';
+      feedbackEl.className = 'feedback';
     }
 
     if (answerEl) {

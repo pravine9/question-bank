@@ -23,12 +23,12 @@ export function init(): void {
 
   const checkBtn = document.getElementById('checkBtn') as HTMLButtonElement | null;
   if (checkBtn) {
-    checkBtn.addEventListener('click', checkAnswer);
+    checkBtn.addEventListener('click', toggleCheck);
   }
 
   const revealBtn = document.getElementById('revealBtn') as HTMLButtonElement | null;
   if (revealBtn) {
-    revealBtn.addEventListener('click', revealAnswer);
+    revealBtn.addEventListener('click', toggleReveal);
   }
 
   const statsModal = document.getElementById('statsModal');
@@ -219,6 +219,43 @@ function startPractice(): void {
   window.location.href = `practice.html?bank=${encodeURIComponent(data.bank)}&num=${numQuestions}`;
 }
 
+function toggleCheck(): void {
+  const checkBtn = document.getElementById('checkBtn') as HTMLButtonElement;
+  if (checkBtn.textContent === 'Hide') {
+    hideAnswer();
+  } else {
+    checkAnswer();
+  }
+}
+
+function toggleReveal(): void {
+  const revealBtn = document.getElementById('revealBtn') as HTMLButtonElement;
+  if (revealBtn.textContent === 'Hide') {
+    hideAnswer();
+  } else {
+    revealAnswer();
+  }
+}
+
+function hideAnswer(): void {
+  ['feedback', 'answer', 'explanation'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.textContent = '';
+      el.className = id;
+      el.style.display = 'none';
+    }
+  });
+  updateButtons('Check', 'Reveal');
+}
+
+function updateButtons(checkText: string, revealText: string): void {
+  const checkBtn = document.getElementById('checkBtn') as HTMLButtonElement;
+  const revealBtn = document.getElementById('revealBtn') as HTMLButtonElement;
+  if (checkBtn) checkBtn.textContent = checkText;
+  if (revealBtn) revealBtn.textContent = revealText;
+}
+
 function checkAnswer(): void {
   if (!currentQuestion) {
     return;
@@ -247,6 +284,7 @@ function checkAnswer(): void {
 
   const isCorrect = evaluateAnswer(currentQuestion, userAnswer);
   revealAnswerWithFeedback(currentQuestion, isCorrect);
+  updateButtons('Hide', 'Reveal');
 }
 
 function revealAnswerWithFeedback(
@@ -279,17 +317,12 @@ function revealAnswerWithFeedback(
 }
 
 function revealAnswer(): void {
-  if (!currentQuestion) {
-    return;
-  }
-
-  // Use the same rendering logic but without feedback
+  if (!currentQuestion) return;
   revealAnswerWithFeedback(currentQuestion, false);
-
-  // Clear any existing feedback since this is just revealing the answer
   const feedbackEl = document.getElementById('feedback');
   if (feedbackEl) {
     feedbackEl.textContent = '';
     feedbackEl.className = 'feedback';
   }
+  updateButtons('Check', 'Hide');
 }
