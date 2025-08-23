@@ -1,8 +1,22 @@
-import type {
-  Question,
-  RenderOptions,
-  QuestionRenderer,
-} from '@/types/question';
+import type { Question } from '@/types/question';
+
+interface RenderOptions {
+  text?: string;
+  title?: string;
+  img?: string;
+  options?: string;
+  input?: string;
+  unit?: string;
+  feedback?: string;
+  answer?: string;
+  explanation?: string;
+  showInput?: boolean;
+}
+
+interface QuestionRenderer {
+  initPdfViewer(): void;
+  renderQuestion(question: Question, config?: RenderOptions): void;
+}
 
 function sanitize(content: string, inline: boolean = false): string {
   if (typeof (window as any).DOMPurify !== 'undefined' && typeof (window as any).marked !== 'undefined') {
@@ -191,5 +205,3 @@ export const questionRenderer: QuestionRenderer = {
   initPdfViewer,
   renderQuestion
 };
-
-export default questionRenderer;

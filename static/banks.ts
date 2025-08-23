@@ -17,5 +17,3 @@ export const banks: QuestionBank = {
     (window as any).clinicalTherapeuticsMedium || [],
   ],
 };
-
-export default banks;
