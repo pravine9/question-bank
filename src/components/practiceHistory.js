@@ -177,6 +177,17 @@ class PracticeHistoryComponent {
     });
   }
 
+  attachBackToSummary() {
+    if (!this.container) { return; }
+
+    const backBtn = this.container.querySelector('#backToSummary');
+    if (backBtn) {
+      backBtn.addEventListener('click', () => {
+        this.render(this.container.id);
+      });
+    }
+  }
+
   showAllResultsModal() {
     // Simplified: just show all results in the main area
     if (this.container) {
@@ -191,14 +202,8 @@ class PracticeHistoryComponent {
           </div>
         </div>
       `;
-      
-      // Add back button functionality
-      const backBtn = this.container.querySelector('#backToSummary');
-      if (backBtn) {
-        backBtn.addEventListener('click', () => {
-          this.render(this.container.id);
-        });
-      }
+
+      this.attachBackToSummary();
     }
   }
 
@@ -247,14 +252,8 @@ class PracticeHistoryComponent {
           </div>
         </div>
       `;
-      
-      // Add back button functionality
-      const backBtn = this.container.querySelector('#backToSummary');
-      if (backBtn) {
-        backBtn.addEventListener('click', () => {
-          this.render(this.container.id);
-        });
-      }
+
+      this.attachBackToSummary();
     }
   }
 
