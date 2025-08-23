@@ -415,127 +415,11 @@ body {
   border: 1px solid rgb(16 185 129 / 0.2);
 }
 
-.question-text {
-  font-size: var(--font-size-lg);
-  line-height: var(--line-height-relaxed);
-  color: var(--color-gray-900);
-  margin-bottom: var(--space-4);
-}
 
-.question-title {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-gray-900);
-  margin-bottom: var(--space-4);
-}
 
-/* Image Display */
-.question-image-container {
-  position: relative;
-  display: block;
-  max-width: 100%;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin: var(--space-4) 0;
-}
 
-.question-image {
-  max-width: 100%;
-  width: 100%;
-  height: auto;
-  display: block;
-  border-radius: var(--radius-lg);
-  margin: var(--space-4) 0;
-  cursor: pointer;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--color-gray-200);
-}
 
-/* Answer Section */
-.answer-options {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
 
-.answer-options .option-btn {
-  display: flex;
-  align-items: center;
-  padding: var(--space-4) var(--space-6);
-  background-color: var(--color-gray-50);
-  border: 2px solid var(--color-gray-200);
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  transition: all 0.2s;
-  text-align: left;
-  font-size: var(--font-size-base);
-  min-height: 60px;
-}
-
-.answer-options .option-btn:hover {
-  background-color: var(--color-gray-100);
-  border-color: var(--color-gray-300);
-}
-
-.answer-options .option-btn.selected {
-  background-color: var(--color-primary);
-  border-color: var(--color-primary);
-  color: var(--color-white);
-}
-
-.answer-options .option-btn.correct {
-  background-color: var(--color-success);
-  border-color: var(--color-success);
-  color: var(--color-white);
-}
-
-.answer-options .option-btn.incorrect {
-  background-color: var(--color-error);
-  border-color: var(--color-error);
-  color: var(--color-white);
-}
-
-/* Calculator */
-.calculator-container {
-  background-color: var(--color-gray-50);
-  border: 1px solid var(--color-gray-200);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4);
-}
-
-.calculator-input {
-  flex: 1;
-  padding: var(--space-3) var(--space-4);
-  font-size: var(--font-size-lg);
-  border: 2px solid var(--color-gray-300);
-  border-radius: var(--radius-lg);
-  transition: all 0.2s;
-  font-family: var(--font-family-mono);
-  text-align: center;
-}
-
-.calculator-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-}
-
-/* Feedback Area */
-.feedback-area {
-  background-color: var(--color-gray-50);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4);
-  border-left: 4px solid var(--color-gray-300);
-}
-
-.feedback-area.correct {
-  background-color: rgb(16 185 129 / 0.1);
-  border-left-color: var(--color-success);
-}
-
-.feedback-area.incorrect {
-  background-color: rgb(239 68 68 / 0.1);
-  border-left-color: var(--color-error);
-}
 
 /* Footer */
 .exam-footer {
@@ -852,55 +736,19 @@ body {
   padding: var(--space-6);
 }
 
-.question-text,
-.question-title {
-  margin-bottom: var(--space-4);
-  line-height: var(--line-height-normal);
-}
 
 
 
 
-.calculator-section {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin: var(--space-4) 0;
-  padding: var(--space-4);
-  background-color: var(--color-gray-50);
-  border-radius: var(--radius-lg);
-}
 
-.calculator-section label {
-  font-weight: var(--font-weight-medium);
-  color: var(--color-gray-700);
-}
 
-.calculator-section input {
-  max-width: 150px;
-}
 
 .modal-footer {
   padding: var(--space-6);
   border-top: 1px solid var(--color-gray-200);
 }
 
-.answer-section,
-.explanation-section {
-  margin-top: var(--space-4);
-  padding: var(--space-4);
-  background-color: var(--color-gray-50);
-  border-radius: var(--radius-lg);
-  border-left: 4px solid var(--color-primary);
-}
 
-.answer-section {
-  font-weight: var(--font-weight-semibold);
-}
-
-.explanation-section {
-  margin-top: var(--space-3);
-}
 
 .practice-section h2,
 .stats-section h2 {
@@ -970,122 +818,16 @@ body {
   min-width: 0; /* Allow container to shrink */
 }
 
-/* Answer options */
-.options {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  margin: var(--space-6) 0;
-}
-
-.option-btn {
-  display: flex;
-  align-items: center;
-  padding: var(--space-4) var(--space-6);
-  background-color: var(--color-gray-50);
-  border: 2px solid var(--color-gray-200);
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  transition: all var(--transition-normal);
-  text-align: left;
-  font-size: var(--font-size-base);
-  line-height: var(--line-height-normal);
-  min-height: 60px;
-}
-
-.option-btn:hover {
-  background-color: var(--color-gray-100);
-  border-color: var(--color-gray-300);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
-}
-
-.option-btn.selected {
-  background-color: var(--color-primary);
-  border-color: var(--color-primary);
-  color: var(--color-white);
-}
-
-.option-btn.correct {
-  background-color: var(--color-success);
-  border-color: var(--color-success);
-  color: var(--color-white);
-}
-
-.option-btn.incorrect {
-  background-color: var(--color-error);
-  border-color: var(--color-error);
-  color: var(--color-white);
-}
 
 
-/* Calculator input */
-.calculator {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  margin: var(--space-6) 0;
-  padding: var(--space-4);
-  background-color: var(--color-gray-50);
-  border-radius: var(--radius-lg);
-}
 
-.calculator label {
-  font-weight: var(--font-weight-medium);
-  color: var(--color-gray-700);
-  min-width: 80px;
-}
 
-.calculator input {
-  flex: 1;
-  max-width: 200px;
-}
 
-.calculator .unit {
-  font-weight: var(--font-weight-medium);
-  color: var(--color-gray-600);
-  min-width: 60px;
-}
 
-/* Feedback */
-.feedback {
-  padding: var(--space-4);
-  border-radius: var(--radius-lg);
-  margin: var(--space-4) 0;
-  font-weight: var(--font-weight-medium);
-  text-align: center;
-}
 
-.feedback.correct {
-  background-color: rgb(16 185 129 / 0.1);
-  color: #065f46;
-  border: 1px solid var(--color-success);
-}
 
-.feedback.incorrect {
-  background-color: rgb(239 68 68 / 0.1);
-  color: #991b1b;
-  border: 1px solid var(--color-error);
-}
 
-/* Answer and explanation */
-.answer, .explanation {
-  margin: var(--space-4) 0;
-  padding: var(--space-4);
-  background-color: var(--color-gray-50);
-  border-radius: var(--radius-lg);
-  border-left: 4px solid var(--color-primary);
-}
 
-.answer {
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-gray-900);
-}
-
-.explanation {
-  line-height: var(--line-height-relaxed);
-  color: var(--color-gray-700);
-}
 
 /* Navigation */
 .nav-buttons {
@@ -1233,14 +975,9 @@ body {
     padding: var(--space-4);
   }
   
-  .calculator-section {
-    flex-direction: column;
-    align-items: stretch;
-  }
+
   
-  .question-image {
-    margin: var(--space-3) 0;
-  }
+
 }
 
 @media (max-width: 480px) {

@@ -350,7 +350,7 @@ export class SummaryManager {
     // Prevent back button navigation
     window.history.pushState(null, '', window.location.href);
     
-    window.addEventListener('popstate', (event) => {
+    window.addEventListener('popstate', () => {
       // Show confirmation dialog
       const confirmNavigation = confirm(
         'Are you sure you want to leave this page? Your test results will be lost.'
