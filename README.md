@@ -31,7 +31,8 @@ Open [http://localhost:3000](http://localhost:3000)
 
 Front End:
 - `index.html`: Main page for viewing single questions, reviewing stats on previously attempted questions and tests, starting new practice sessions.
-- `practice.html`: Dedicated page for timed practice sessions replicating the real GPhC exam format. 
+- `practice.html`: Dedicated page for timed practice sessions replicating the real GPhC exam format.
+- `summary.html`: Dedicated page for displaying test results with detailed review functionality. 
 ## Usage
 
 ### Single Question Mode
@@ -48,12 +49,16 @@ Front End:
 5. Click "Finish Test" for results
 
 ### Test Summary
-After completing a practice test, users see a clean, focused summary:
+After completing a practice test, users are redirected to a dedicated summary page (`summary.html`) that provides:
 - **Immediate score feedback** with pass/fail indicator (70% threshold)
 - **Visual score circle** with percentage and fraction display
 - **Quick stats** showing correct, incorrect, and unanswered counts
 - **Detailed table** with question number, your answer, correct answer, result, and review button
+- **Review modal** that shows the original question with your answer, correct answer, and explanation
+- **Navigation controls** to move between questions during review
 - **Simple actions** to review wrong answers or go home
+
+The summary page loads test results from localStorage and provides a read-only review experience without the ability to change answers.
 
 ## Adding Questions
 

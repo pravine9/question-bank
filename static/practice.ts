@@ -479,115 +479,36 @@ class PracticeManager {
     }
 
     const score = Math.round((correctCount / this.state.totalQuestions) * 100);
+    const resultId = Date.now().toString();
 
-    // Save to history
+    // Save complete test result to history
     this.savePracticeResult({
-      id: Date.now().toString(),
+      id: resultId,
       bank: this.state.bank,
       totalQuestions: this.state.totalQuestions,
       correctAnswers: correctCount,
       score,
       duration,
       date: new Date().toISOString(),
-      flaggedQuestions: this.state.flagged.size
+      flaggedQuestions: this.state.flagged.size,
+      questions: this.state.questions,
+      answers: this.state.answers,
+      flagged: Array.from(this.state.flagged)
     });
 
     this.isFinished = true;
+    
+    // Redirect to summary page
+    window.location.href = `summary.html?resultId=${resultId}`;
   }
 
   private showSummary(): void {
-    // Hide main content and show summary
-    const main = document.querySelector('.main') as HTMLElement;
-    const header = document.querySelector('.header') as HTMLElement;
-    const footer = document.querySelector('.footer') as HTMLElement;
-    const summary = document.querySelector('.summary') as HTMLElement;
-
-    if (main) {main.style.display = 'none';}
-    if (header) {header.style.display = 'none';}
-    if (footer) {footer.style.display = 'none';}
-    if (summary) {summary.style.display = 'block';}
-
-    this.populateSummaryTable();
-    this.updateSummaryNavigation();
+    // This method is no longer needed as we redirect to a separate summary page
+    // The summary functionality is now handled by summary.ts
   }
 
   private populateSummaryTable(): void {
-    if (!this.state) {return;}
-
-    const tbody = document.querySelector('.summary-table tbody') as HTMLTableSectionElement;
-    const scoreDisplay = document.getElementById('scoreDisplay') as HTMLElement;
-    const percentageDisplay = document.getElementById('percentageDisplay') as HTMLElement;
-    const correctCountEl = document.getElementById('correctCount') as HTMLElement;
-    const incorrectCountEl = document.getElementById('incorrectCount') as HTMLElement;
-    const unansweredCountEl = document.getElementById('unansweredCount') as HTMLElement;
-    const passFailEl = document.getElementById('passFail') as HTMLElement;
-
-    if (!tbody) {return;}
-
-    let correctCount = 0;
-    let incorrectCount = 0;
-    let unansweredCount = 0;
-    tbody.innerHTML = '';
-
-    for (let i = 0; i < this.state.questions.length; i++) {
-      const question = this.state.questions[i];
-      const userAnswer = this.state.answers[i] || 'No answer';
-      const isCorrect = userAnswer !== 'No answer' && this.evaluateAnswer(question, userAnswer);
-      const isFlagged = this.state.flagged.has(i);
-      
-      if (isCorrect) {
-        correctCount++;
-      } else if (userAnswer !== 'No answer') {
-        incorrectCount++;
-      } else {
-        unansweredCount++;
-      }
-
-      const row = tbody.insertRow();
-      const statusClass = isCorrect ? 'correct' : (userAnswer !== 'No answer' ? 'incorrect' : 'unanswered');
-      const statusText = isCorrect ? '✓ Correct' : (userAnswer !== 'No answer' ? '✗ Incorrect' : '○ Unanswered');
-      const flagIcon = isFlagged ? ' ⚑' : '';
-      
-      row.innerHTML = `
-        <td>
-          <div class="question-number">${i + 1}</div>
-          ${isFlagged ? '<div class="flag-indicator">⚑</div>' : ''}
-        </td>
-        <td class="answer-cell">${userAnswer}</td>
-        <td class="correct-answer-cell">${this.getCorrectAnswerText(question)}</td>
-        <td class="status-cell ${statusClass}">${statusText}${flagIcon}</td>
-        <td>
-          <button class="btn btn-sm review-question" data-question="${i}">
-            <span class="review-icon">👁️</span> Review
-          </button>
-        </td>
-      `;
-    }
-
-    const score = Math.round((correctCount / this.state.totalQuestions) * 100);
-    const isPass = score >= 70; // 70% pass threshold
-
-    // Update score display
-    if (scoreDisplay) {scoreDisplay.textContent = `${correctCount}/${this.state.totalQuestions}`;}
-    if (percentageDisplay) {percentageDisplay.textContent = `${score}%`;}
-    if (correctCountEl) {correctCountEl.textContent = correctCount.toString();}
-    if (incorrectCountEl) {incorrectCountEl.textContent = incorrectCount.toString();}
-    if (unansweredCountEl) {unansweredCountEl.textContent = unansweredCount.toString();}
-    
-    // Update pass/fail indicator
-    if (passFailEl) {
-      passFailEl.textContent = isPass ? 'Pass' : 'Fail';
-      passFailEl.className = `pass-fail ${isPass ? 'pass' : 'fail'}`;
-    }
-
-    // Add review handlers
-    tbody.addEventListener('click', (e) => {
-      const btn = (e.target as HTMLElement).closest('.review-question') as HTMLButtonElement;
-      if (btn) {
-        const questionNum = parseInt(btn.dataset.question || '0');
-        this.reviewQuestion(questionNum);
-      }
-    });
+    // This method is no longer needed as summary functionality is moved to summary.ts
   }
 
   private getCorrectAnswerText(question: any): string {
@@ -604,33 +525,8 @@ class PracticeManager {
     }
   }
 
-  private reviewQuestion(questionNum: number): void {
-    // Hide summary and show question for review
-    const main = document.querySelector('.main') as HTMLElement;
-    const header = document.querySelector('.header') as HTMLElement;
-    const footer = document.querySelector('.footer') as HTMLElement;
-    const summary = document.querySelector('.summary') as HTMLElement;
-
-    if (main) {main.style.display = 'block';}
-    if (header) {header.style.display = 'block';}
-    if (footer) {footer.style.display = 'block';}
-    if (summary) {summary.style.display = 'none';}
-
-    // Go to the question and ensure it renders properly
-    this.goToQuestion(questionNum);
-    
-    // Force re-render the question to ensure content appears
-    setTimeout(() => {
-      this.renderCurrentQuestion();
-    }, 100);
-
-    // Auto-reveal the answer for review
-    const question = this.state!.questions[questionNum];
-    const userAnswer = this.state!.answers[questionNum];
-    if (userAnswer) {
-      const isCorrect = this.evaluateAnswer(question, userAnswer);
-      this.revealAnswer(question, isCorrect);
-    }
+  private reviewQuestion(): void {
+    // This method is no longer needed as review functionality is moved to summary.ts
   }
 
   private showReviewModal(): void {
@@ -686,108 +582,19 @@ class PracticeManager {
   }
 
   private updateSummaryNavigation(): void {
-    if (!this.state) {return;}
-
-    // Add event listeners for simplified buttons
-    const reviewWrongBtn = document.getElementById('reviewWrongBtn');
-    const goHomeBtn = document.getElementById('goHomeBtn');
-
-    if (reviewWrongBtn) {
-      reviewWrongBtn.addEventListener('click', () => this.startReviewMode('incorrect'));
-    }
-    if (goHomeBtn) {
-      goHomeBtn.addEventListener('click', () => {
-        window.location.href = 'index.html';
-      });
-    }
+    // This method is no longer needed as summary functionality is moved to summary.ts
   }
 
-  private startReviewMode(mode: 'all' | 'incorrect' | 'flagged'): void {
-    if (!this.state) {return;}
-
-    // Hide summary and show main content
-    const main = document.querySelector('.main') as HTMLElement;
-    const header = document.querySelector('.header') as HTMLElement;
-    const footer = document.querySelector('.footer') as HTMLElement;
-    const summary = document.querySelector('.summary') as HTMLElement;
-
-    if (main) {main.style.display = 'block';}
-    if (header) {header.style.display = 'block';}
-    if (footer) {footer.style.display = 'block';}
-    if (summary) {summary.style.display = 'none';}
-
-    // Find first question to review based on mode
-    let firstQuestion = 0;
-    
-    if (mode === 'incorrect') {
-      for (let i = 0; i < this.state.questions.length; i++) {
-        const userAnswer = this.state.answers[i];
-        if (userAnswer && !this.evaluateAnswer(this.state.questions[i], userAnswer)) {
-          firstQuestion = i;
-          break;
-        }
-      }
-    } else if (mode === 'flagged') {
-      for (let i = 0; i < this.state.questions.length; i++) {
-        if (this.state.flagged.has(i)) {
-          firstQuestion = i;
-          break;
-        }
-      }
-    }
-
-    // Go to first question and enable review mode
-    this.goToQuestion(firstQuestion);
-    this.enableReviewMode(mode);
+  private startReviewMode(): void {
+    // This method is no longer needed as review functionality is moved to summary.ts
   }
 
-  private enableReviewMode(mode: 'all' | 'incorrect' | 'flagged'): void {
-    // Update footer buttons for review mode
-    const backBtn = document.querySelector('.back-btn') as HTMLButtonElement;
-    const nextBtn = document.querySelector('.next-btn') as HTMLButtonElement;
-    const finishBtn = document.querySelector('.finish-btn') as HTMLButtonElement;
-
-    if (backBtn) {
-      backBtn.textContent = '‹ Previous';
-      backBtn.onclick = () => this.navigateReviewQuestion(-1, mode);
-    }
-    if (nextBtn) {
-      nextBtn.textContent = 'Next ›';
-      nextBtn.onclick = () => this.navigateReviewQuestion(1, mode);
-    }
-    if (finishBtn) {
-      finishBtn.textContent = 'Back to Summary';
-      finishBtn.onclick = () => this.showSummary();
-    }
+  private enableReviewMode(): void {
+    // This method is no longer needed as review functionality is moved to summary.ts
   }
 
-  private navigateReviewQuestion(direction: number, mode: 'all' | 'incorrect' | 'flagged'): void {
-    if (!this.state) {return;}
-
-    let nextQuestion = this.state.currentQuestion + direction;
-    
-    // Find next question based on mode
-    if (mode === 'incorrect') {
-      while (nextQuestion >= 0 && nextQuestion < this.state.questions.length) {
-        const userAnswer = this.state.answers[nextQuestion];
-        if (userAnswer && !this.evaluateAnswer(this.state.questions[nextQuestion], userAnswer)) {
-          break;
-        }
-        nextQuestion += direction;
-      }
-    } else if (mode === 'flagged') {
-      while (nextQuestion >= 0 && nextQuestion < this.state.questions.length) {
-        if (this.state.flagged.has(nextQuestion)) {
-          break;
-        }
-        nextQuestion += direction;
-      }
-    }
-
-    // Ensure we stay within bounds
-    if (nextQuestion >= 0 && nextQuestion < this.state.questions.length) {
-      this.goToQuestion(nextQuestion);
-    }
+  private navigateReviewQuestion(): void {
+    // This method is no longer needed as review functionality is moved to summary.ts
   }
 
   private savePracticeResult(result: any): void {

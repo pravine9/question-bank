@@ -11,7 +11,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'templates/index.html'),
-        practice: resolve(__dirname, 'templates/practice.html')
+        practice: resolve(__dirname, 'templates/practice.html'),
+        summary: resolve(__dirname, 'templates/summary.html')
       }
     },
     target: 'es2015',
