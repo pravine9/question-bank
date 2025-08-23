@@ -1,32 +1,49 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GPhC Question Bank</title>
+  <meta name="description" content="Comprehensive GPhC exam preparation with practice questions, calculations, and clinical scenarios. Offline-capable question bank for pharmacy students.">
+  <meta name="keywords" content="GPhC, pharmacy exam, question bank, clinical calculations, pharmaceutical education">
+  <meta name="author" content="GPhC Question Bank Team">
+  
+  <!-- Open Graph / Social Media -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="GPhC Question Bank - Pharmacy Exam Preparation">
+  <meta property="og:description" content="Master your GPhC exam with our comprehensive question bank featuring calculations, clinical scenarios, and practice tests.">
+  <meta property="og:url" content="">
+  
+  <title>GPhC Question Bank - Pharmacy Exam Preparation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
   <link rel="stylesheet" href="/src/styles/consolidated.css">
   <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
   <div class="container">
-    <h1>GPhC Question Bank</h1>
+    <header class="simple-header">
+      <h1>GPhC Question Bank</h1>
+      <p class="subtitle">Pharmacy Exam Preparation</p>
+    </header>
     
     <div class="main-layout">
       <!-- Left Column - Main Content -->
       <div class="left-column">
         <!-- Practice Section -->
         <div class="practice-section">
-          <h2>Start Practice</h2>
-          <label for="bankSelect">Select Bank:</label>
-          <select id="bankSelect">
-            <option value="">-- Choose --</option>
-          </select>
-          <label for="numInput">Number of questions:</label>
-          <input type="number" id="numInput" value="1" min="1">
-          <div class="button-row">
-            <button id="loadBtn">Load Random Question</button>
-            <button id="practiceBtn">Start Practice</button>
+          <h2>📚 Start Practice</h2>
+          <div class="form-group">
+            <label for="bankSelect">Select Question Bank:</label>
+            <select id="bankSelect" class="form-select">
+              <option value="">-- Choose a question bank --</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="numInput">Number of questions:</label>
+            <input type="number" id="numInput" value="1" min="1" class="form-input">
+          </div>
+          <div class="button-group">
+            <button id="loadBtn" class="btn btn-secondary">Load Single Question</button>
+            <button id="practiceBtn" class="btn btn-primary">Start Practice Session</button>
           </div>
         </div>
 
@@ -52,13 +69,15 @@
         </div>
 
         <!-- Statistics Section -->
-        <div id="statsArea">
-          <h2>Question Statistics</h2>
-          <label for="statsBankSelect">Select Bank:</label>
-          <select id="statsBankSelect">
-            <option value="">-- Choose --</option>
-          </select>
-          <button id="loadStatsBtn">Load Stats</button>
+        <div id="statsArea" class="stats-section">
+          <h2>📊 Question Statistics</h2>
+          <div class="form-group">
+            <label for="statsBankSelect">Select Question Bank:</label>
+            <select id="statsBankSelect" class="form-select">
+              <option value="">-- Choose a question bank --</option>
+            </select>
+          </div>
+          <button id="loadStatsBtn" class="btn btn-primary">Load Statistics</button>
           <table id="statsTable">
             <thead>
               <tr>
