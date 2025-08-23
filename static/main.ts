@@ -4,6 +4,7 @@ import type {
   BankData,
   BankLabels,
 } from '@/types/question';
+import { evaluateAnswer, getCorrectAnswerText } from '@/utils/answerUtils';
 
 let bankFiles: QuestionBank = (window as any).banks || {};
 const flagged = new Set<number>();
@@ -270,34 +271,6 @@ function checkAnswer(): void {
   revealAnswerWithFeedback(currentQuestion, isCorrect);
 }
 
-function evaluateAnswer(question: Question, userAnswer: string): boolean {
-  if (!question || !userAnswer) {
-    return false;
-  }
-
-  if (question.is_free) {
-    return userAnswer.toLowerCase().trim() === question.correct_answer.toLowerCase().trim();
-  }
-  
-  if (question.is_calculation) {
-    const userNum = parseFloat(userAnswer);
-    const correctNum = question.correct_answer_number || parseFloat(question.correct_answer);
-    if (isNaN(userNum) || isNaN(correctNum)) {
-      return false;
-    }
-    
-    const tolerance = Math.abs(correctNum * 0.05); // 5% tolerance
-    return Math.abs(userNum - correctNum) <= tolerance;
-  }
-  
-  // Multiple choice - use correct_answer_number directly
-  const correctAnswerNumber = question.correct_answer_number;
-  if (correctAnswerNumber === undefined || correctAnswerNumber === null) {
-    return false;
-  }
-  return parseInt(userAnswer) === correctAnswerNumber;
-}
-
 function revealAnswerWithFeedback(question: Question, isCorrect: boolean): void {
   const feedbackEl = document.getElementById('feedback');
   const answerEl = document.getElementById('answer');
@@ -309,15 +282,8 @@ function revealAnswerWithFeedback(question: Question, isCorrect: boolean): void 
   }
 
   if (answerEl) {
-    let correctAnswerText = question.correct_answer;
-    
-    // For multiple choice questions, find the correct answer text
-    if (!correctAnswerText && question.correct_answer_number && question.answers) {
-      const correctAnswer = question.answers.find(a => a.answer_number === question.correct_answer_number);
-      correctAnswerText = correctAnswer ? correctAnswer.text : 'N/A';
-    }
-    
-    answerEl.innerHTML = `<strong>Correct Answer:</strong> ${correctAnswerText || 'N/A'}${question.answer_unit ? ' ' + question.answer_unit : ''}`;
+    const correctAnswerText = getCorrectAnswerText(question);
+    answerEl.innerHTML = `<strong>Correct Answer:</strong> ${correctAnswerText}`;
     answerEl.style.display = 'block';
   }
 
