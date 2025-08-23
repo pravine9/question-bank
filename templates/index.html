@@ -49,7 +49,15 @@
 
         <!-- Single Question Section -->
         <div id="questionArea" class="question-container" style="display:none">
-          <div id="questionRoot"></div>
+          <div id="qText" class="question-text"></div>
+          <div id="qTitle" class="question-title"></div>
+          <img id="qImg" class="question-image" alt="Question image" style="display:none;">
+          <div id="answerOptions" class="options"></div>
+          <div class="calculator" style="display:none">
+            <label>Answer</label>
+            <input type="number" id="calcInput">
+            <span class="unit" id="answerUnit"></span>
+          </div>
           <div class="button-row">
             <button id="checkBtn" class="btn btn-primary">Check</button>
             <button id="revealBtn" class="btn btn-secondary">Reveal</button>
@@ -166,14 +174,10 @@
   <script src="/question_banks/clinical_therapeutics_medium_questions.js"></script>
   <script type="module">
     import { init } from '/static/main.ts';
-    import React from 'react';
-    import { createRoot } from 'react-dom/client';
-    import PracticeHistory from '/src/components/PracticeHistory.tsx';
+    import { PracticeHistoryComponent } from '/src/components/practiceHistory.ts';
     init();
-    const container = document.getElementById('practiceHistory');
-    if (container) {
-      createRoot(container).render(<PracticeHistory />);
-    }
+    const practiceHistory = new PracticeHistoryComponent();
+    practiceHistory.render('practiceHistory');
   </script>
 </body>
 </html>

@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite';
 import legacy from '@vitejs/plugin-legacy';
-import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import { copyFileSync, mkdirSync, existsSync, readdirSync } from 'fs';
 
@@ -22,7 +21,6 @@ export default defineConfig({
     copyPublicDir: true
   },
   plugins: [
-    react(),
     legacy({
       targets: ['defaults', 'not IE 11']
     }),
@@ -56,7 +54,7 @@ export default defineConfig({
             mkdirSync(distSrcComponents, { recursive: true });
           }
           if (existsSync('src/components')) {
-            const componentFiles = readdirSync('src/components').filter(f => f.endsWith('.js'));
+            const componentFiles = readdirSync('src/components').filter(f => f.endsWith('.js') || f.endsWith('.ts'));
             componentFiles.forEach(file => {
               copyFileSync(`src/components/${file}`, `${distSrcComponents}/${file}`);
             });
