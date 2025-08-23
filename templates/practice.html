@@ -125,8 +125,14 @@
   <script src="../question_banks/clinical_therapeutics_high_questions.js"></script>
   <script src="../question_banks/clinical_therapeutics_low_questions.js"></script>
   <script src="../question_banks/clinical_therapeutics_medium_questions.js"></script>
-  <script type="module" src="/static/banks.ts"></script>
-  <script type="module" src="/static/question_renderer.ts"></script>
-  <script type="module" src="/static/practice.ts"></script>
+  <script type="module">
+    import { loadBanks } from '/static/banks.ts';
+    import { questionRenderer } from '/static/question_renderer.ts';
+    import { PracticeManager } from '/static/practice.ts';
+
+    const banks = loadBanks();
+    const practiceManager = new PracticeManager(banks, questionRenderer);
+    practiceManager.init();
+  </script>
 </body>
 </html>

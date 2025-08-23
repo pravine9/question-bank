@@ -1,15 +1,15 @@
 // Summary Page Logic - Dedicated Implementation
 
-import type { PracticeResult } from '@/types/question';
+import type { PracticeResult, QuestionRenderer } from '@/types/question';
 import { EMPTY_HISTORY } from '@/utils/history';
 import { evaluateAnswer, getCorrectAnswerText } from '@/utils/answers';
 
-class SummaryManager {
+export class SummaryManager {
   private testResult: PracticeResult | null = null;
   private currentReviewQuestion: number = 0;
   private reviewMode: 'all' | 'incorrect' | 'flagged' = 'all';
 
-  constructor() {
+  constructor(private renderer: QuestionRenderer) {
     this.init();
   }
 
@@ -210,9 +210,9 @@ class SummaryManager {
       modalTitle.textContent = `Question ${questionNum + 1} Review`;
     }
 
-    // Render question using global renderer
-    if ((window as any).questionRenderer) {
-      (window as any).questionRenderer.renderQuestion(question, {
+    // Render question using provided renderer
+    if (this.renderer) {
+      this.renderer.renderQuestion(question, {
         text: '#reviewQuestionText',
         title: '#reviewQuestionTitle',
         img: '#reviewQuestionImage',
@@ -305,11 +305,4 @@ class SummaryManager {
   }
 }
 
-// Initialize summary manager when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('Summary page initializing...');
-  new SummaryManager();
-});
-
-// Make class available globally if needed
-(window as any).SummaryManager = SummaryManager;
+// Class is exported for module-based initialization

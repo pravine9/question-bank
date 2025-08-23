@@ -1,7 +1,7 @@
 // Practice History Component - JavaScript Version
 import { EMPTY_HISTORY } from '../utils/history';
 
-class PracticeHistoryComponent {
+export class PracticeHistoryComponent {
   constructor() {
     this.container = null;
     this.history = this.getPracticeHistory();
@@ -139,5 +139,3 @@ class PracticeHistoryComponent {
   }
 }
 
-// Make it available globally
-window.practiceHistoryComponent = new PracticeHistoryComponent();
