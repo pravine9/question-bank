@@ -79,7 +79,7 @@ export class StorageManager {
   }
 
   getPracticeState(): PracticeState | null {
-    const state = this.getItem(STORAGE_KEYS.PRACTICE_STATE, null);
+    const state = this.getItem(STORAGE_KEYS.PRACTICE_STATE, null) as PracticeState | null;
     if (!state) return null;
 
     try {
@@ -121,7 +121,7 @@ export class StorageManager {
       totalTime: 0
     };
 
-    const history = this.getItem(STORAGE_KEYS.PRACTICE_HISTORY, null);
+    const history = this.getItem(STORAGE_KEYS.PRACTICE_HISTORY, null) as PracticeHistory | null;
     if (!history) return defaultHistory;
 
     try {

@@ -150,17 +150,17 @@ export class QuestionRenderer {
         return Math.abs(userNum - correctNum) <= tolerance;
       }
 
+      // Handle free text questions (case-insensitive) - check this first
+      if (question.is_free) {
+        return cleanUserAnswer === cleanCorrectAnswer;
+      }
+
       // Handle multiple choice questions
       if (question.answers && question.answers.length > 0) {
         const selectedAnswer = question.answers.find(a => 
           a.answer_number.toString() === userAnswer
         );
         return selectedAnswer ? selectedAnswer.text.toLowerCase() === cleanCorrectAnswer : false;
-      }
-
-      // Handle free text questions (case-insensitive)
-      if (question.is_free) {
-        return cleanUserAnswer === cleanCorrectAnswer;
       }
 
       return false;

@@ -90,7 +90,7 @@ describe('QuestionRenderer', () => {
       resource_image: 'https://example.com/image.jpg',
       visible: true,
       is_calculation: false,
-      correct_answer: 'Test answer',
+      correct_answer: 'Option A',
       answer_unit: 'mg',
       correct_answer_number: 1,
       weighting: 1,
@@ -138,7 +138,13 @@ describe('QuestionRenderer', () => {
     });
 
     it('should handle calculation questions', async () => {
-      const calcQuestion = { ...mockQuestion, is_calculation: true };
+      const calcQuestion = { 
+        ...mockQuestion, 
+        is_calculation: true, 
+        answers: [], // Remove answers for calculation questions
+        correct_answer: '25.5',
+        correct_answer_number: 25.5
+      };
       const options = {
         text: '#qText',
         title: '#qTitle',
@@ -153,7 +159,13 @@ describe('QuestionRenderer', () => {
 
       const result = await renderer.renderQuestion(calcQuestion, options);
 
-      expect(mockDocument.querySelector).toHaveBeenCalledWith('.calculator');
+      // Check that all expected selectors were called (order doesn't matter)
+      const calls = mockDocument.querySelector.mock.calls.map(call => call[0]);
+      expect(calls).toContain('#qText');
+      expect(calls).toContain('#qTitle');
+      expect(calls).toContain('#qImg');
+      expect(calls).toContain('#answerOptions');
+      expect(calls).toContain('.calculator');
       expect(result.input).toBeDefined();
     });
 
@@ -290,8 +302,8 @@ describe('QuestionRenderer', () => {
       renderer.clearQuestion();
 
       const expectedSelectors = [
-        '#qText', '#qTitle', '#qImg', '#answerOptions', 
-        '#feedback', '#answer', '#explanation'
+        '#qText', '#qTitle', '#answerOptions', '.calculator', '.free-text-input',
+        '#qImg', '.unit-display', '#correctAnswer', '#explanation'
       ];
 
       expectedSelectors.forEach(selector => {
