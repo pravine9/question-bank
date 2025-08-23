@@ -12,7 +12,12 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'templates/index.html'),
         practice: resolve(__dirname, 'templates/practice.html'),
-        summary: resolve(__dirname, 'templates/summary.html')
+        summary: resolve(__dirname, 'templates/summary.html'),
+        banks: resolve(__dirname, 'src/pages/banks.ts'),
+        question_renderer: resolve(__dirname, 'src/pages/question_renderer.ts'),
+        main_script: resolve(__dirname, 'src/pages/main.ts'),
+        practice_script: resolve(__dirname, 'src/pages/practice.ts'),
+        summary_script: resolve(__dirname, 'src/pages/summary.ts')
       }
     },
     target: 'es2015',
@@ -37,18 +42,7 @@ export default defineConfig({
           questionBankFiles.forEach(file => {
             copyFileSync(`question_banks/${file}`, `${distQuestionBanks}/${file}`);
           });
-
-          // Copy static files
-          const distStatic = 'dist/static';
-          if (!existsSync(distStatic)) {
-            mkdirSync(distStatic, { recursive: true });
-          }
-          const staticFiles = readdirSync('static').filter(f => f.endsWith('.js') || f.endsWith('.ts'));
-          staticFiles.forEach(file => {
-            copyFileSync(`static/${file}`, `${distStatic}/${file}`);
-          });
-
-          // Copy src components
+            // Copy src components
           const distSrcComponents = 'dist/src/components';
           if (!existsSync(distSrcComponents)) {
             mkdirSync(distSrcComponents, { recursive: true });
