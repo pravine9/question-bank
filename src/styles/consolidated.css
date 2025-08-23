@@ -245,19 +245,7 @@ body {
   transition: width 0.3s;
 }
 
-.timer-display {
-  font-family: var(--font-family-mono);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-bold);
-}
-
-.timer-display.warning {
-  color: var(--color-warning);
-}
-
-.timer-display.danger {
-  color: var(--color-error);
-}
+/* Timer display styles removed */
 
 /* Sidebar */
 .exam-sidebar {
@@ -837,18 +825,7 @@ body {
   box-shadow: none;
 }
 
-/* Timer */
-.timer {
-  font-family: var(--font-family-mono);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-gray-700);
-  background-color: var(--color-gray-100);
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-lg);
-  min-width: 120px;
-  text-align: center;
-}
+/* Timer styles removed */
 
 
 

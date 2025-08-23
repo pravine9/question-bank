@@ -18,9 +18,7 @@ interface Question {
   is_free: boolean;
 }
 
-interface QuestionBank {
-  [key: string]: Question[][];
-}
+// QuestionBank interface removed - defined globally in types/question.ts
 
 interface PracticeState {
   currentQuestion: number;
@@ -32,187 +30,16 @@ interface PracticeState {
   totalQuestions: number;
 }
 
-// Timer constants
-const TIMER_CONSTANTS = {
-  TIME_PER_QUESTION: 120, // 2 minutes per question in seconds
-  MILLISECONDS_PER_SECOND: 1000,
-  SECONDS_PER_MINUTE: 60,
-  MILLISECONDS_PER_MINUTE: 60000,
-  WARNING_DISPLAY_TIME: 5000, // 5 seconds
-  WARNING_THRESHOLDS: {
-    WARNING: 300, // 5 minutes in seconds
-    DANGER: 60    // 1 minute in seconds
-  }
-};
+// Timer functionality removed
 
-interface TimerWarning {
-  threshold: number;
-  shown: boolean;
-  type: 'warning' | 'danger';
-  message: string;
-}
-
-// Timer implementation
-class PracticeTimer {
-  private timePerQuestion: number;
-  private totalTime: number;
-  private remainingTime: number;
-  private startTime: number;
-  private timerElement: HTMLElement | null;
-  private timerId: NodeJS.Timeout | null;
-  private isPaused: boolean;
-  private onTimeUp: () => void;
-  private onWarning: () => void;
-  private warnings: TimerWarning[];
-
-  constructor(totalQuestions: number, onTimeUp?: () => void, onWarning?: () => void) {
-    this.timePerQuestion = TIMER_CONSTANTS.TIME_PER_QUESTION;
-    this.totalTime = totalQuestions * this.timePerQuestion;
-    this.remainingTime = this.totalTime;
-    this.startTime = Date.now();
-    this.timerElement = null;
-    this.timerId = null;
-    this.isPaused = false;
-    this.onTimeUp = onTimeUp || (() => {});
-    this.onWarning = onWarning || (() => {});
-    
-    this.warnings = [
-      { threshold: 10, shown: false, type: 'warning', message: '10 minutes remaining' },
-      { threshold: 5, shown: false, type: 'warning', message: '5 minutes remaining' },
-      { threshold: 1, shown: false, type: 'danger', message: '1 minute remaining - Final warning!' }
-    ];
-  }
-
-  initTimer(elementId: string): void {
-    this.timerElement = document.getElementById(elementId);
-    if (!this.timerElement) {
-      console.warn('Timer element not found:', elementId);
-    return;
-  }
-  
-    this.updateDisplay();
-    this.start();
-  }
-
-  start(savedStartTime?: number): void {
-    if (savedStartTime) {
-      this.startTime = savedStartTime;
-      const elapsed = Math.floor((Date.now() - savedStartTime) / 1000);
-      this.remainingTime = Math.max(0, this.totalTime - elapsed);
-    }
-    
-    this.isPaused = false;
-    this.updateDisplay();
-    
-    this.timerId = setInterval(() => {
-      if (!this.isPaused) {
-        this.tick();
-      }
-    }, 1000);
-  }
-
-  private tick(): void {
-    if (this.remainingTime <= 0) {
-      this.handleTimeUp();
-      return;
-    }
-
-    this.remainingTime--;
-    this.updateDisplay();
-    this.checkWarnings();
-  }
-
-  private updateDisplay(): void {
-    if (!this.timerElement) return;
-
-    this.timerElement.textContent = this.formatTime(this.remainingTime);
-    
-    this.timerElement.className = 'timer';
-    if (this.remainingTime <= TIMER_CONSTANTS.WARNING_THRESHOLDS.DANGER) {
-      this.timerElement.classList.add('danger');
-    } else if (this.remainingTime <= TIMER_CONSTANTS.WARNING_THRESHOLDS.WARNING) {
-      this.timerElement.classList.add('warning');
-    }
-  }
-
-  private formatTime(seconds: number): string {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    
-    return hours > 0 
-      ? `${this.pad(hours)}:${this.pad(minutes)}:${this.pad(secs)}`
-      : `${this.pad(minutes)}:${this.pad(secs)}`;
-  }
-
-  private pad(num: number): string {
-    return num.toString().padStart(2, '0');
-  }
-
-  private checkWarnings(): void {
-    const remainingMinutes = Math.floor(this.remainingTime / 60);
-    
-    this.warnings.forEach(warning => {
-      if (!warning.shown && remainingMinutes <= warning.threshold) {
-        warning.shown = true;
-        this.showWarning(warning.message, warning.type);
-        this.onWarning();
-      }
-    });
-  }
-
-  private showWarning(message: string, type: 'warning' | 'danger'): void {
-    const warningEl = document.createElement('div');
-    warningEl.className = `timer-warning ${type}`;
-    warningEl.textContent = message;
-    
-    document.body.appendChild(warningEl);
-    
-    setTimeout(() => {
-      if (warningEl.parentNode) {
-        warningEl.parentNode.removeChild(warningEl);
-      }
-    }, TIMER_CONSTANTS.WARNING_DISPLAY_TIME);
-  }
-
-  private handleTimeUp(): void {
-    this.remainingTime = 0;
-    this.stop();
-    this.updateDisplay();
-    this.onTimeUp();
-  }
-
-  stop(): void {
-    if (this.timerId) {
-      clearInterval(this.timerId);
-      this.timerId = null;
-    }
-  }
-
-  pause(): void {
-    this.isPaused = true;
-  }
-
-  resume(): void {
-    this.isPaused = false;
-  }
-
-  getElapsedTime(): number {
-    return Math.floor((Date.now() - this.startTime) / 1000);
-  }
-
-  getElapsedMinutes(): number {
-    return Math.floor(this.getElapsedTime() / 60);
-  }
-}
+// Timer functionality removed - practice mode runs without time constraints
 
 class PracticeManager {
   private state: PracticeState | null = null;
-  private timer: PracticeTimer;
   private isFinished: boolean = false;
 
   constructor() {
-    this.timer = new PracticeTimer(10, () => this.handleTimeUp());
+    // Timer functionality removed
   }
 
   init(): void {
@@ -223,23 +50,25 @@ class PracticeManager {
     if (!bank || !window.banks || !window.banks[bank]) {
       alert('No valid question bank selected');
       window.location.href = 'index.html';
-      return;
-    }
-
+    return;
+  }
+  
     this.setupPracticeSession(bank, numQuestions);
     this.setupEventListeners();
     this.renderCurrentQuestion();
-    
-    // Initialize timer with correct number of questions
-    this.timer = new PracticeTimer(numQuestions, () => this.handleTimeUp());
-    this.timer.initTimer('timer');
   }
 
   private setupPracticeSession(bank: string, numQuestions: number): void {
     const bankData = window.banks![bank];
     if (!bankData || !bankData.length) {
       alert('Question bank is empty');
-      return;
+    return;
+  }
+  
+    // Validate numQuestions
+    if (numQuestions <= 0 || numQuestions > 100) {
+      alert('Invalid number of questions. Using default of 10.');
+      numQuestions = 10;
     }
 
     // Flatten all questions from all files in the bank
@@ -261,8 +90,8 @@ class PracticeManager {
       bank,
       totalQuestions: selectedQuestions.length
     };
-
-    // Update UI
+  
+  // Update UI
     const titleEl = document.querySelector('.test-title');
     if (titleEl) {
       titleEl.textContent = `${this.formatBankName(bank)} - ${selectedQuestions.length} Questions`;
@@ -273,10 +102,10 @@ class PracticeManager {
   }
 
   private setupNavigation(): void {
-    if (!this.state) return;
+    if (!this.state) {return;}
 
     const nav = document.querySelector('.sidebar .nav');
-    if (!nav) return;
+    if (!nav) {return;}
 
     nav.innerHTML = '';
     for (let i = 0; i < this.state.totalQuestions; i++) {
@@ -345,7 +174,7 @@ class PracticeManager {
   }
 
   private renderCurrentQuestion(): void {
-    if (!this.state || this.state.currentQuestion >= this.state.questions.length) return;
+    if (!this.state || this.state.currentQuestion >= this.state.questions.length) {return;}
 
     const question = this.state.questions[this.state.currentQuestion];
     
@@ -375,10 +204,10 @@ class PracticeManager {
     if (savedAnswer) {
       if (question.is_calculation) {
         const input = document.getElementById('calcInput') as HTMLInputElement;
-        if (input) input.value = savedAnswer;
+        if (input) {input.value = savedAnswer;}
       } else {
         const radio = document.querySelector(`input[name="answer"][value="${savedAnswer}"]`) as HTMLInputElement;
-        if (radio) radio.checked = true;
+        if (radio) {radio.checked = true;}
       }
     }
 
@@ -398,7 +227,7 @@ class PracticeManager {
   }
 
   private saveAnswer(): void {
-    if (!this.state) return;
+    if (!this.state) {return;}
 
     const question = this.state.questions[this.state.currentQuestion];
     let answer = '';
@@ -418,7 +247,7 @@ class PracticeManager {
   }
 
   private updateProgress(): void {
-    if (!this.state) return;
+    if (!this.state) {return;}
 
     const progressBar = document.querySelector('.progress .bar') as HTMLElement;
     const answeredCount = Object.keys(this.state.answers).length;
@@ -430,7 +259,7 @@ class PracticeManager {
   }
 
   private updateNavigation(): void {
-    if (!this.state) return;
+    if (!this.state) {return;}
 
     // Update navigation buttons
     const backBtn = document.querySelector('.back-btn') as HTMLButtonElement;
@@ -466,24 +295,24 @@ class PracticeManager {
   }
 
   private goToQuestion(questionNum: number): void {
-    if (!this.state || questionNum < 0 || questionNum >= this.state.totalQuestions) return;
+    if (!this.state || questionNum < 0 || questionNum >= this.state.totalQuestions) {return;}
 
     this.state.currentQuestion = questionNum;
     this.renderCurrentQuestion();
   }
 
   private previousQuestion(): void {
-    if (!this.state || this.state.currentQuestion <= 0) return;
+    if (!this.state || this.state.currentQuestion <= 0) {return;}
     this.goToQuestion(this.state.currentQuestion - 1);
   }
 
   private nextQuestion(): void {
-    if (!this.state || this.state.currentQuestion >= this.state.totalQuestions - 1) return;
+    if (!this.state || this.state.currentQuestion >= this.state.totalQuestions - 1) {return;}
     this.goToQuestion(this.state.currentQuestion + 1);
   }
 
   private toggleFlag(): void {
-    if (!this.state) return;
+    if (!this.state) {return;}
 
     const questionNum = this.state.currentQuestion;
     if (this.state.flagged.has(questionNum)) {
@@ -496,7 +325,7 @@ class PracticeManager {
   }
 
   private checkAnswer(): void {
-    if (!this.state) return;
+    if (!this.state) {return;}
 
     const question = this.state.questions[this.state.currentQuestion];
     const userAnswer = this.state.answers[this.state.currentQuestion];
@@ -511,6 +340,8 @@ class PracticeManager {
   }
 
   private evaluateAnswer(question: Question, userAnswer: string): boolean {
+    if (!question || !userAnswer) {return false;}
+
     if (question.is_free) {
       return userAnswer.toLowerCase().trim() === question.correct_answer.toLowerCase().trim();
     }
@@ -518,14 +349,15 @@ class PracticeManager {
     if (question.is_calculation) {
       const userNum = parseFloat(userAnswer);
       const correctNum = question.correct_answer_number || parseFloat(question.correct_answer);
-      if (isNaN(userNum) || isNaN(correctNum)) return false;
+      if (isNaN(userNum) || isNaN(correctNum)) {return false;}
       
       const tolerance = Math.abs(correctNum * 0.05); // 5% tolerance
       return Math.abs(userNum - correctNum) <= tolerance;
     }
     
     // Multiple choice
-    const correctAnswerNumber = question.answers.find(a => a.text === question.correct_answer)?.answer_number;
+    const correctAnswerNumber = question.answers?.find(a => a.text === question.correct_answer)?.answer_number;
+    if (correctAnswerNumber === undefined) {return false;}
     return parseInt(userAnswer) === correctAnswerNumber;
   }
 
@@ -551,7 +383,7 @@ class PracticeManager {
   }
 
   private finishTest(): void {
-    if (!this.state) return;
+    if (!this.state) {return;}
 
     const answeredCount = Object.keys(this.state.answers).length;
     const unanswered = this.state.totalQuestions - answeredCount;
@@ -560,26 +392,20 @@ class PracticeManager {
       const confirm = window.confirm(
         `You have ${unanswered} unanswered questions. Are you sure you want to finish the test?`
       );
-      if (!confirm) return;
+      if (!confirm) {return;}
     }
 
-    this.timer.stop();
     this.calculateResults();
     this.showSummary();
   }
 
-  private handleTimeUp(): void {
-    if (this.isFinished) return;
-    
-    alert('Time is up! The test will be finished automatically.');
-    this.finishTest();
-  }
+  // Timer functionality removed - handleTimeUp method no longer needed
 
   private calculateResults(): void {
-    if (!this.state) return;
+    if (!this.state) {return;}
 
     let correctCount = 0;
-    const duration = this.timer.getElapsedMinutes();
+    const duration = Math.floor((Date.now() - this.state.startTime) / 60000); // Calculate elapsed minutes
 
     // Check answers
     for (let i = 0; i < this.state.questions.length; i++) {
@@ -615,22 +441,22 @@ class PracticeManager {
     const footer = document.querySelector('.footer') as HTMLElement;
     const summary = document.querySelector('.summary') as HTMLElement;
 
-    if (main) main.style.display = 'none';
-    if (header) header.style.display = 'none';
-    if (footer) footer.style.display = 'none';
-    if (summary) summary.style.display = 'block';
+    if (main) {main.style.display = 'none';}
+    if (header) {header.style.display = 'none';}
+    if (footer) {footer.style.display = 'none';}
+    if (summary) {summary.style.display = 'block';}
 
     this.populateSummaryTable();
   }
 
   private populateSummaryTable(): void {
-    if (!this.state) return;
+    if (!this.state) {return;}
 
     const tbody = document.querySelector('.summary-table tbody') as HTMLTableSectionElement;
     const scoreDisplay = document.getElementById('scoreDisplay') as HTMLElement;
     const percentageDisplay = document.getElementById('percentageDisplay') as HTMLElement;
 
-    if (!tbody) return;
+    if (!tbody) {return;}
 
     let correctCount = 0;
     tbody.innerHTML = '';
@@ -640,7 +466,7 @@ class PracticeManager {
       const userAnswer = this.state.answers[i] || 'No answer';
       const isCorrect = userAnswer !== 'No answer' && this.evaluateAnswer(question, userAnswer);
       
-      if (isCorrect) correctCount++;
+      if (isCorrect) {correctCount++;}
 
       const row = tbody.insertRow();
       row.innerHTML = `
@@ -653,8 +479,8 @@ class PracticeManager {
     }
 
     const score = Math.round((correctCount / this.state.totalQuestions) * 100);
-    if (scoreDisplay) scoreDisplay.textContent = `${correctCount}/${this.state.totalQuestions}`;
-    if (percentageDisplay) percentageDisplay.textContent = `(${score}%)`;
+    if (scoreDisplay) {scoreDisplay.textContent = `${correctCount}/${this.state.totalQuestions}`;}
+    if (percentageDisplay) {percentageDisplay.textContent = `(${score}%)`;}
 
     // Add review handlers
     tbody.addEventListener('click', (e) => {
@@ -681,10 +507,10 @@ class PracticeManager {
     const footer = document.querySelector('.footer') as HTMLElement;
     const summary = document.querySelector('.summary') as HTMLElement;
 
-    if (main) main.style.display = 'block';
-    if (header) header.style.display = 'block';
-    if (footer) footer.style.display = 'block';
-    if (summary) summary.style.display = 'none';
+    if (main) {main.style.display = 'block';}
+    if (header) {header.style.display = 'block';}
+    if (footer) {footer.style.display = 'block';}
+    if (summary) {summary.style.display = 'none';}
 
     // Go to the question
     this.goToQuestion(questionNum);
@@ -699,10 +525,10 @@ class PracticeManager {
   }
 
   private showReviewModal(): void {
-    if (!this.state) return;
+    if (!this.state) {return;}
 
     const modal = document.getElementById('reviewModal');
-    if (!modal) return;
+    if (!modal) {return;}
 
     // Update counts
     const attemptedCount = Object.keys(this.state.answers).length;
@@ -713,9 +539,9 @@ class PracticeManager {
     const notAttemptedEl = document.getElementById('notAttemptedCount');
     const flaggedEl = document.getElementById('flaggedCount');
 
-    if (attemptedEl) attemptedEl.textContent = attemptedCount.toString();
-    if (notAttemptedEl) notAttemptedEl.textContent = notAttemptedCount.toString();
-    if (flaggedEl) flaggedEl.textContent = flaggedCount.toString();
+    if (attemptedEl) {attemptedEl.textContent = attemptedCount.toString();}
+    if (notAttemptedEl) {notAttemptedEl.textContent = notAttemptedCount.toString();}
+    if (flaggedEl) {flaggedEl.textContent = flaggedCount.toString();}
 
     // Generate question grid
     const gridEl = document.getElementById('questionGridReview');
@@ -727,9 +553,9 @@ class PracticeManager {
         btn.textContent = (i + 1).toString();
         btn.dataset.question = i.toString();
 
-        if (this.state.answers[i]) btn.classList.add('attempted');
-        if (this.state.flagged.has(i)) btn.classList.add('flagged');
-        if (i === this.state.currentQuestion) btn.classList.add('current');
+        if (this.state.answers[i]) {btn.classList.add('attempted');}
+        if (this.state.flagged.has(i)) {btn.classList.add('flagged');}
+        if (i === this.state.currentQuestion) {btn.classList.add('current');}
 
         btn.addEventListener('click', () => {
           this.goToQuestion(i);
@@ -778,4 +604,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Make classes available globally if needed
 window.PracticeManager = PracticeManager;
-window.PracticeTimer = PracticeTimer;
+// Timer class removed - no longer needed

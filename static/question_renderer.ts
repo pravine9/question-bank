@@ -69,7 +69,7 @@ function sanitize(text: string, inline: boolean): string {
 }
 
 function enhanceLinksAndImages(el: HTMLElement): void {
-  if (!el) return;
+  if (!el) {return;}
   
   el.querySelectorAll('a').forEach((a: HTMLAnchorElement) => {
     a.target = '_blank';
@@ -169,9 +169,9 @@ function renderQuestion(question: Question, config: RenderConfig = {}): void {
   }
 
   // Reset feedback elements
-  if (feedbackEl) feedbackEl.textContent = '';
-  if (answerEl) answerEl.style.display = 'none';
-  if (explanationEl) explanationEl.style.display = 'none';
+  if (feedbackEl) {feedbackEl.textContent = '';}
+  if (answerEl) {answerEl.style.display = 'none';}
+  if (explanationEl) {explanationEl.style.display = 'none';}
 }
 
 

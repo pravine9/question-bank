@@ -139,7 +139,7 @@ class PracticeHistoryComponent {
   }
 
   attachEventListeners() {
-    if (!this.container) return;
+    if (!this.container) {return;}
 
     // Clear history button
     const clearBtn = this.container.querySelector('#clearHistory');
@@ -212,7 +212,7 @@ class PracticeHistoryComponent {
 
   showResultDetails(resultId) {
     const result = this.history.results.find(r => r.id === resultId);
-    if (!result) return;
+    if (!result) {return;}
 
     // Simplified: show basic result info in the main area
     if (this.container) {

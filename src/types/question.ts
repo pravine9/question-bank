@@ -44,7 +44,7 @@ declare global {
     questionRenderer?: any;
     toggleFlag?: (id: number) => boolean;
     practiceHistoryComponent?: any;
-    Timer?: any;
+    // Timer functionality removed
   }
 }
 
@@ -67,23 +67,7 @@ export interface PracticeState {
   isFinished: boolean;
 }
 
-export interface TimerStats {
-  allocatedTimeMs: number;
-  allocatedTimeSeconds: number;
-  allocatedTimeMinutes: number;
-  actualTimeMs: number;
-  actualTimeSeconds: number;
-  actualTimeMinutes: number;
-  timeUsedSeconds: number;
-  timeUsedMinutes: number;
-  remainingTimeSeconds: number;
-  remainingTimeMinutes: number;
-  timeSavedSeconds: number;
-  timeSavedMinutes: number;
-  efficiency: number;
-  isFinishedEarly: boolean;
-  timeExpired: boolean;
-}
+// TimerStats interface removed - timer functionality no longer needed
 
 export interface PracticeResult {
   id: string;
@@ -98,7 +82,7 @@ export interface PracticeResult {
   duration: number; // in minutes
   date: string;
   flaggedQuestions: number;
-  timerStats?: TimerStats;
+  // timerStats removed - no longer tracking timer statistics
   questions: {
     id: number;
     userAnswer: string;

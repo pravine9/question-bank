@@ -42,10 +42,10 @@ const bankLabels: BankLabels = {
 };
 
 const loadBtn = document.getElementById('loadBtn') as HTMLButtonElement | null;
-if (loadBtn) loadBtn.addEventListener('click', loadQuestion);
+if (loadBtn) {loadBtn.addEventListener('click', loadQuestion);}
 
 const practiceBtn = document.getElementById('practiceBtn') as HTMLButtonElement | null;
-if (practiceBtn) practiceBtn.addEventListener('click', startPractice);
+if (practiceBtn) {practiceBtn.addEventListener('click', startPractice);}
 
 function populateBankSelects(data: QuestionBank): void {
   console.log('populateBankSelects called with:', data);
@@ -83,13 +83,13 @@ function populateBankSelects(data: QuestionBank): void {
 
 function getSelectedBank(id: string): BankData | null {
   const sel = document.getElementById(id) as HTMLSelectElement | null;
-  if (!sel) return null;
+  if (!sel) {return null;}
   
   const bank = sel.value;
-  if (!bank) return null;
+  if (!bank) {return null;}
   
   const files = bankFiles[bank];
-  if (!Array.isArray(files) || !files.length) return null;
+  if (!Array.isArray(files) || !files.length) {return null;}
   
   return { bank, files };
 }
@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (params.get('isStandAlone') === 'true') {
     document.body.classList.add('standalone');
     const container = document.querySelector('.container');
-    if (container) container.classList.add('standalone');
+    if (container) {container.classList.add('standalone');}
   }
   
   // Update bankFiles if banks have been loaded

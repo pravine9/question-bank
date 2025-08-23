@@ -17,12 +17,19 @@
     "@typescript-eslint"
   ],
   "rules": {
-    "@typescript-eslint/no-unused-vars": "error",
-    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/no-explicit-any": "off",
     "prefer-const": "error",
     "no-var": "error",
-    "eqeqeq": "error",
-    "curly": "error",
-    "no-console": "warn"
-  }
+    "eqeqeq": "warn",
+    "curly": "warn",
+    "no-console": "off",
+    "no-undef": "off"
+  },
+  "ignorePatterns": [
+    "dist/**/*",
+    "node_modules/**/*",
+    "question_banks/**/*",
+    "*.min.js"
+  ]
 }

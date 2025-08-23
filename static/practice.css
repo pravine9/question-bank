@@ -35,12 +35,7 @@ body {
   transition: width 0.3s ease;
 }
 
-.timer {
-  margin-right: 15px;
-  font-size: 18px;
-  font-weight: 600;
-  color: #ecf0f1;
-}
+/* Timer styles removed */
 
 .finish-btn {
   background: #e74c3c;
