@@ -1,36 +1,10 @@
 // Practice Mode Logic - Full Implementation
-// Type definitions moved inline to avoid import issues
 
-interface Question {
-  id: number;
-  bank: string;
-  title: string;
-  text: string;
-  why: string;
-  resource_image?: string | null;
-  visible: boolean;
-  is_calculation: boolean;
-  correct_answer: string;
-  answer_unit?: string;
-  correct_answer_number?: number | null;
-  weighting?: number | null;
-  answers: Array<{text: string; answer_number: number}>;
-  is_free: boolean;
-}
-
-// QuestionBank interface removed - defined globally in types/question.ts
-
-interface PracticeState {
-  currentQuestion: number;
-  questions: Question[];
-  answers: { [key: number]: string };
-  flagged: Set<number>;
-  startTime: number;
-  bank: string;
-  totalQuestions: number;
-}
-
-// Timer functionality removed
+import type {
+  Question,
+  PracticeState,
+  PracticeResult,
+} from '@/types/question';
 
 // Timer functionality removed - practice mode runs without time constraints
 
@@ -494,7 +468,7 @@ class PracticeManager {
       questions: this.state.questions,
       answers: this.state.answers,
       flagged: Array.from(this.state.flagged)
-    });
+    } as PracticeResult);
 
     this.isFinished = true;
     
@@ -597,7 +571,7 @@ class PracticeManager {
     // This method is no longer needed as review functionality is moved to summary.ts
   }
 
-  private savePracticeResult(result: any): void {
+  private savePracticeResult(result: PracticeResult): void {
     try {
       const existingHistory = localStorage.getItem('practice_history');
       const history = existingHistory ? JSON.parse(existingHistory) : { results: [] };
