@@ -1,4 +1,21 @@
-import type { Question } from '../src/types/question';
+// Type definitions moved inline to avoid import issues
+
+interface Question {
+  id: number;
+  bank: string;
+  title: string;
+  text: string;
+  why: string;
+  resource_image?: string | null;
+  visible: boolean;
+  is_calculation: boolean;
+  correct_answer: string;
+  answer_unit?: string;
+  correct_answer_number?: number | null;
+  weighting?: number | null;
+  answers: Array<{text: string; answer_number: number}>;
+  is_free: boolean;
+}
 
 interface RenderConfig {
   text?: string;
@@ -165,12 +182,11 @@ function initPdfViewer(): void {
   console.log('PDF viewer initialized');
 }
 
-// Export the question renderer object
-export const questionRenderer: QuestionRenderer = {
+// Create the question renderer object
+const questionRenderer: QuestionRenderer = {
   initPdfViewer,
   renderQuestion
 };
 
-
-
+// Make it available globally
 window.questionRenderer = questionRenderer;

@@ -1,4 +1,25 @@
-import type { Question, QuestionBank } from '../src/types/question';
+// Type definitions moved inline to avoid import issues
+
+interface Question {
+  id: number;
+  bank: string;
+  title: string;
+  text: string;
+  why: string;
+  resource_image?: string | null;
+  visible: boolean;
+  is_calculation: boolean;
+  correct_answer: string;
+  answer_unit?: string;
+  correct_answer_number?: number | null;
+  weighting?: number | null;
+  answers: Array<{text: string; answer_number: number}>;
+  is_free: boolean;
+}
+
+interface QuestionBank {
+  [key: string]: Question[][];
+}
 
 interface BankData {
   bank: string;
@@ -9,7 +30,7 @@ interface BankLabels {
   [key: string]: string;
 }
 
-let bankFiles: QuestionBank = window.banks;
+let bankFiles: QuestionBank = window.banks || {};
 const flagged = new Set<number>();
 
 const bankLabels: BankLabels = {
@@ -27,14 +48,21 @@ const practiceBtn = document.getElementById('practiceBtn') as HTMLButtonElement 
 if (practiceBtn) practiceBtn.addEventListener('click', startPractice);
 
 function populateBankSelects(data: QuestionBank): void {
+  console.log('populateBankSelects called with:', data);
+  
   const bankSelect = document.getElementById('bankSelect') as HTMLSelectElement | null;
   const statsSelect = document.getElementById('statsBankSelect') as HTMLSelectElement | null;
   
-  if (!bankSelect && !statsSelect) return;
+  if (!bankSelect && !statsSelect) {
+    console.log('Bank select elements not found');
+    return;
+  }
   
   const names = Object.keys(data)
     .filter(k => Array.isArray(data[k]))
     .sort();
+    
+  console.log('Bank names found:', names);
     
   names.forEach(name => {
     if (bankSelect) {
@@ -42,6 +70,7 @@ function populateBankSelects(data: QuestionBank): void {
       opt1.value = name;
       opt1.textContent = bankLabels[name] || name;
       bankSelect.appendChild(opt1);
+      console.log('Added option:', name);
     }
     if (statsSelect) {
       const opt2 = document.createElement('option');
@@ -76,6 +105,10 @@ function toggleFlag(id: number): boolean {
 
 window.toggleFlag = toggleFlag;
 
+// Make populateBankSelects available globally
+window.populateBankSelects = populateBankSelects;
+console.log('main.ts loaded, populateBankSelects exposed globally');
+
 // Adjust layout when loaded in standalone mode
 document.addEventListener('DOMContentLoaded', function() {
   // Ensure statsModal is hidden by default
@@ -91,7 +124,14 @@ document.addEventListener('DOMContentLoaded', function() {
     if (container) container.classList.add('standalone');
   }
   
-  populateBankSelects(bankFiles);
+  // Update bankFiles if banks have been loaded
+  if (window.banks) {
+    bankFiles = window.banks;
+    console.log('Banks found in window, populating selects...');
+    populateBankSelects(bankFiles);
+  } else {
+    console.log('No banks found in window yet');
+  }
   
   // Preselect the last used bank if available
   try {
@@ -183,12 +223,5 @@ function startPractice(): void {
   window.location.href = `practice.html?bank=${encodeURIComponent(data.bank)}`;
 }
 
-// Export functions for potential use in other modules
-export {
-  loadQuestion,
-  startPractice,
-  renderQuestion,
-  toggleFlag,
-  populateBankSelects,
-  getSelectedBank
-};
+// Functions are available globally via window object
+// No need to export since we're not using ES modules in HTML
