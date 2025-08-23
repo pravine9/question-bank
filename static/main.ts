@@ -30,7 +30,7 @@ interface BankLabels {
   [key: string]: string;
 }
 
-let bankFiles: QuestionBank = window.banks || {};
+let bankFiles: QuestionBank = (window as any).banks || {};
 const flagged = new Set<number>();
 
 const bankLabels: BankLabels = {
@@ -46,6 +46,18 @@ if (loadBtn) {loadBtn.addEventListener('click', loadQuestion);}
 
 const practiceBtn = document.getElementById('practiceBtn') as HTMLButtonElement | null;
 if (practiceBtn) {practiceBtn.addEventListener('click', startPractice);}
+
+// Add event handlers for question buttons
+let currentQuestion: Question | null = null;
+
+const checkBtn = document.getElementById('checkBtn') as HTMLButtonElement | null;
+if (checkBtn) {checkBtn.addEventListener('click', checkAnswer);}
+
+const revealBtn = document.getElementById('revealBtn') as HTMLButtonElement | null;
+if (revealBtn) {revealBtn.addEventListener('click', revealAnswer);}
+
+const saveBtn = document.getElementById('saveBtn') as HTMLButtonElement | null;
+if (saveBtn) {saveBtn.addEventListener('click', saveForReview);}
 
 function populateBankSelects(data: QuestionBank): void {
   console.log('populateBankSelects called with:', data);
@@ -103,10 +115,10 @@ function toggleFlag(id: number): boolean {
   return true;
 }
 
-window.toggleFlag = toggleFlag;
+(window as any).toggleFlag = toggleFlag;
 
 // Make populateBankSelects available globally
-window.populateBankSelects = populateBankSelects;
+(window as any).populateBankSelects = populateBankSelects;
 console.log('main.ts loaded, populateBankSelects exposed globally');
 
 // Adjust layout when loaded in standalone mode
@@ -125,8 +137,8 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // Update bankFiles if banks have been loaded
-  if (window.banks) {
-    bankFiles = window.banks;
+  if ((window as any).banks) {
+    bankFiles = (window as any).banks;
     console.log('Banks found in window, populating selects...');
     populateBankSelects(bankFiles);
   } else {
@@ -146,8 +158,8 @@ document.addEventListener('DOMContentLoaded', function() {
     console.warn('Failed to load lastBank', e);
   }
   
-  if (window.questionRenderer) {
-    window.questionRenderer.initPdfViewer();
+  if ((window as any).questionRenderer) {
+    (window as any).questionRenderer.initPdfViewer();
   }
 });
 
@@ -164,7 +176,8 @@ function loadQuestion(): void {
 }
 
 function renderQuestion(question: Question): void {
-
+  // Store current question for button actions
+  currentQuestion = question;
   
   // Store the selected bank for next time
   try {
@@ -177,17 +190,17 @@ function renderQuestion(question: Question): void {
   }
   
   // Render the question using the question renderer
-  if (window.questionRenderer) {
-    window.questionRenderer.renderQuestion(question, {
-      title: '#questionTitle',
-      text: '#questionText',
-      img: '#questionImage',
-      options: '#questionOptions',
-      input: '#questionInput',
-      unit: '#questionUnit',
-      feedback: '#questionFeedback',
-      answer: '#questionAnswer',
-      explanation: '#questionExplanation'
+  if ((window as any).questionRenderer) {
+    (window as any).questionRenderer.renderQuestion(question, {
+      text: '#qText',
+      title: '#qTitle',
+      img: '#qImg',
+      options: '#answerOptions',
+      input: '#calcInput',
+      unit: '#answerUnit',
+      feedback: '#feedback',
+      answer: '#answer',
+      explanation: '#explanation'
     });
   }
   
@@ -198,7 +211,7 @@ function renderQuestion(question: Question): void {
   }
   
   // Reset feedback
-  const feedbackEl = document.getElementById('questionFeedback');
+  const feedbackEl = document.getElementById('feedback');
   if (feedbackEl) {
     feedbackEl.textContent = '';
     feedbackEl.classList.remove('correct', 'incorrect');
@@ -212,6 +225,10 @@ function startPractice(): void {
     return;
   }
   
+  // Get number of questions
+  const numInput = document.getElementById('numInput') as HTMLInputElement;
+  const numQuestions = numInput ? parseInt(numInput.value) || 10 : 10;
+  
   // Store the selected bank for next time
   try {
     localStorage.setItem('lastBank', data.bank);
@@ -219,8 +236,131 @@ function startPractice(): void {
     console.warn('Failed to save lastBank', e);
   }
   
-  // Redirect to practice page with bank parameter
-  window.location.href = `practice.html?bank=${encodeURIComponent(data.bank)}`;
+  // Redirect to practice page with bank and number parameters
+  window.location.href = `practice.html?bank=${encodeURIComponent(data.bank)}&num=${numQuestions}`;
+}
+
+function checkAnswer(): void {
+  if (!currentQuestion) {
+    return;
+  }
+  
+  // Get user answer first
+  let userAnswer = '';
+  
+  if (currentQuestion.is_calculation) {
+    const calcInput = document.getElementById('calcInput') as HTMLInputElement;
+    if (!calcInput || !calcInput.value) {
+      alert('Please enter an answer first');
+      return;
+    }
+    userAnswer = calcInput.value;
+  } else {
+    const selectedOption = document.querySelector('input[name="answer"]:checked') as HTMLInputElement;
+    if (!selectedOption) {
+      alert('Please select an answer first');
+      return;
+    }
+    userAnswer = selectedOption.value;
+  }
+  
+  const isCorrect = evaluateAnswer(currentQuestion, userAnswer);
+  revealAnswerWithFeedback(currentQuestion, isCorrect);
+}
+
+function evaluateAnswer(question: Question, userAnswer: string): boolean {
+  if (!question || !userAnswer) {
+    return false;
+  }
+
+  if (question.is_free) {
+    return userAnswer.toLowerCase().trim() === question.correct_answer.toLowerCase().trim();
+  }
+  
+  if (question.is_calculation) {
+    const userNum = parseFloat(userAnswer);
+    const correctNum = question.correct_answer_number || parseFloat(question.correct_answer);
+    if (isNaN(userNum) || isNaN(correctNum)) {
+      return false;
+    }
+    
+    const tolerance = Math.abs(correctNum * 0.05); // 5% tolerance
+    return Math.abs(userNum - correctNum) <= tolerance;
+  }
+  
+  // Multiple choice - use correct_answer_number directly
+  const correctAnswerNumber = question.correct_answer_number;
+  if (correctAnswerNumber === undefined || correctAnswerNumber === null) {
+    return false;
+  }
+  return parseInt(userAnswer) === correctAnswerNumber;
+}
+
+function revealAnswerWithFeedback(question: Question, isCorrect: boolean): void {
+  const feedbackEl = document.getElementById('feedback');
+  const answerEl = document.getElementById('answer');
+  const explanationEl = document.getElementById('explanation');
+
+  if (feedbackEl) {
+    feedbackEl.textContent = isCorrect ? 'Correct!' : 'Incorrect';
+    feedbackEl.className = isCorrect ? 'feedback correct' : 'feedback incorrect';
+  }
+
+  if (answerEl) {
+    let correctAnswerText = question.correct_answer;
+    
+    // For multiple choice questions, find the correct answer text
+    if (!correctAnswerText && question.correct_answer_number && question.answers) {
+      const correctAnswer = question.answers.find(a => a.answer_number === question.correct_answer_number);
+      correctAnswerText = correctAnswer ? correctAnswer.text : 'N/A';
+    }
+    
+    answerEl.innerHTML = `<strong>Correct Answer:</strong> ${correctAnswerText || 'N/A'}${question.answer_unit ? ' ' + question.answer_unit : ''}`;
+    answerEl.style.display = 'block';
+  }
+
+  if (explanationEl && question.why) {
+    explanationEl.innerHTML = `<strong>Explanation:</strong><br>${question.why}`;
+    explanationEl.style.display = 'block';
+  }
+}
+
+function revealAnswer(): void {
+  if (!currentQuestion) {
+    return;
+  }
+  
+  // Use the same rendering logic but without feedback
+  revealAnswerWithFeedback(currentQuestion, false);
+  
+  // Clear any existing feedback since this is just revealing the answer
+  const feedbackEl = document.getElementById('feedback');
+  if (feedbackEl) {
+    feedbackEl.textContent = '';
+    feedbackEl.className = 'feedback';
+  }
+}
+
+function saveForReview(): void {
+  if (!currentQuestion) {
+    return;
+  }
+  
+  try {
+    const savedQuestions = JSON.parse(localStorage.getItem('savedQuestions') || '[]');
+    const exists = savedQuestions.some((q: Question) => q.id === currentQuestion!.id);
+    
+    if (!exists) {
+      savedQuestions.push(currentQuestion);
+      localStorage.setItem('savedQuestions', JSON.stringify(savedQuestions));
+      alert('Question saved for review!');
+    } else {
+      alert('Question already saved for review');
+    }
+  } catch (e) {
+    console.warn('Failed to save question for review', e);
+    alert('Failed to save question for review');
+  }
 }
 
 // Functions are available globally via window object

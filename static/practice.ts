@@ -47,7 +47,7 @@ class PracticeManager {
     const bank = params.get('bank');
     const numQuestions = parseInt(params.get('num') || '10');
 
-    if (!bank || !window.banks || !window.banks[bank]) {
+    if (!bank || !(window as any).banks || !(window as any).banks[bank]) {
       alert('No valid question bank selected');
       window.location.href = 'index.html';
     return;
@@ -59,7 +59,7 @@ class PracticeManager {
   }
 
   private setupPracticeSession(bank: string, numQuestions: number): void {
-    const bankData = window.banks![bank];
+    const bankData = (window as any).banks![bank];
     if (!bankData || !bankData.length) {
       alert('Question bank is empty');
     return;
@@ -185,8 +185,8 @@ class PracticeManager {
     }
 
     // Render question using global renderer
-    if (window.questionRenderer) {
-      window.questionRenderer.renderQuestion(question, {
+    if ((window as any).questionRenderer) {
+      (window as any).questionRenderer.renderQuestion(question, {
         text: '#qText',
         title: '#qTitle',
         img: '#qImg',
@@ -356,8 +356,8 @@ class PracticeManager {
     }
     
     // Multiple choice
-    const correctAnswerNumber = question.answers?.find(a => a.text === question.correct_answer)?.answer_number;
-    if (correctAnswerNumber === undefined) {return false;}
+    const correctAnswerNumber = question.correct_answer_number;
+    if (correctAnswerNumber === undefined || correctAnswerNumber === null) {return false;}
     return parseInt(userAnswer) === correctAnswerNumber;
   }
 
@@ -372,7 +372,15 @@ class PracticeManager {
     }
 
     if (answerEl) {
-      answerEl.innerHTML = `<strong>Correct Answer:</strong> ${question.correct_answer}${question.answer_unit ? ' ' + question.answer_unit : ''}`;
+      let correctAnswerText = question.correct_answer;
+      
+      // For multiple choice questions, find the correct answer text
+      if (!correctAnswerText && question.correct_answer_number && question.answers) {
+        const correctAnswer = question.answers.find(a => a.answer_number === question.correct_answer_number);
+        correctAnswerText = correctAnswer ? correctAnswer.text : 'N/A';
+      }
+      
+      answerEl.innerHTML = `<strong>Correct Answer:</strong> ${correctAnswerText || 'N/A'}${question.answer_unit ? ' ' + question.answer_unit : ''}`;
       answerEl.style.display = 'block';
     }
 
@@ -603,5 +611,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Make classes available globally if needed
-window.PracticeManager = PracticeManager;
+(window as any).PracticeManager = PracticeManager;
 // Timer class removed - no longer needed

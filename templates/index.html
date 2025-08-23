@@ -16,7 +16,6 @@
   <title>GPhC Question Bank - Pharmacy Exam Preparation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
   <link rel="stylesheet" href="/src/styles/consolidated.css">
-  <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
   <div class="container">
@@ -48,10 +47,10 @@
         </div>
 
         <!-- Single Question Section -->
-        <div id="questionArea" style="display:none">
-          <div id="qText"></div>
+        <div id="questionArea" class="question-container" style="display:none">
+          <div id="qText" class="question-text"></div>
           <div id="qTitle" class="question-title"></div>
-          <img id="qImg" alt="Question image">
+          <img id="qImg" class="question-image" alt="Question image" style="display:none;">
           <div id="answerOptions" class="options"></div>
           <div class="calculator" style="display:none">
             <label>Answer</label>
@@ -59,13 +58,13 @@
             <span class="unit" id="answerUnit"></span>
           </div>
           <div class="button-row">
-            <button id="checkBtn">Check</button>
-            <button id="revealBtn">Reveal</button>
-            <button id="saveBtn">Save for review</button>
+            <button id="checkBtn" class="btn btn-primary">Check</button>
+            <button id="revealBtn" class="btn btn-secondary">Reveal</button>
+            <button id="saveBtn" class="btn btn-secondary">Save for review</button>
           </div>
-          <div id="feedback"></div>
-          <div id="answer" style="display:none"></div>
-          <div id="explanation" style="display:none"></div>
+          <div id="feedback" class="feedback"></div>
+          <div id="answer" class="answer" style="display:none"></div>
+          <div id="explanation" class="explanation" style="display:none"></div>
         </div>
 
         <!-- Statistics Section -->
@@ -78,34 +77,66 @@
             </select>
           </div>
           <button id="loadStatsBtn" class="btn btn-primary">Load Statistics</button>
-          <table id="statsTable">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Attempts</th>
-                <th>Right</th>
-                <th>Wrong</th>
-                <th>View</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-          <!-- Modal for displaying a single stats question -->
-          <div id="statsModal" class="modal-overlay">
-            <div class="modal-content">
-              <button id="sqCloseBtn" class="close">&times;</button>
-              <div id="sqText"></div>
-              <p id="sqTitle" class="question-title"></p>
-              <img id="sqImg" alt="Question image">
-              <div id="sqOptions" class="options"></div>
-              <div class="calculator" style="display:none">
-                <label>Answer</label>
-                <input type="number" id="sqCalcInput">
-                <span class="unit" id="sqAnswerUnit"></span>
+          
+          <div id="statsContainer" class="stats-container" style="display:none;">
+            <div class="stats-summary">
+              <div class="summary-cards">
+                <div class="summary-card">
+                  <span class="summary-number" id="totalQuestions">0</span>
+                  <span class="summary-label">Total Questions</span>
+                </div>
+                <div class="summary-card">
+                  <span class="summary-number" id="attemptedQuestions">0</span>
+                  <span class="summary-label">Attempted</span>
+                </div>
+                <div class="summary-card">
+                  <span class="summary-number" id="correctAnswers">0</span>
+                  <span class="summary-label">Correct</span>
+                </div>
+                <div class="summary-card">
+                  <span class="summary-number" id="accuracyRate">0%</span>
+                  <span class="summary-label">Accuracy</span>
+                </div>
               </div>
-              <button id="sqRevealBtn">Reveal Answer</button>
-              <div id="sqAnswer"></div>
-              <div id="sqExplanation"></div>
+            </div>
+            
+            <table id="statsTable" class="stats-table">
+              <thead>
+                <tr>
+                  <th>Question</th>
+                  <th>Attempts</th>
+                  <th>Correct</th>
+                  <th>Wrong</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <!-- Modal for displaying a single stats question -->
+          <div id="statsModal" class="stats-modal">
+            <div class="modal-backdrop"></div>
+            <div class="modal-dialog">
+              <div class="modal-header">
+                <h3>Question Details</h3>
+                <button id="sqCloseBtn" class="btn-close">&times;</button>
+              </div>
+              <div class="modal-body">
+                <div id="sqText" class="question-text"></div>
+                <div id="sqTitle" class="question-title"></div>
+                <img id="sqImg" class="question-image" alt="Question image" style="display:none;">
+                <div id="sqOptions" class="question-options"></div>
+                <div class="calculator-section" style="display:none">
+                  <label>Answer:</label>
+                  <input type="number" id="sqCalcInput" class="form-input">
+                  <span class="unit" id="sqAnswerUnit"></span>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button id="sqRevealBtn" class="btn btn-primary">Show Answer</button>
+                <div id="sqAnswer" class="answer-section"></div>
+                <div id="sqExplanation" class="explanation-section"></div>
+              </div>
             </div>
           </div>
         </div>
