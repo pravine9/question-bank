@@ -50,3 +50,14 @@ export function getCorrectAnswerText(question: Question): string {
   return question.correct_answer || 'Unknown';
 }
 
+export function formatExplanation(explanation: string): string {
+  if (!explanation) return '';
+  
+  // Convert \r\n\r\n to double line breaks and \r\n to single line breaks
+  return explanation
+    .replace(/\r\n\r\n/g, '<br><br>')
+    .replace(/\r\n/g, '<br>')
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>');
+}
+

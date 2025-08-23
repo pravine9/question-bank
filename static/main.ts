@@ -1,6 +1,6 @@
 import type { Question, QuestionBank, BankData } from '@/types/question';
 import { formatBankName } from '@/utils/bankNames';
-import { evaluateAnswer, getCorrectAnswerText } from '@/utils/answers';
+import { evaluateAnswer, getCorrectAnswerText, formatExplanation } from '@/utils/answers';
 import { banks } from './banks';
 import { questionRenderer } from './question_renderer';
 
@@ -273,7 +273,7 @@ function revealAnswerWithFeedback(
   }
 
   if (explanationEl && question.why) {
-    explanationEl.innerHTML = `<strong>Explanation:</strong><br>${question.why}`;
+    explanationEl.innerHTML = `<strong>Explanation:</strong><br>${formatExplanation(question.why)}`;
     explanationEl.style.display = 'block';
   }
 }

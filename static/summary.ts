@@ -2,7 +2,7 @@
 
 import type { PracticeResult } from '@/types/question';
 import { EMPTY_HISTORY } from '@/utils/history';
-import { evaluateAnswer, getCorrectAnswerText } from '@/utils/answers';
+import { evaluateAnswer, getCorrectAnswerText, formatExplanation } from '@/utils/answers';
 import { questionRenderer } from './question_renderer';
 
 export class SummaryManager {
@@ -13,6 +13,7 @@ export class SummaryManager {
 
   constructor() {
     this.init();
+    this.setupBackButtonHandling();
   }
 
   init(): void {
@@ -282,7 +283,7 @@ export class SummaryManager {
     // Show explanation
     const reviewExplanation = document.getElementById('reviewExplanation');
     if (reviewExplanation) {
-      reviewExplanation.innerHTML = question.why || 'No explanation available';
+      reviewExplanation.innerHTML = formatExplanation(question.why) || 'No explanation available';
     }
 
     // Update navigation buttons
@@ -343,6 +344,33 @@ export class SummaryManager {
     if (nextQuestion >= 0 && nextQuestion < this.testResult.questions.length) {
       this.openReviewModal(nextQuestion);
     }
+  }
+
+  private setupBackButtonHandling(): void {
+    // Prevent back button navigation
+    window.history.pushState(null, '', window.location.href);
+    
+    window.addEventListener('popstate', (event) => {
+      // Show confirmation dialog
+      const confirmNavigation = confirm(
+        'Are you sure you want to leave this page? Your test results will be lost.'
+      );
+      
+      if (confirmNavigation) {
+        // User confirmed, navigate to home
+        window.location.href = 'index.html';
+      } else {
+        // User cancelled, prevent navigation and restore state
+        window.history.pushState(null, '', window.location.href);
+      }
+    });
+
+    // Also handle beforeunload for page refresh/close
+    window.addEventListener('beforeunload', (event) => {
+      event.preventDefault();
+      event.returnValue = 'Are you sure you want to leave this page? Your test results will be lost.';
+      return event.returnValue;
+    });
   }
 }
 

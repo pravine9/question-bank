@@ -7,7 +7,7 @@ import type {
 } from '@/types/question';
 import { formatBankName } from '@/utils/bankNames';
 import { EMPTY_HISTORY } from '@/utils/history';
-import { evaluateAnswer, getCorrectAnswerText } from '@/utils/answers';
+import { evaluateAnswer, getCorrectAnswerText, formatExplanation } from '@/utils/answers';
 import { banks } from './banks';
 import { questionRenderer } from './question_renderer';
 
@@ -376,7 +376,7 @@ export class PracticeManager {
     }
 
     if (explanationEl && question.why) {
-      explanationEl.innerHTML = `<strong>Explanation:</strong> ${question.why}`;
+      explanationEl.innerHTML = `<strong>Explanation:</strong> ${formatExplanation(question.why)}`;
       explanationEl.style.display = 'block';
     }
   }
