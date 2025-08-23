@@ -6,6 +6,15 @@ class PracticeHistoryComponent {
   constructor() {
     this.container = null;
     this.history = this.getPracticeHistory();
+    this.handleReviewClick = (e) => {
+      const reviewBtn = e.target.closest('.review-result');
+      if (reviewBtn) {
+        const resultId = reviewBtn.getAttribute('data-result-id');
+        if (resultId) {
+          this.showResultDetails(resultId);
+        }
+      }
+    };
   }
 
   render(containerId) {
@@ -165,16 +174,8 @@ class PracticeHistoryComponent {
       });
     }
 
-    // Review result buttons
-    const reviewBtns = this.container.querySelectorAll('.review-result');
-    reviewBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const resultId = e.target.getAttribute('data-result-id');
-        if (resultId) {
-          this.showResultDetails(resultId);
-        }
-      });
-    });
+    // Delegate review button clicks to the container
+    this.container.addEventListener('click', this.handleReviewClick);
   }
 
   attachBackToSummary() {
