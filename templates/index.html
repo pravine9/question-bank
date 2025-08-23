@@ -174,14 +174,9 @@
   <script type="module" src="/static/banks.ts"></script>
   <script type="module" src="/static/question_renderer.ts"></script>
   <script type="module" src="/static/main.ts"></script>
-  <script src="/src/components/practiceHistory.js"></script>
-  <script>
-    // Initialize practice history component
-    document.addEventListener('DOMContentLoaded', function() {
-      if (window.practiceHistoryComponent) {
-        window.practiceHistoryComponent.render('practiceHistory');
-      }
-    });
+  <script type="module">
+    import practiceHistoryComponent from '/src/components/practiceHistory.ts';
+    practiceHistoryComponent.render('practiceHistory');
   </script>
 </body>
 </html>
