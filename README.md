@@ -1,3 +1,7 @@
+Note: After several changes and "enhancements" to the code base a lot of functionality has been broken and lots of new bugs introduced. The aim is to revert back to a simple working functional version with only the desired featured.
+
+
+
 # GPhC Question Bank
 
 A modern, offline-capable question bank application for GPhC (General Pharmaceutical Council) exam preparation. Built with TypeScript, Vite, and modern web technologies for optimal performance and developer experience.
@@ -8,11 +12,9 @@ A modern, offline-capable question bank application for GPhC (General Pharmaceut
 - **🎯 Practice Mode** - Timed practice sessions with progress tracking
 - **📊 Statistics & Analytics** - Track your performance across all questions
 - **📚 Offline Capable** - Works without internet connection
-- **🎨 Modern UI/UX** - Clean design with consistent styling
-- **⚡ Performance Optimized** - Fast loading with intelligent caching
-- **🔒 Privacy First** - All data stored locally, no external tracking
+- **🎨 UI** - Design of practice page replicating the real GPhC exam format.
 
-- **🧪 Comprehensive Testing** - Unit tests with high coverage
+
 
 ## 🚀 Quick Start
 
@@ -228,25 +230,6 @@ npm run test:coverage
 npm run test:ui
 ```
 
-### Test Structure
-
-- **Unit Tests**: Test individual functions and components
-- **Integration Tests**: Test component interactions
-- **E2E Tests**: Test complete user workflows (planned)
-
-### Writing Tests
-
-```typescript
-import { describe, it, expect } from 'vitest';
-import { QuestionRenderer } from '../utils/questionRenderer';
-
-describe('QuestionRenderer', () => {
-  it('should render question correctly', () => {
-    // Test implementation
-  });
-});
-```
-
 ## 🔌 Offline Functionality
 
 The application provides offline capabilities through:
@@ -254,79 +237,3 @@ The application provides offline capabilities through:
 - **Offline Support**: Works without internet connection
 - **Local Storage**: All data stored locally in the browser
 - **Caching**: Intelligent caching strategies for performance
-
-### Offline Features
-
-- Service Worker for caching and offline functionality
-- Local data storage for questions and progress
-- Optimized performance with intelligent caching
-
-## 🔒 Privacy & Security
-
-- **Local Storage**: All data is stored locally in the browser
-- **No Tracking**: No analytics or tracking scripts
-- **Offline First**: Works without internet connection
-- **Secure**: HTTPS only in production
-
-## 🚀 Performance
-
-### Optimizations
-
-- **Code Splitting**: Automatic code splitting with Vite
-- **Tree Shaking**: Unused code is eliminated
-- **Caching**: Intelligent caching strategies
-- **Lazy Loading**: Images and resources loaded on demand
-- **Minification**: All assets are minified for production
-
-### Performance Metrics
-
-- **First Contentful Paint**: < 1.5s
-- **Largest Contentful Paint**: < 2.5s
-- **Cumulative Layout Shift**: < 0.1
-- **First Input Delay**: < 100ms
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-### Development Workflow
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/new-feature`
-3. Make your changes
-4. Run tests: `npm test`
-5. Commit your changes: `git commit -am 'Add new feature'`
-6. Push to the branch: `git push origin feature/new-feature`
-7. Submit a pull request
-
-### Code Style
-
-- Follow TypeScript best practices
-- Use ESLint and Prettier for code formatting
-- Write comprehensive tests
-
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- GPhC for providing the exam structure
-- The open source community for the amazing tools used
-- Contributors and users for feedback and improvements
-
-## 📞 Support
-
-- **Issues**: [GitHub Issues](https://github.com/your-username/gphc-scraper/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-username/gphc-scraper/discussions)
-- **Email**: support@example.com
-
-## 🔄 Changelog
-
-See [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes.
-
----
-
-**Note**: This application is for educational purposes. Always refer to official GPhC resources for exam preparation.
-
