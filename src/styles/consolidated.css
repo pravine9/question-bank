@@ -860,9 +860,6 @@ body {
 
 
 
-.question-options {
-  margin: var(--space-4) 0;
-}
 
 .calculator-section {
   display: flex;
@@ -1020,6 +1017,7 @@ body {
   border-color: var(--color-error);
   color: var(--color-white);
 }
+
 
 /* Calculator input */
 .calculator {
