@@ -1,17 +1,15 @@
-import React from 'react';
-import { createRoot, type Root } from 'react-dom/client';
 import type { Question, QuestionBank, BankData } from '@/types/question';
 import { formatBankName } from '@/utils/bankNames';
 import { evaluateAnswer, getCorrectAnswerText } from '@/utils/answers';
-import QuestionRenderer from '@/components/QuestionRenderer';
 import { banks } from './banks';
+import { questionRenderer } from './question_renderer';
 
 const bankFiles: QuestionBank = banks;
 let banksPopulated = false;
 
 // Add event handlers for question buttons
 let currentQuestion: Question | null = null;
-let questionRoot: Root | null = null;
+let questionContainer: HTMLElement | null = null;
 let selectedAnswer = '';
 
 export function init(): void {
@@ -49,10 +47,7 @@ export function init(): void {
     }
   }
 
-  const container = document.getElementById('questionRoot');
-  if (container) {
-    questionRoot = createRoot(container);
-  }
+  questionContainer = document.getElementById('questionRoot');
 
   populateBankSelects(bankFiles);
 
@@ -159,17 +154,34 @@ function renderQuestion(question: Question): void {
     console.warn('Failed to save lastBank', e);
   }
 
-  if (questionRoot) {
-    questionRoot.render(
-      React.createElement(QuestionRenderer, {
-        question,
-        variant: 'index',
-        onAnswerChange: (val: string) => {
-          selectedAnswer = val;
+  // Ensure the question container has the required structure
+  if (questionContainer && !questionContainer.dataset.initialized) {
+    questionContainer.innerHTML = `
+      <div id="questionTitle" class="question-title"></div>
+      <div id="questionText" class="question-text"></div>
+      <img id="questionImage" class="question-image" style="display:none;" />
+      <div id="answerOptions" class="question-options"></div>
+      <div id="calculatorInput" class="calculator" style="display:none;">
+        <input type="number" id="calcInput" />
+        <span id="answerUnit" class="unit"></span>
+      </div>
+    `;
+
+    const optionsEl = questionContainer.querySelector('#answerOptions');
+    if (optionsEl) {
+      optionsEl.addEventListener('change', (e) => {
+        const target = e.target as HTMLInputElement;
+        if (target.name === 'answer') {
+          selectedAnswer = target.checked ? target.value : '';
         }
-      })
-    );
+      });
+    }
+
+    questionContainer.dataset.initialized = 'true';
   }
+
+  // Render question using the DOM-based renderer
+  questionRenderer.renderQuestion(question);
 
   // Show the question area
   const questionArea = document.getElementById('questionArea');
