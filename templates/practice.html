@@ -79,19 +79,23 @@
           <button type="button" class="modal-close">&times;</button>
         </div>
         <div class="modal-body">
-          <div class="status-summary">
-            <div class="status-item attempted">
-              <span class="status-label">Attempted:</span>
-              <span class="status-count" id="attemptedCount">0</span>
+          <div class="filter-section">
+            <div class="filter-title">Filter by:</div>
+            <div class="filter-options">
+              <label class="filter-option">
+                <input type="checkbox" id="filterUnattempted">
+                <span class="filter-text">Unattempted</span>
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" id="filterAttempted">
+                <span class="filter-text">Attempted</span>
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" id="filterFlagged">
+                <span class="filter-text">Flagged</span>
+              </label>
             </div>
-            <div class="status-item not-attempted">
-              <span class="status-label">Not Attempted:</span>
-              <span class="status-count" id="notAttemptedCount">0</span>
-            </div>
-            <div class="status-item flagged">
-              <span class="status-label">Flagged:</span>
-              <span class="status-count" id="flaggedCount">0</span>
-            </div>
+            <button type="button" class="clear-filter-btn">Clear</button>
           </div>
           <div class="question-grid-review" id="questionGridReview">
             <!-- Question grid will be populated here -->

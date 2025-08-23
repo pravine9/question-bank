@@ -15,7 +15,7 @@
     <div class="summary">
       <div class="summary-container">
         <div class="summary-header">
-          <h1>Test Complete!</h1>
+          <h1>Results</h1>
           <div class="score-circle">
             <div class="score-number" id="scoreDisplay">0/0</div>
             <div class="score-percentage" id="percentageDisplay">0%</div>
@@ -25,21 +25,21 @@
         
         <div class="summary-stats">
           <div class="stat correct">
-            <div class="stat-icon">✓</div>
+            <div class="stat-icon">C</div>
             <div class="stat-content">
               <div class="stat-number" id="correctCount">0</div>
               <div class="stat-label">Correct</div>
             </div>
           </div>
           <div class="stat incorrect">
-            <div class="stat-icon">✗</div>
+            <div class="stat-icon">I</div>
             <div class="stat-content">
               <div class="stat-number" id="incorrectCount">0</div>
               <div class="stat-label">Incorrect</div>
             </div>
           </div>
           <div class="stat unanswered">
-            <div class="stat-icon">○</div>
+            <div class="stat-icon">U</div>
             <div class="stat-content">
               <div class="stat-number" id="unansweredCount">0</div>
               <div class="stat-label">Unanswered</div>
@@ -48,17 +48,17 @@
         </div>
 
         <div class="summary-actions">
-          <button type="button" id="reviewWrongBtn" class="btn btn-primary">Review Wrong Answers</button>
-          <button type="button" id="goHomeBtn" class="btn btn-secondary">Go Home</button>
+          <button type="button" id="reviewWrongBtn" class="btn btn-primary">Review</button>
+          <button type="button" id="goHomeBtn" class="btn btn-secondary">Home</button>
         </div>
 
         <table class="summary-table">
           <thead>
             <tr>
-              <th>Question</th>
+              <th>Q</th>
               <th>Your Answer</th>
-              <th>Correct Answer</th>
-              <th>Result</th>
+              <th>Correct</th>
+              <th>Status</th>
               <th>Review</th>
             </tr>
           </thead>
@@ -81,21 +81,21 @@
           <div id="reviewAnswerOptions" class="options"></div>
           <div class="review-answers">
             <div class="your-answer">
-              <h4>Your Answer:</h4>
+              <h4>Your Answer</h4>
               <div id="reviewYourAnswer"></div>
             </div>
             <div class="correct-answer">
-              <h4>Correct Answer:</h4>
+              <h4>Correct Answer</h4>
               <div id="reviewCorrectAnswer"></div>
             </div>
             <div class="explanation">
-              <h4>Explanation:</h4>
+              <h4>Explanation</h4>
               <div id="reviewExplanation"></div>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" id="prevQuestionBtn" class="btn btn-secondary">‹ Previous</button>
+          <button type="button" id="prevQuestionBtn" class="btn btn-secondary">‹ Prev</button>
           <button type="button" id="nextQuestionBtn" class="btn btn-secondary">Next ›</button>
           <button type="button" id="closeReviewBtn" class="btn btn-primary">Close</button>
         </div>

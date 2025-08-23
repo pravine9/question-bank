@@ -84,20 +84,20 @@ export class SummaryManager {
 
       const row = tbody.insertRow();
       const statusClass = isCorrect ? 'correct' : (userAnswer !== 'No answer' ? 'incorrect' : 'unanswered');
-      const statusText = isCorrect ? '✓ Correct' : (userAnswer !== 'No answer' ? '✗ Incorrect' : '○ Unanswered');
-      const flagIcon = isFlagged ? ' ⚑' : '';
+      const statusText = isCorrect ? '✓' : (userAnswer !== 'No answer' ? '✗' : '-');
+      const flagIcon = isFlagged ? ' F' : '';
       
       row.innerHTML = `
         <td>
           <div class="question-number">${i + 1}</div>
-          ${isFlagged ? '<div class="flag-indicator">⚑</div>' : ''}
+          ${isFlagged ? '<div class="flag-indicator">F</div>' : ''}
         </td>
         <td class="answer-cell">${userAnswer}</td>
         <td class="correct-answer-cell">${getCorrectAnswerText(question)}</td>
         <td class="status-cell ${statusClass}">${statusText}${flagIcon}</td>
         <td>
           <button class="btn btn-sm review-question" data-question="${i}">
-            <span class="review-icon">👁️</span> Review
+            <span class="review-icon">View</span> Review
           </button>
         </td>
       `;

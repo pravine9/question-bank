@@ -453,43 +453,94 @@ export class PracticeManager {
     const modal = document.getElementById('reviewModal');
     if (!modal) {return;}
 
-    // Update counts
-    const attemptedCount = Object.keys(this.state.answers).length;
-    const notAttemptedCount = this.state.totalQuestions - attemptedCount;
-    const flaggedCount = this.state.flagged.size;
-
-    const attemptedEl = document.getElementById('attemptedCount');
-    const notAttemptedEl = document.getElementById('notAttemptedCount');
-    const flaggedEl = document.getElementById('flaggedCount');
-
-    if (attemptedEl) {attemptedEl.textContent = attemptedCount.toString();}
-    if (notAttemptedEl) {notAttemptedEl.textContent = notAttemptedCount.toString();}
-    if (flaggedEl) {flaggedEl.textContent = flaggedCount.toString();}
+    // Setup filter functionality
+    this.setupFilterHandlers();
 
     // Generate question grid
-    const gridEl = document.getElementById('questionGridReview');
-    if (gridEl) {
-      gridEl.innerHTML = '';
-      for (let i = 0; i < this.state.totalQuestions; i++) {
-        const btn = document.createElement('button');
-        btn.className = 'grid-question';
-        btn.textContent = (i + 1).toString();
-        btn.dataset.question = i.toString();
-
-        if (this.state.answers[i]) {btn.classList.add('attempted');}
-        if (this.state.flagged.has(i)) {btn.classList.add('flagged');}
-        if (i === this.state.currentQuestion) {btn.classList.add('current');}
-
-        btn.addEventListener('click', () => {
-          this.goToQuestion(i);
-          this.hideReviewModal();
-        });
-
-        gridEl.appendChild(btn);
-      }
-    }
+    this.updateQuestionGrid();
 
     modal.style.display = 'block';
+  }
+
+  private setupFilterHandlers(): void {
+    const filterUnattempted = document.getElementById('filterUnattempted') as HTMLInputElement;
+    const filterAttempted = document.getElementById('filterAttempted') as HTMLInputElement;
+    const filterFlagged = document.getElementById('filterFlagged') as HTMLInputElement;
+    const clearBtn = document.querySelector('.clear-filter-btn') as HTMLButtonElement;
+
+    if (filterUnattempted) {
+      filterUnattempted.addEventListener('change', () => this.updateQuestionGrid());
+    }
+    if (filterAttempted) {
+      filterAttempted.addEventListener('change', () => this.updateQuestionGrid());
+    }
+    if (filterFlagged) {
+      filterFlagged.addEventListener('change', () => this.updateQuestionGrid());
+    }
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => this.clearFilters());
+    }
+  }
+
+  private clearFilters(): void {
+    const filterUnattempted = document.getElementById('filterUnattempted') as HTMLInputElement;
+    const filterAttempted = document.getElementById('filterAttempted') as HTMLInputElement;
+    const filterFlagged = document.getElementById('filterFlagged') as HTMLInputElement;
+
+    if (filterUnattempted) filterUnattempted.checked = false;
+    if (filterAttempted) filterAttempted.checked = false;
+    if (filterFlagged) filterFlagged.checked = false;
+
+    this.updateQuestionGrid();
+  }
+
+  private updateQuestionGrid(): void {
+    if (!this.state) {return;}
+
+    const filterUnattempted = document.getElementById('filterUnattempted') as HTMLInputElement;
+    const filterAttempted = document.getElementById('filterAttempted') as HTMLInputElement;
+    const filterFlagged = document.getElementById('filterFlagged') as HTMLInputElement;
+
+    const gridEl = document.getElementById('questionGridReview');
+    if (!gridEl) {return;}
+
+    gridEl.innerHTML = '';
+
+    // Check if any filters are active
+    const hasActiveFilters = filterUnattempted?.checked || filterAttempted?.checked || filterFlagged?.checked;
+
+    for (let i = 0; i < this.state.totalQuestions; i++) {
+      const isAttempted = !!this.state.answers[i];
+      const isFlagged = this.state.flagged.has(i);
+      const isCurrent = i === this.state.currentQuestion;
+
+      // Show all questions if no filters are active, otherwise show only matching questions
+      let shouldShow = true;
+      if (hasActiveFilters) {
+        shouldShow = false;
+        if (isAttempted && filterAttempted?.checked) shouldShow = true;
+        if (!isAttempted && filterUnattempted?.checked) shouldShow = true;
+        if (isFlagged && filterFlagged?.checked) shouldShow = true;
+      }
+
+      if (!shouldShow) continue;
+
+      const btn = document.createElement('button');
+      btn.className = 'grid-item';
+      btn.textContent = (i + 1).toString();
+      btn.dataset.question = i.toString();
+
+      if (isAttempted) btn.classList.add('attempted');
+      if (isFlagged) btn.classList.add('flagged');
+      if (isCurrent) btn.classList.add('current');
+
+      btn.addEventListener('click', () => {
+        this.goToQuestion(i);
+        this.hideReviewModal();
+      });
+
+      gridEl.appendChild(btn);
+    }
   }
 
   private hideReviewModal(): void {
