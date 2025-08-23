@@ -1,5 +1,6 @@
 // Practice History Component - JavaScript Version
 import { formatBankName } from '../utils/bankNames';
+import { EMPTY_HISTORY } from '../utils/history';
 
 class PracticeHistoryComponent {
   constructor() {
@@ -262,26 +263,14 @@ class PracticeHistoryComponent {
     try {
       const history = localStorage.getItem('practice_history');
       if (!history) {
-        return {
-          results: [],
-          totalTests: 0,
-          averageScore: 0,
-          bestScore: 0,
-          totalTime: 0
-        };
+        return { ...EMPTY_HISTORY };
       }
 
       const parsedHistory = JSON.parse(history);
       return this.calculateHistoryStats(parsedHistory.results || []);
     } catch (error) {
       console.warn('Failed to load practice history:', error);
-      return {
-        results: [],
-        totalTests: 0,
-        averageScore: 0,
-        bestScore: 0,
-        totalTime: 0
-      };
+      return { ...EMPTY_HISTORY };
     }
   }
 
@@ -304,6 +293,7 @@ class PracticeHistoryComponent {
   clearPracticeHistory() {
     try {
       localStorage.removeItem('practice_history');
+      this.history = { ...EMPTY_HISTORY };
     } catch (error) {
       console.warn('Failed to clear practice history:', error);
     }

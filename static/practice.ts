@@ -6,6 +6,7 @@ import type {
   PracticeResult,
 } from '@/types/question';
 import { formatBankName } from '@/utils/bankNames';
+import { EMPTY_HISTORY } from '@/utils/history';
 
 // Timer functionality removed - practice mode runs without time constraints
 
@@ -564,7 +565,7 @@ class PracticeManager {
   private savePracticeResult(result: PracticeResult): void {
     try {
       const existingHistory = localStorage.getItem('practice_history');
-      const history = existingHistory ? JSON.parse(existingHistory) : { results: [] };
+      const history = existingHistory ? JSON.parse(existingHistory) : { ...EMPTY_HISTORY };
       
       history.results.unshift(result);
       
