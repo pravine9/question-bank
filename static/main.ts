@@ -10,6 +10,11 @@ let banksPopulated = false;
 // Add event handlers for question buttons
 let currentQuestion: Question | null = null;
 
+// Make utility functions globally available for questionRenderer
+(window as any).evaluateAnswer = evaluateAnswer;
+(window as any).getCorrectAnswerText = getCorrectAnswerText;
+(window as any).formatExplanation = formatExplanation;
+
 export function init(): void {
   const loadBtn = document.getElementById('loadBtn') as HTMLButtonElement | null;
   if (loadBtn) {
@@ -172,12 +177,26 @@ function renderQuestion(question: Question): void {
     questionArea.style.display = 'block';
   }
 
-  // Reset feedback
+  // Reset feedback and buttons
   const feedbackEl = document.getElementById('feedback');
   if (feedbackEl) {
     feedbackEl.textContent = '';
     feedbackEl.classList.remove('correct', 'incorrect');
   }
+
+  // Reset answer and explanation visibility
+  const answerEl = document.getElementById('answer');
+  const explanationEl = document.getElementById('explanation');
+  if (answerEl) {
+    answerEl.style.display = 'none';
+    answerEl.innerHTML = '';
+  }
+  if (explanationEl) {
+    explanationEl.style.display = 'none';
+    explanationEl.innerHTML = '';
+  }
+
+
 }
 
 function startPractice(): void {
@@ -219,110 +238,49 @@ function startPractice(): void {
   window.location.href = `practice.html?bank=${encodeURIComponent(data.bank)}&num=${numQuestions}`;
 }
 
-function toggleCheck(): void {
-  const checkBtn = document.getElementById('checkBtn') as HTMLButtonElement;
-  if (checkBtn.textContent === 'Hide') {
-    hideAnswer();
-  } else {
-    checkAnswer();
-  }
-}
-
-function toggleReveal(): void {
-  const revealBtn = document.getElementById('revealBtn') as HTMLButtonElement;
-  if (revealBtn.textContent === 'Hide') {
-    hideAnswer();
-  } else {
-    revealAnswer();
-  }
-}
-
-function hideAnswer(): void {
-  ['feedback', 'answer', 'explanation'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.textContent = '';
-      el.className = id;
-      el.style.display = 'none';
-    }
-  });
-  updateButtons('Check', 'Reveal');
-}
-
-function updateButtons(checkText: string, revealText: string): void {
-  const checkBtn = document.getElementById('checkBtn') as HTMLButtonElement;
-  const revealBtn = document.getElementById('revealBtn') as HTMLButtonElement;
-  if (checkBtn) checkBtn.textContent = checkText;
-  if (revealBtn) revealBtn.textContent = revealText;
-}
-
-function checkAnswer(): void {
+function getUserAnswer(): string {
   if (!currentQuestion) {
-    return;
+    return '';
   }
-
-  // Get user answer first
-  let userAnswer = '';
 
   if (currentQuestion.is_calculation) {
     const calcInput = document.getElementById('calcInput') as HTMLInputElement;
-    if (!calcInput || !calcInput.value) {
-      alert('Please enter an answer first');
-      return;
-    }
-    userAnswer = calcInput.value;
+    return calcInput?.value || '';
   } else {
     const selectedOption = document.querySelector(
       'input[name="answer"]:checked'
     ) as HTMLInputElement;
-    if (!selectedOption) {
-      alert('Please select an answer first');
-      return;
-    }
-    userAnswer = selectedOption.value;
-  }
-
-  const isCorrect = evaluateAnswer(currentQuestion, userAnswer);
-  revealAnswerWithFeedback(currentQuestion, isCorrect);
-  updateButtons('Hide', 'Reveal');
-}
-
-function revealAnswerWithFeedback(
-  question: Question,
-  isCorrect: boolean
-): void {
-  const feedbackEl = document.getElementById('feedback');
-  const answerEl = document.getElementById('answer');
-  const explanationEl = document.getElementById('explanation');
-
-  if (feedbackEl) {
-    feedbackEl.textContent = isCorrect ? 'Correct!' : 'Incorrect';
-    feedbackEl.className = isCorrect
-      ? 'feedback correct'
-      : 'feedback incorrect';
-  }
-
-  if (answerEl) {
-    const correctAnswerText = getCorrectAnswerText(question);
-    answerEl.innerHTML = `<strong>Correct Answer:</strong> ${correctAnswerText}${
-      question.answer_unit ? ' ' + question.answer_unit : ''
-    }`;
-    answerEl.style.display = 'block';
-  }
-
-  if (explanationEl && question.why) {
-    explanationEl.innerHTML = `<strong>Explanation:</strong><br>${formatExplanation(question.why)}`;
-    explanationEl.style.display = 'block';
+    return selectedOption?.value || '';
   }
 }
 
-function revealAnswer(): void {
-  if (!currentQuestion) return;
-  revealAnswerWithFeedback(currentQuestion, false);
-  const feedbackEl = document.getElementById('feedback');
-  if (feedbackEl) {
-    feedbackEl.textContent = '';
-    feedbackEl.className = 'feedback';
+function toggleCheck(): void {
+  if (!currentQuestion || !questionRenderer) {
+    return;
   }
-  updateButtons('Check', 'Hide');
+  
+  const currentState = questionRenderer.getCurrentDisplayState();
+  
+  if (currentState === 'checked') {
+    questionRenderer.displayAnswer(currentQuestion, 'hide');
+  } else {
+    const userAnswer = getUserAnswer();
+    questionRenderer.displayAnswer(currentQuestion, 'check', userAnswer);
+  }
 }
+
+function toggleReveal(): void {
+  if (!currentQuestion || !questionRenderer) {
+    return;
+  }
+  
+  const currentState = questionRenderer.getCurrentDisplayState();
+  
+  if (currentState === 'revealed') {
+    questionRenderer.displayAnswer(currentQuestion, 'hide');
+  } else {
+    questionRenderer.displayAnswer(currentQuestion, 'reveal');
+  }
+}
+
+

@@ -8,18 +8,26 @@ import type {
 import { formatBankName } from '@/utils/bankNames';
 import { EMPTY_HISTORY } from '@/utils/history';
 import { evaluateAnswer, getCorrectAnswerText, formatExplanation } from '@/utils/answers';
+import { PracticeTestTimer, showTimerWarning, type TimerWarning } from '@/utils/timer';
 import { banks } from './banks';
 import { questionRenderer } from './question_renderer';
 
-// Timer functionality removed - practice mode runs without time constraints
+// Make utility functions globally available for questionRenderer
+(window as any).evaluateAnswer = evaluateAnswer;
+(window as any).getCorrectAnswerText = getCorrectAnswerText;
+(window as any).formatExplanation = formatExplanation;
+
+// Practice test with timer functionality - countdown based on question count
 
 export class PracticeManager {
   private state: PracticeState | null = null;
   private isFinished: boolean = false;
   private sessionKey: string = '';
+  private timer: PracticeTestTimer | null = null;
+  private timerDisplayElement: HTMLElement | null = null;
 
   constructor() {
-    // Timer functionality removed
+    this.timerDisplayElement = document.getElementById('timerValue');
   }
 
   init(): void {
@@ -46,9 +54,12 @@ export class PracticeManager {
     this.setupEventListeners();
     this.renderCurrentQuestion();
     
-    // Add auto-save on page unload
+    // Add auto-save and cleanup on page unload
     window.addEventListener('beforeunload', () => {
       this.saveSession();
+      if (this.timer) {
+        this.timer.destroy();
+      }
     });
   }
 
@@ -93,6 +104,7 @@ export class PracticeManager {
 
     this.setupNavigation();
     this.updateProgress();
+    this.initializeTimer();
   }
 
   private setupNavigation(): void {
@@ -222,6 +234,9 @@ export class PracticeManager {
       }
     }
 
+    // Reset feedback elements and button states when moving to a new question
+    this.resetFeedbackAndButtons();
+
     this.updateNavigation();
     this.updateProgress();
     this.saveSession(); // Auto-save on question change
@@ -252,6 +267,15 @@ export class PracticeManager {
       this.updateNavigation();
       this.updateProgress();
       this.saveSession(); // Auto-save when answer changes
+    }
+    
+    // Reset feedback and buttons when answer changes (only if currently showing feedback)
+    if (questionRenderer) {
+      const currentState = questionRenderer.getCurrentDisplayState();
+      if (currentState !== 'hidden') {
+        const question = this.state.questions[this.state.currentQuestion];
+        questionRenderer.displayAnswer(question, 'hide');
+      }
     }
   }
 
@@ -349,85 +373,44 @@ export class PracticeManager {
   }
 
   private toggleCheck(): void {
-    const checkBtn = document.getElementById('checkBtn') as HTMLButtonElement;
-    if (checkBtn.textContent === 'Hide') {
-      this.hideAnswer();
+    if (!this.state || !questionRenderer) {
+      return;
+    }
+    
+    const question = this.state.questions[this.state.currentQuestion];
+    const userAnswer = this.state.answers[this.state.currentQuestion];
+    const currentState = questionRenderer.getCurrentDisplayState();
+    
+    if (currentState === 'checked') {
+      questionRenderer.displayAnswer(question, 'hide');
     } else {
-      this.checkAnswer();
+      questionRenderer.displayAnswer(question, 'check', userAnswer);
     }
   }
 
   private toggleReveal(): void {
-    const revealBtn = document.getElementById('revealBtn') as HTMLButtonElement;
-    if (revealBtn.textContent === 'Hide') {
-      this.hideAnswer();
-    } else {
-      this.revealAnswerOnly();
-    }
-  }
-
-  private checkAnswer(): void {
-    if (!this.state) return;
-    const question = this.state.questions[this.state.currentQuestion];
-    const userAnswer = this.state.answers[this.state.currentQuestion];
-    if (!userAnswer) {
-      alert('Please select an answer first');
+    if (!this.state || !questionRenderer) {
       return;
     }
-    const isCorrect = evaluateAnswer(question, userAnswer);
-    this.revealAnswer(question, isCorrect);
-    this.updateButtons('Check', 'Hide', 'Reveal');
-  }
-
-  private revealAnswerOnly(): void {
-    if (!this.state) return;
+    
     const question = this.state.questions[this.state.currentQuestion];
-    this.revealAnswer(question, false, true);
-    this.updateButtons('Reveal', 'Check', 'Hide');
+    const currentState = questionRenderer.getCurrentDisplayState();
+    
+    if (currentState === 'revealed') {
+      questionRenderer.displayAnswer(question, 'hide');
+    } else {
+      questionRenderer.displayAnswer(question, 'reveal');
+    }
   }
 
-  private hideAnswer(): void {
-    ['feedback', 'answer', 'explanation'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) {
-        el.textContent = '';
-        el.className = id;
-        el.style.display = 'none';
-      }
-    });
-    this.updateButtons('Hide', 'Check', 'Reveal');
-  }
-
-  private updateButtons(action: string, checkText: string, revealText: string): void {
-    const checkBtn = document.getElementById('checkBtn') as HTMLButtonElement;
-    const revealBtn = document.getElementById('revealBtn') as HTMLButtonElement;
-    if (checkBtn) checkBtn.textContent = checkText;
-    if (revealBtn) revealBtn.textContent = revealText;
-  }
-
-  private revealAnswer(question: Question, isCorrect: boolean, revealOnly: boolean = false): void {
-    const feedbackEl = document.getElementById('feedback');
-    const answerEl = document.getElementById('answer');
-    const explanationEl = document.getElementById('explanation');
-
-    if (feedbackEl && !revealOnly) {
-      feedbackEl.textContent = isCorrect ? 'Correct!' : 'Incorrect';
-      feedbackEl.className = isCorrect ? 'feedback correct' : 'feedback incorrect';
-    } else if (feedbackEl && revealOnly) {
-      feedbackEl.textContent = '';
-      feedbackEl.className = 'feedback';
+  private resetFeedbackAndButtons(): void {
+    if (!questionRenderer) {
+      return;
     }
-
-    if (answerEl) {
-      const correctAnswerText = getCorrectAnswerText(question);
-      answerEl.innerHTML = `<strong>Correct Answer:</strong> ${correctAnswerText}${question.answer_unit ? ' ' + question.answer_unit : ''}`;
-      answerEl.style.display = 'block';
-    }
-
-    if (explanationEl && question.why) {
-      explanationEl.innerHTML = `<strong>Explanation:</strong> ${formatExplanation(question.why)}`;
-      explanationEl.style.display = 'block';
-    }
+    
+    // The questionRenderer will handle all the cleanup and button state management
+    const dummyQuestion = { id: 0 } as Question; // Just for the interface, not actually used
+    questionRenderer.displayAnswer(dummyQuestion, 'hide');
   }
 
   private finishTest(): void {
@@ -448,7 +431,159 @@ export class PracticeManager {
     this.showSummary();
   }
 
-  // Timer functionality removed - handleTimeUp method no longer needed
+  private initializeTimer(): void {
+    if (!this.state) {
+      return;
+    }
+
+    // Create timer with callbacks
+    this.timer = new PracticeTestTimer(this.state.totalQuestions, {
+      onUpdate: () => this.updateTimerDisplay(),
+      onWarning: (warning) => this.handleTimerWarning(warning),
+      onComplete: () => this.handleTimeUp()
+    });
+
+    // Start the timer
+    this.timer.start();
+  }
+
+  private updateTimerDisplay(): void {
+    if (!this.timerDisplayElement || !this.timer) {
+      return;
+    }
+
+    const formattedTime = this.timer.getFormattedTime();
+    this.timerDisplayElement.textContent = formattedTime;
+
+    // Update timer display styling based on remaining time
+    const remainingSeconds = this.timer.getTotalRemainingSeconds();
+    const timerDisplay = document.getElementById('timerDisplay');
+    
+    if (timerDisplay) {
+      // Remove existing warning classes
+      timerDisplay.classList.remove('warning', 'critical');
+      
+      // Add appropriate warning class
+      if (remainingSeconds <= 60) { // Last minute
+        timerDisplay.classList.add('critical');
+      } else if (remainingSeconds <= 300) { // Last 5 minutes
+        timerDisplay.classList.add('warning');
+      }
+    }
+  }
+
+  private handleTimerWarning(warning: TimerWarning): void {
+    // Show unintrusive warning notification
+    showTimerWarning(warning);
+  }
+
+  private handleTimeUp(): void {
+    if (!this.state) {
+      return;
+    }
+
+    // Stop any ongoing actions
+    this.isFinished = true;
+
+    // Show time up notification
+    const timeUpModal = this.createTimeUpModal();
+    document.body.appendChild(timeUpModal);
+  }
+
+  private createTimeUpModal(): HTMLElement {
+    const modal = document.createElement('div');
+    modal.className = 'time-up-modal';
+    modal.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      font-family: 'Nunito', sans-serif;
+    `;
+
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      text-align: center;
+      max-width: 400px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    `;
+
+    const title = document.createElement('h2');
+    title.textContent = '⏰ Time\'s Up!';
+    title.style.cssText = `
+      color: #e74c3c;
+      margin: 0 0 20px 0;
+      font-size: 28px;
+    `;
+
+    const message = document.createElement('p');
+    message.textContent = 'Your practice test time has expired. You can still review your answers or finish the test now.';
+    message.style.cssText = `
+      color: #555;
+      margin: 0 0 30px 0;
+      line-height: 1.5;
+      font-size: 16px;
+    `;
+
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.cssText = `
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    `;
+
+    const finishButton = document.createElement('button');
+    finishButton.textContent = 'Finish Test';
+    finishButton.className = 'btn btn-danger';
+    finishButton.style.cssText = `
+      padding: 12px 24px;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #e74c3c;
+      color: white;
+    `;
+    finishButton.addEventListener('click', () => {
+      document.body.removeChild(modal);
+      this.finishTest();
+    });
+
+    const continueButton = document.createElement('button');
+    continueButton.textContent = 'Continue Review';
+    continueButton.className = 'btn btn-secondary';
+    continueButton.style.cssText = `
+      padding: 12px 24px;
+      font-weight: 600;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      cursor: pointer;
+      background: white;
+      color: #555;
+    `;
+    continueButton.addEventListener('click', () => {
+      document.body.removeChild(modal);
+    });
+
+    buttonContainer.appendChild(finishButton);
+    buttonContainer.appendChild(continueButton);
+
+    modalContent.appendChild(title);
+    modalContent.appendChild(message);
+    modalContent.appendChild(buttonContainer);
+    modal.appendChild(modalContent);
+
+    return modal;
+  }
 
   private calculateResults(): void {
     if (!this.state) {return;}
@@ -536,9 +671,15 @@ export class PracticeManager {
     const filterAttempted = document.getElementById('filterAttempted') as HTMLInputElement;
     const filterFlagged = document.getElementById('filterFlagged') as HTMLInputElement;
 
-    if (filterUnattempted) filterUnattempted.checked = true;
-    if (filterAttempted) filterAttempted.checked = true;
-    if (filterFlagged) filterFlagged.checked = true;
+    if (filterUnattempted) {
+      filterUnattempted.checked = true;
+    }
+    if (filterAttempted) {
+      filterAttempted.checked = true;
+    }
+    if (filterFlagged) {
+      filterFlagged.checked = true;
+    }
 
     this.updateQuestionGrid();
   }
@@ -562,20 +703,34 @@ export class PracticeManager {
 
       // Check if question should be shown based on filters
       let shouldShow = false;
-      if (isAttempted && filterAttempted?.checked) shouldShow = true;
-      if (!isAttempted && filterUnattempted?.checked) shouldShow = true;
-      if (isFlagged && filterFlagged?.checked) shouldShow = true;
+      if (isAttempted && filterAttempted?.checked) {
+        shouldShow = true;
+      }
+      if (!isAttempted && filterUnattempted?.checked) {
+        shouldShow = true;
+      }
+      if (isFlagged && filterFlagged?.checked) {
+        shouldShow = true;
+      }
 
-      if (!shouldShow) continue;
+      if (!shouldShow) {
+        continue;
+      }
 
       const btn = document.createElement('button');
       btn.className = 'grid-item';
       btn.textContent = (i + 1).toString();
       btn.dataset.question = i.toString();
 
-      if (isAttempted) btn.classList.add('attempted');
-      if (isFlagged) btn.classList.add('flagged');
-      if (isCurrent) btn.classList.add('current');
+      if (isAttempted) {
+        btn.classList.add('attempted');
+      }
+      if (isFlagged) {
+        btn.classList.add('flagged');
+      }
+      if (isCurrent) {
+        btn.classList.add('current');
+      }
 
       btn.addEventListener('click', () => {
         this.goToQuestion(i);
@@ -683,6 +838,7 @@ export class PracticeManager {
       }
       
       this.setupNavigation();
+      this.initializeTimer();
       console.log('Session loaded successfully');
       return true;
     } catch (error) {
@@ -698,7 +854,12 @@ export class PracticeManager {
     } catch (error) {
       console.warn('Failed to clear session:', error);
     }
+    
+    // Clean up timer
+    if (this.timer) {
+      this.timer.destroy();
+      this.timer = null;
+    }
   }
 }
 
-// Timer class removed - no longer needed

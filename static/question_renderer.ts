@@ -18,6 +18,8 @@ interface RenderOptions {
 interface QuestionRenderer {
   initPdfViewer(): void;
   renderQuestion(question: Question, config?: RenderOptions): void;
+  displayAnswer(question: Question, mode: 'check' | 'reveal' | 'hide', userAnswer?: string): 'checked' | 'revealed' | 'hidden';
+  getCurrentDisplayState(): 'hidden' | 'checked' | 'revealed';
 }
 
 function sanitize(content: string, inline: boolean = false): string {
@@ -199,22 +201,32 @@ function renderQuestion(question: Question, config: RenderOptions = {}): void {
     unitEl.style.display = showInput ? '' : 'none';
   }
 
-  // Reset feedback elements
+  // Reset feedback elements and display state
   if (feedbackEl) {
     feedbackEl.textContent = '';
     feedbackEl.className = 'feedback';
+    feedbackEl.style.display = 'none';
   }
   if (answerEl) {
     answerEl.innerHTML = '';
     answerEl.className = 'answer';
+    answerEl.style.display = 'none';
   }
   if (explanationEl) {
     explanationEl.innerHTML = '';
     explanationEl.className = 'explanation';
+    explanationEl.style.display = 'none';
   }
+  
+  // Reset the global display state
+  currentDisplayState = 'hidden';
+  updateButtons();
 }
 
 
+
+// Global state for answer display
+let currentDisplayState: 'hidden' | 'checked' | 'revealed' = 'hidden';
 
 function initPdfViewer(): void {
   // Initialize PDF viewer functionality
@@ -222,8 +234,114 @@ function initPdfViewer(): void {
   console.log('PDF viewer initialized');
 }
 
+function displayAnswer(question: Question, mode: 'check' | 'reveal' | 'hide', userAnswer?: string): 'checked' | 'revealed' | 'hidden' {
+  const feedbackEl = document.getElementById('feedback');
+  const answerEl = document.getElementById('answer');
+  const explanationEl = document.getElementById('explanation');
+
+  if (mode === 'hide') {
+    // Hide all content
+    [feedbackEl, answerEl, explanationEl].forEach(el => {
+      if (el) {
+        el.textContent = '';
+        el.className = el.id;
+        el.style.display = 'none';
+      }
+    });
+    currentDisplayState = 'hidden';
+    updateButtons();
+    return 'hidden';
+  }
+
+  if (mode === 'check') {
+    if (!userAnswer) {
+      alert('Please select an answer first');
+      return currentDisplayState as 'checked' | 'revealed' | 'hidden';
+    }
+    
+    const evaluateAnswerFn = (window as any).evaluateAnswer;
+    if (!evaluateAnswerFn) {
+      console.warn('evaluateAnswer function not available');
+      return currentDisplayState as 'checked' | 'revealed' | 'hidden';
+    }
+    const isCorrect = evaluateAnswerFn(question, userAnswer);
+    
+    // Check mode: ONLY show feedback (correct/incorrect)
+    if (feedbackEl) {
+      feedbackEl.textContent = isCorrect ? 'Correct!' : 'Incorrect';
+      feedbackEl.className = isCorrect ? 'feedback correct' : 'feedback incorrect';
+      feedbackEl.style.display = 'block';
+    }
+    
+    // Hide answer and explanation in check mode
+    if (answerEl) {
+      answerEl.style.display = 'none';
+    }
+    if (explanationEl) {
+      explanationEl.style.display = 'none';
+    }
+    
+    currentDisplayState = 'checked';
+  } else if (mode === 'reveal') {
+    // Reveal mode: show answer + explanation, hide feedback
+    if (feedbackEl) {
+      feedbackEl.textContent = '';
+      feedbackEl.className = 'feedback';
+      feedbackEl.style.display = 'none';
+    }
+    
+    // Show answer and explanation
+    if (answerEl) {
+      const correctAnswerText = (window as any).getCorrectAnswerText?.(question) ?? 'Unknown';
+      answerEl.innerHTML = `<strong>Correct Answer:</strong> ${correctAnswerText}${question.answer_unit ? ' ' + question.answer_unit : ''}`;
+      answerEl.style.display = 'block';
+    }
+
+    if (explanationEl && question.why) {
+      const formattedExplanation = (window as any).formatExplanation?.(question.why) ?? question.why;
+      explanationEl.innerHTML = `<strong>Explanation:</strong> ${formattedExplanation}`;
+      explanationEl.style.display = 'block';
+    }
+    
+    currentDisplayState = 'revealed';
+  }
+
+  updateButtons();
+  return currentDisplayState;
+}
+
+function getCurrentDisplayState(): 'hidden' | 'checked' | 'revealed' {
+  return currentDisplayState;
+}
+
+function updateButtons(): void {
+  const checkBtn = document.getElementById('checkBtn') as HTMLButtonElement;
+  const revealBtn = document.getElementById('revealBtn') as HTMLButtonElement;
+  
+  if (!checkBtn || !revealBtn) {
+    return;
+  }
+
+  switch (currentDisplayState) {
+    case 'hidden':
+      checkBtn.textContent = 'Check';
+      revealBtn.textContent = 'Reveal';
+      break;
+    case 'checked':
+      checkBtn.textContent = 'Hide';
+      revealBtn.textContent = 'Reveal';
+      break;
+    case 'revealed':
+      checkBtn.textContent = 'Check';
+      revealBtn.textContent = 'Hide';
+      break;
+  }
+}
+
 // Create the question renderer object
 export const questionRenderer: QuestionRenderer = {
   initPdfViewer,
-  renderQuestion
+  renderQuestion,
+  displayAnswer,
+  getCurrentDisplayState
 };

@@ -5,6 +5,11 @@ import { EMPTY_HISTORY } from '@/utils/history';
 import { evaluateAnswer, getCorrectAnswerText, formatExplanation } from '@/utils/answers';
 import { questionRenderer } from './question_renderer';
 
+// Make utility functions globally available for questionRenderer
+(window as any).evaluateAnswer = evaluateAnswer;
+(window as any).getCorrectAnswerText = getCorrectAnswerText;
+(window as any).formatExplanation = formatExplanation;
+
 export class SummaryManager {
   private testResult: PracticeResult | null = null;
   private currentReviewQuestion: number = 0;
@@ -274,16 +279,9 @@ export class SummaryManager {
 
 
 
-    // Show correct answer
-    const reviewCorrectAnswer = document.getElementById('reviewCorrectAnswer');
-    if (reviewCorrectAnswer) {
-      reviewCorrectAnswer.textContent = getCorrectAnswerText(question);
-    }
-
-    // Show explanation
-    const reviewExplanation = document.getElementById('reviewExplanation');
-    if (reviewExplanation) {
-      reviewExplanation.innerHTML = formatExplanation(question.why) || 'No explanation available';
+    // Use the unified answer display system for consistent styling
+    if (questionRenderer) {
+      questionRenderer.displayAnswer(question, 'reveal');
     }
 
     // Update navigation buttons
