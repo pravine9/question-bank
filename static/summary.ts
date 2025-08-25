@@ -223,33 +223,7 @@ export class SummaryManager {
     this.applyFilters();
   }
 
-  private startReviewMode(mode: 'all' | 'incorrect' | 'flagged'): void {
-    if (!this.testResult) return;
 
-    this.reviewMode = mode;
-    
-    // Find first question to review based on mode
-    let firstQuestion = 0;
-    
-    if (mode === 'incorrect') {
-      for (let i = 0; i < this.testResult.questions.length; i++) {
-        const userAnswer = this.testResult.answers[i];
-        if (userAnswer && !evaluateAnswer(this.testResult.questions[i], userAnswer)) {
-          firstQuestion = i;
-          break;
-        }
-      }
-    } else if (mode === 'flagged') {
-      for (let i = 0; i < this.testResult.questions.length; i++) {
-        if (this.testResult.flagged.includes(i)) {
-          firstQuestion = i;
-          break;
-        }
-      }
-    }
-
-    this.openReviewModal(firstQuestion);
-  }
 
   private openReviewModal(questionNum: number): void {
     if (!this.testResult || questionNum < 0 || questionNum >= this.testResult.questions.length) return;
