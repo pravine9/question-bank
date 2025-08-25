@@ -22,10 +22,15 @@ export class PracticeTestTimer {
 
   constructor(numQuestions: number, callbacks: TimerCallbacks = {}) {
     this.timer = new Timer();
-    this.totalSeconds = numQuestions * 3 * 60; // 3 minutes per question
+    this.totalSeconds = Math.max(60, numQuestions * 3 * 60); // Minimum 1 minute, 3 minutes per question
     this.callbacks = callbacks;
     this.setupEventListeners();
+    
+    // Failsafe: Set up interval to check timer health
+    this.setupTimerHealthCheck();
   }
+
+  private healthCheckInterval: number | null = null;
 
   private setupEventListeners(): void {
     // Update event - fires every second
@@ -79,10 +84,85 @@ export class PracticeTestTimer {
   }
 
   public start(): void {
-    this.timer.start({
-      countdown: true,
-      startValues: { seconds: this.totalSeconds }
-    });
+    this.startWithTime(this.totalSeconds);
+  }
+
+  public startWithTime(remainingSeconds: number): void {
+    try {
+      this.timer.start({
+        countdown: true,
+        startValues: { seconds: remainingSeconds }
+      });
+    } catch (error) {
+      console.error('Failed to start timer:', error);
+      // Failsafe: Try to restart after a brief delay
+      setTimeout(() => {
+        try {
+          this.timer.start({
+            countdown: true,
+            startValues: { seconds: remainingSeconds }
+          });
+        } catch (retryError) {
+          console.error('Timer restart failed:', retryError);
+        }
+      }, 100);
+    }
+  }
+
+  private setupTimerHealthCheck(): void {
+    // Check timer health every 30 seconds
+    this.healthCheckInterval = window.setInterval(() => {
+      if (this.timer.isRunning()) {
+        const remainingSeconds = this.getTotalRemainingSeconds();
+        
+        // Failsafe: If timer shows negative or invalid time, trigger completion
+        if (remainingSeconds <= 0) {
+          console.warn('Timer health check: Timer expired, triggering completion');
+          this.clearHealthCheck();
+          if (this.callbacks.onComplete) {
+            this.callbacks.onComplete();
+          }
+        }
+        
+        // Failsafe: If timer appears stuck (same value for too long), restart it
+        this.checkTimerStall(remainingSeconds);
+      }
+    }, 30000);
+  }
+
+  private lastHealthCheckTime: number = 0;
+  private healthCheckStallCount: number = 0;
+
+  private checkTimerStall(currentTime: number): void {
+    if (this.lastHealthCheckTime === currentTime) {
+      this.healthCheckStallCount++;
+      
+      // If timer hasn't changed for 3 consecutive checks (90 seconds), restart it
+      if (this.healthCheckStallCount >= 3) {
+        console.warn('Timer appears stalled, attempting restart');
+        this.healthCheckStallCount = 0;
+        
+        const wasRunning = this.timer.isRunning();
+        if (wasRunning) {
+          this.timer.stop();
+          this.timer.start({
+            countdown: true,
+            startValues: { seconds: currentTime }
+          });
+        }
+      }
+    } else {
+      this.healthCheckStallCount = 0;
+    }
+    
+    this.lastHealthCheckTime = currentTime;
+  }
+
+  private clearHealthCheck(): void {
+    if (this.healthCheckInterval) {
+      clearInterval(this.healthCheckInterval);
+      this.healthCheckInterval = null;
+    }
   }
 
   public pause(): void {
@@ -134,6 +214,7 @@ export class PracticeTestTimer {
   }
 
   public destroy(): void {
+    this.clearHealthCheck();
     this.timer.removeAllEventListeners();
     this.timer.stop();
   }

@@ -34,6 +34,7 @@
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   min-width: 120px;
+  margin-right: 16px;
 }
 
 .timer-label {
@@ -57,23 +58,11 @@
 .timer-display.warning {
   background: rgba(255, 152, 0, 0.2);
   border-color: rgba(255, 152, 0, 0.4);
-  animation: pulse-warning 2s infinite;
 }
 
 .timer-display.critical {
   background: rgba(244, 67, 54, 0.2);
   border-color: rgba(244, 67, 54, 0.4);
-  animation: pulse-critical 1s infinite;
-}
-
-@keyframes pulse-warning {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
-}
-
-@keyframes pulse-critical {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
 }
 
 /* Timer warning notification styles */
@@ -515,6 +504,7 @@
   padding: 0;
 }
 
+/* Keep legacy styles for backward compatibility */
 .question-grid-review .grid-item.attempted {
   background: #394552;
   color: #ffffff;
@@ -532,33 +522,33 @@
   box-shadow: 0 0 0 2px #3498db;
 }
 
+/* New styles to match sidebar navigation */
+.question-grid-review .grid-item.answered {
+  background: #394552;
+  color: #ffffff;
+}
+
+.question-grid-review .grid-item.active {
+  background: #49698d;
+  color: #ffffff;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px #3498db;
+}
+
+/* Flag styling - use inline flag-btn style to match sidebar */
+.question-grid-review .grid-item.flagged .flag-btn {
+  color: #ffffff;
+  display: inline;
+}
+
+/* Remove old ::after flag styling to avoid conflicts */
 .question-grid-review .grid-item.flagged {
   position: relative;
 }
 
+/* Keep legacy ::after flag for backward compatibility */
 .question-grid-review .grid-item.flagged::after {
-  content: '⚑';
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  font-size: 10px;
-  background: #e74c3c;
-  color: #ffffff;
-  border-radius: 50%;
-  width: 14px;
-  height: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-
-
-.question-grid-review .grid-item.current {
-  border-color: #3498db;
-  box-shadow: 0 0 0 2px #3498db;
+  content: '';  /* Remove content to prevent duplicate flags */
 }
 
 .question-grid-review .grid-item:hover {

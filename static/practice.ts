@@ -25,6 +25,7 @@ export class PracticeManager {
   private sessionKey: string = '';
   private timer: PracticeTestTimer | null = null;
   private timerDisplayElement: HTMLElement | null = null;
+  private timeUpTriggered: boolean = false;
 
   constructor() {
     this.timerDisplayElement = document.getElementById('timerValue');
@@ -138,8 +139,6 @@ export class PracticeManager {
     const flagBtn = document.querySelector('.flag-current-btn') as HTMLButtonElement;
     const finishBtn = document.querySelector('.finish-btn') as HTMLButtonElement;
     const checkBtn = document.getElementById('checkBtn') as HTMLButtonElement;
-    const revealBtn = document.getElementById('revealBtn') as HTMLButtonElement;
-
     if (backBtn) {
       backBtn.addEventListener('click', () => this.previousQuestion());
     }
@@ -154,9 +153,6 @@ export class PracticeManager {
     }
     if (checkBtn) {
       checkBtn.addEventListener('click', () => this.toggleCheck());
-    }
-    if (revealBtn) {
-      revealBtn.addEventListener('click', () => this.toggleReveal());
     }
 
     // Answer selection handling
@@ -388,20 +384,7 @@ export class PracticeManager {
     }
   }
 
-  private toggleReveal(): void {
-    if (!this.state || !questionRenderer) {
-      return;
-    }
-    
-    const question = this.state.questions[this.state.currentQuestion];
-    const currentState = questionRenderer.getCurrentDisplayState();
-    
-    if (currentState === 'revealed') {
-      questionRenderer.displayAnswer(question, 'hide');
-    } else {
-      questionRenderer.displayAnswer(question, 'reveal');
-    }
-  }
+
 
   private resetFeedbackAndButtons(): void {
     if (!questionRenderer) {
@@ -431,9 +414,15 @@ export class PracticeManager {
     this.showSummary();
   }
 
-  private initializeTimer(): void {
+  private initializeTimer(remainingSeconds?: number): void {
     if (!this.state) {
       return;
+    }
+
+    // Clean up existing timer if any
+    if (this.timer) {
+      this.timer.destroy();
+      this.timer = null;
     }
 
     // Create timer with callbacks
@@ -443,8 +432,37 @@ export class PracticeManager {
       onComplete: () => this.handleTimeUp()
     });
 
-    // Start the timer
-    this.timer.start();
+    // Start timer with remaining time if provided (for session restoration)
+    if (remainingSeconds !== undefined && remainingSeconds > 0) {
+      // Calculate elapsed time and adjust start time
+      const totalSeconds = this.state.totalQuestions * 3 * 60;
+      const elapsedSeconds = totalSeconds - remainingSeconds;
+      this.state.startTime = Date.now() - (elapsedSeconds * 1000);
+      
+      // Start timer with exact remaining time
+      this.timer.startWithTime(remainingSeconds);
+    } else {
+      // Start fresh timer
+      this.timer.start();
+    }
+
+    // Failsafe: Check if timer should have already expired
+    this.checkTimerExpiry();
+  }
+
+  private checkTimerExpiry(): void {
+    if (!this.state || !this.timer) {
+      return;
+    }
+
+    // Failsafe: Check if test should have already ended based on elapsed time
+    const elapsedMs = Date.now() - this.state.startTime;
+    const totalTimeMs = this.state.totalQuestions * 3 * 60 * 1000;
+    
+    if (elapsedMs >= totalTimeMs) {
+      console.warn('Timer failsafe triggered - test time has expired');
+      this.handleTimeUp();
+    }
   }
 
   private updateTimerDisplay(): void {
@@ -452,22 +470,37 @@ export class PracticeManager {
       return;
     }
 
-    const formattedTime = this.timer.getFormattedTime();
-    this.timerDisplayElement.textContent = formattedTime;
+    try {
+      const formattedTime = this.timer.getFormattedTime();
+      this.timerDisplayElement.textContent = formattedTime;
 
-    // Update timer display styling based on remaining time
-    const remainingSeconds = this.timer.getTotalRemainingSeconds();
-    const timerDisplay = document.getElementById('timerDisplay');
-    
-    if (timerDisplay) {
-      // Remove existing warning classes
-      timerDisplay.classList.remove('warning', 'critical');
+      // Update timer display styling based on remaining time
+      const remainingSeconds = this.timer.getTotalRemainingSeconds();
+      const timerDisplay = document.getElementById('timerDisplay');
       
-      // Add appropriate warning class
-      if (remainingSeconds <= 60) { // Last minute
-        timerDisplay.classList.add('critical');
-      } else if (remainingSeconds <= 300) { // Last 5 minutes
-        timerDisplay.classList.add('warning');
+      // Failsafe: Check for negative time (shouldn't happen but just in case)
+      if (remainingSeconds < 0) {
+        console.warn('Timer display failsafe: Negative time detected, triggering completion');
+        this.handleTimeUp();
+        return;
+      }
+      
+      if (timerDisplay) {
+        // Remove existing warning classes
+        timerDisplay.classList.remove('warning', 'critical');
+        
+        // Add appropriate warning class
+        if (remainingSeconds <= 60) { // Last minute
+          timerDisplay.classList.add('critical');
+        } else if (remainingSeconds <= 300) { // Last 5 minutes
+          timerDisplay.classList.add('warning');
+        }
+      }
+    } catch (error) {
+      console.error('Error updating timer display:', error);
+      // Failsafe: Show a generic timer display if specific formatting fails
+      if (this.timerDisplayElement) {
+        this.timerDisplayElement.textContent = '00:00';
       }
     }
   }
@@ -478,12 +511,21 @@ export class PracticeManager {
   }
 
   private handleTimeUp(): void {
-    if (!this.state) {
-      return;
+    if (!this.state || this.timeUpTriggered) {
+      return; // Prevent multiple time-up events
     }
+
+    // Mark time up as triggered to prevent duplicates
+    this.timeUpTriggered = true;
 
     // Stop any ongoing actions
     this.isFinished = true;
+
+    // Clean up timer
+    if (this.timer) {
+      this.timer.destroy();
+      this.timer = null;
+    }
 
     // Show time up notification
     const timeUpModal = this.createTimeUpModal();
@@ -672,13 +714,13 @@ export class PracticeManager {
     const filterFlagged = document.getElementById('filterFlagged') as HTMLInputElement;
 
     if (filterUnattempted) {
-      filterUnattempted.checked = true;
+      filterUnattempted.checked = false;
     }
     if (filterAttempted) {
-      filterAttempted.checked = true;
+      filterAttempted.checked = false;
     }
     if (filterFlagged) {
-      filterFlagged.checked = true;
+      filterFlagged.checked = false;
     }
 
     this.updateQuestionGrid();
@@ -702,15 +744,25 @@ export class PracticeManager {
       const isCurrent = i === this.state.currentQuestion;
 
       // Check if question should be shown based on filters
+      // If no filters are selected, show all questions
+      const hasActiveFilters = (filterUnattempted?.checked || filterAttempted?.checked || filterFlagged?.checked);
+      
       let shouldShow = false;
-      if (isAttempted && filterAttempted?.checked) {
+      
+      if (!hasActiveFilters) {
+        // If no filters are selected, show all questions
         shouldShow = true;
-      }
-      if (!isAttempted && filterUnattempted?.checked) {
-        shouldShow = true;
-      }
-      if (isFlagged && filterFlagged?.checked) {
-        shouldShow = true;
+      } else {
+        // Apply selected filters
+        if (isAttempted && filterAttempted?.checked) {
+          shouldShow = true;
+        }
+        if (!isAttempted && filterUnattempted?.checked) {
+          shouldShow = true;
+        }
+        if (isFlagged && filterFlagged?.checked) {
+          shouldShow = true;
+        }
       }
 
       if (!shouldShow) {
@@ -719,17 +771,22 @@ export class PracticeManager {
 
       const btn = document.createElement('button');
       btn.className = 'grid-item';
-      btn.textContent = (i + 1).toString();
       btn.dataset.question = i.toString();
 
-      if (isAttempted) {
-        btn.classList.add('attempted');
-      }
+      // Set base content with flag icon if flagged (consistent with sidebar navigation)
+      const questionNumber = i + 1;
       if (isFlagged) {
+        btn.innerHTML = `${questionNumber} <span class="flag-btn">⚑</span>`;
         btn.classList.add('flagged');
+      } else {
+        btn.textContent = questionNumber.toString();
+      }
+
+      if (isAttempted) {
+        btn.classList.add('answered'); // Use 'answered' to match sidebar navigation
       }
       if (isCurrent) {
-        btn.classList.add('current');
+        btn.classList.add('active'); // Use 'active' to match sidebar navigation
       }
 
       btn.addEventListener('click', () => {
@@ -772,6 +829,17 @@ export class PracticeManager {
     }
     
     try {
+      // Calculate remaining time for timer persistence
+      let remainingSeconds = 0;
+      if (this.timer && this.timer.isRunning()) {
+        remainingSeconds = this.timer.getTotalRemainingSeconds();
+      } else {
+        // Fallback calculation if timer is not running
+        const elapsedMs = Date.now() - this.state.startTime;
+        const totalTimeMs = this.state.totalQuestions * 3 * 60 * 1000; // 3 minutes per question
+        remainingSeconds = Math.max(0, Math.floor((totalTimeMs - elapsedMs) / 1000));
+      }
+
       const sessionData = {
         currentQuestion: this.state.currentQuestion,
         answers: this.state.answers,
@@ -780,7 +848,9 @@ export class PracticeManager {
         bank: this.state.bank,
         totalQuestions: this.state.totalQuestions,
         questions: this.state.questions.map((q: Question) => q.id), // Store only IDs to save space
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        remainingSeconds: remainingSeconds, // Save timer state
+        timerActive: this.timer ? this.timer.isRunning() : true
       };
       
       sessionStorage.setItem(this.sessionKey, JSON.stringify(sessionData));
@@ -838,7 +908,21 @@ export class PracticeManager {
       }
       
       this.setupNavigation();
-      this.initializeTimer();
+      
+      // Restore timer with saved remaining time
+      const savedRemainingSeconds = data.remainingSeconds;
+      const timerWasActive = data.timerActive !== false; // Default to true if not saved
+      
+      if (timerWasActive && savedRemainingSeconds > 0) {
+        this.initializeTimer(savedRemainingSeconds);
+      } else if (savedRemainingSeconds <= 0) {
+        // Timer had expired, trigger time up immediately
+        this.handleTimeUp();
+      } else {
+        // Initialize fresh timer as fallback
+        this.initializeTimer();
+      }
+      
       console.log('Session loaded successfully');
       return true;
     } catch (error) {
