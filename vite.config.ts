@@ -4,7 +4,7 @@ import { resolve } from 'path';
 import { copyFileSync, mkdirSync, existsSync, readdirSync } from 'fs';
 
 export default defineConfig({
-  base: '/questionbank/',
+  base: '/question-bank/',
   root: '.',
   publicDir: 'public',
   build: {
@@ -14,7 +14,18 @@ export default defineConfig({
         main: resolve(__dirname, 'templates/index.html'),
         practice: resolve(__dirname, 'templates/practice.html'),
         summary: resolve(__dirname, 'templates/summary.html')
-      }
+      },
+      external: [
+        './question_banks/calculations_questions.js',
+        './question_banks/clinical_mep_low_questions.js',
+        './question_banks/clinical_mixed_high_questions.js',
+        './question_banks/clinical_mixed_low_questions.js',
+        './question_banks/clinical_mixed_medium_questions.js',
+        './question_banks/clinical_otc_low_questions.js',
+        './question_banks/clinical_therapeutics_high_questions.js',
+        './question_banks/clinical_therapeutics_low_questions.js',
+        './question_banks/clinical_therapeutics_medium_questions.js'
+      ]
     },
     target: 'es2015',
     minify: 'terser',

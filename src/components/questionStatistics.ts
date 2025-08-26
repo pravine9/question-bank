@@ -615,9 +615,11 @@ export class QuestionStatisticsComponent {
     if (question.is_calculation) {
       const userNum = parseFloat(userAnswer);
       const correctNum = question.correct_answer_number;
-      return !isNaN(userNum) && correctNum !== null && Math.abs(userNum - correctNum) < 0.01;
+      return !isNaN(userNum) && correctNum !== null && correctNum !== undefined && Math.abs(userNum - correctNum) < 0.01;
     } else {
-      return parseInt(userAnswer) === question.correct_answer_number;
+      const correctNum = question.correct_answer_number;
+      return correctNum !== null && correctNum !== undefined && parseInt(userAnswer) === correctNum;
     }
   }
 }
+
