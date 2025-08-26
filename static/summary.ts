@@ -1,7 +1,6 @@
 // Summary Page Logic - Dedicated Implementation
 
 import type { PracticeResult } from '@/types/question';
-import { EMPTY_HISTORY } from '@/utils/history';
 import { evaluateAnswer, getCorrectAnswerText, formatExplanation } from '@/utils/answers';
 import { questionRenderer } from './question_renderer';
 
@@ -16,7 +15,7 @@ export class SummaryManager {
   private reviewMode: 'all' | 'incorrect' | 'flagged' = 'all';
   private filteredRows: HTMLTableRowElement[] = [];
   private dateFormatter: Intl.DateTimeFormat;
-  private isLoading: boolean = false;
+
 
   constructor() {
     this.dateFormatter = new Intl.DateTimeFormat('en-GB', {
@@ -37,8 +36,6 @@ export class SummaryManager {
   }
 
   private async loadTestResult(): Promise<void> {
-    this.setLoadingState(true);
-    
     try {
       const params = new URLSearchParams(window.location.search);
       const resultId = params.get('resultId');
@@ -107,20 +104,13 @@ export class SummaryManager {
       this.populateSummary();
     } catch (error) {
       console.error('💥 Failed to load test result:', error);
-      this.showError(`Failed to load test result: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      this.showError(`Failed to load test result: ${errorMessage}`);
       this.redirectToHome();
-    } finally {
-      this.setLoadingState(false);
     }
   }
 
-  private setLoadingState(loading: boolean): void {
-    this.isLoading = loading;
-    const container = document.querySelector('.summary-container');
-    if (container) {
-      container.classList.toggle('loading', loading);
-    }
-  }
+
 
   private showError(message: string): void {
     console.error(message);

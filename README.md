@@ -81,3 +81,57 @@ window.newBank = [
 ];
 ```
 Calculation questions are in different format supporting answer entries, all other questions are multiple choice questions.
+
+## GitHub Pages Deployment
+
+This project is configured to work with GitHub Pages. To deploy:
+
+### Option 1: Using the deployment script
+```bash
+./deploy.sh
+```
+
+### Option 2: Manual deployment
+1. Build the project:
+   ```bash
+   npm run build
+   ```
+
+2. Configure GitHub Pages:
+   - Go to your repository settings on GitHub
+   - Navigate to 'Pages' in the left sidebar
+   - Set source to 'Deploy from a branch'
+   - Select 'main' branch and '/docs' folder
+   - Click 'Save'
+
+3. Copy build files to docs folder:
+   ```bash
+   cp -r dist/* docs/
+   ```
+
+4. Push changes to GitHub:
+   ```bash
+   git add .
+   git commit -m "Deploy to GitHub Pages"
+   git push
+   ```
+
+Your site will be available at: `https://[username].github.io/question-bank/`
+
+### Important Notes
+- The base path is configured as `/question-bank/` in `vite.config.ts`
+- All assets are properly configured for GitHub Pages deployment
+- Question bank files are excluded from bundling and served as static files
+- The application works offline and stores data in localStorage
+
+### Automatic Deployment with GitHub Actions
+
+The project includes a GitHub Actions workflow (`.github/workflows/deploy.yml`) that automatically builds and deploys the site to GitHub Pages when you push to the main branch.
+
+To enable automatic deployment:
+1. Go to your repository settings on GitHub
+2. Navigate to 'Pages' in the left sidebar
+3. Set source to 'GitHub Actions'
+4. The workflow will automatically deploy when you push to main
+
+This eliminates the need to manually copy files to the docs folder.

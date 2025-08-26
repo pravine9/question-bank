@@ -958,7 +958,7 @@ export class PracticeManager {
 
   private generateQuestionId(question: Question): string {
     // Create a consistent ID based on question content (first 50 chars of question text + calculation flag)
-    const questionText = question.question_text || '';
+    const questionText = question.text || '';
     const prefix = questionText.substring(0, 50).replace(/[^a-zA-Z0-9]/g, '');
     const suffix = question.is_calculation ? '_calc' : '_mcq';
     return `${prefix}${suffix}`;

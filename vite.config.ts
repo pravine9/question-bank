@@ -4,7 +4,7 @@ import { resolve } from 'path';
 import { copyFileSync, mkdirSync, existsSync, readdirSync } from 'fs';
 
 export default defineConfig({
-  base: '/question-bank/',
+  base: '/questionbank/',
   root: '.',
   publicDir: 'public',
   build: {
