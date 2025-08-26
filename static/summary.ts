@@ -15,8 +15,18 @@ export class SummaryManager {
   private currentReviewQuestion: number = 0;
   private reviewMode: 'all' | 'incorrect' | 'flagged' = 'all';
   private filteredRows: HTMLTableRowElement[] = [];
+  private dateFormatter: Intl.DateTimeFormat;
+  private isLoading: boolean = false;
 
   constructor() {
+    this.dateFormatter = new Intl.DateTimeFormat('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    
     this.init();
     this.setupBackButtonHandling();
   }
@@ -26,34 +36,101 @@ export class SummaryManager {
     this.setupEventListeners();
   }
 
-  private loadTestResult(): void {
-    const params = new URLSearchParams(window.location.search);
-    const resultId = params.get('resultId');
+  private async loadTestResult(): Promise<void> {
+    this.setLoadingState(true);
     
-    if (!resultId) {
-      alert('No test result found');
-      window.location.href = 'index.html';
-      return;
-    }
-
     try {
-      const existingHistory = localStorage.getItem('practice_history');
-      const history = existingHistory ? JSON.parse(existingHistory) : { ...EMPTY_HISTORY };
+      const params = new URLSearchParams(window.location.search);
+      const resultId = params.get('resultId');
       
-      const result = history.results.find((r: any) => r.id === resultId);
+      if (!resultId) {
+        this.showError('No test result found - missing ID');
+        this.redirectToHome();
+        return;
+      }
+
+      const existingHistory = localStorage.getItem('practice_history');
+      if (!existingHistory) {
+        this.showError('No practice history found - please complete a test first');
+        this.redirectToHome();
+        return;
+      }
+
+      let history;
+      try {
+        history = JSON.parse(existingHistory);
+      } catch (parseError) {
+        console.error('Failed to parse practice history:', parseError);
+        this.showError('Invalid practice history data');
+        this.redirectToHome();
+        return;
+      }
+      
+      if (!Array.isArray(history.results)) {
+        console.error('history.results is not an array:', history.results);
+        this.showError('Invalid practice history format');
+        this.redirectToHome();
+        return;
+      }
+      
+      // Try both string and exact comparison
+      let result = history.results.find((r: any) => r.id === resultId);
       if (!result) {
-        alert('Test result not found');
-        window.location.href = 'index.html';
+        // Try comparing as strings
+        result = history.results.find((r: any) => String(r.id) === String(resultId));
+      }
+      
+      if (!result) {
+        console.error('Test result not found for ID:', resultId);
+        this.showError(`Test result not found (ID: ${resultId})`);
+        this.redirectToHome();
+        return;
+      }
+      
+      // Validate the result structure
+      if (!result.questions || !Array.isArray(result.questions)) {
+        console.error('❌ Invalid result structure - missing questions array');
+        this.showError('This test result is from an older version and cannot be reviewed in detail. Only basic statistics are available.');
+        this.redirectToHome();
+        return;
+      }
+
+      // Additional validation for questions array
+      if (result.questions.length === 0) {
+        console.error('❌ Questions array is empty');
+        this.showError('This test result has no questions data.');
+        this.redirectToHome();
         return;
       }
 
       this.testResult = result;
       this.populateSummary();
     } catch (error) {
-      console.error('Failed to load test result:', error);
-      alert('Failed to load test result');
-      window.location.href = 'index.html';
+      console.error('💥 Failed to load test result:', error);
+      this.showError(`Failed to load test result: ${error.message}`);
+      this.redirectToHome();
+    } finally {
+      this.setLoadingState(false);
     }
+  }
+
+  private setLoadingState(loading: boolean): void {
+    this.isLoading = loading;
+    const container = document.querySelector('.summary-container');
+    if (container) {
+      container.classList.toggle('loading', loading);
+    }
+  }
+
+  private showError(message: string): void {
+    console.error(message);
+    alert(message);
+  }
+
+  private redirectToHome(): void {
+    setTimeout(() => {
+      window.location.href = 'index.html';
+    }, 1000);
   }
 
   private populateSummary(): void {
@@ -63,6 +140,9 @@ export class SummaryManager {
     const scoreText = document.getElementById('scoreText') as HTMLElement;
 
     if (!tbody) return;
+
+    // Update page title and header with test info
+    this.updateTestInfo();
 
     let correctCount = 0;
     tbody.innerHTML = '';
@@ -124,6 +204,7 @@ export class SummaryManager {
 
   private setupEventListeners(): void {
     const goHomeBtn = document.getElementById('goHomeBtn');
+    const backToHistoryBtn = document.getElementById('backToHistoryBtn');
     const modalClose = document.querySelector('.modal-close');
     const closeReviewBtn = document.getElementById('closeReviewBtn');
     const prevQuestionBtn = document.getElementById('prevQuestionBtn');
@@ -131,6 +212,11 @@ export class SummaryManager {
     const clearFilterBtn = document.querySelector('.clear-filter-btn');
     if (goHomeBtn) {
       goHomeBtn.addEventListener('click', () => {
+        window.location.href = 'index.html';
+      });
+    }
+    if (backToHistoryBtn) {
+      backToHistoryBtn.addEventListener('click', () => {
         window.location.href = 'index.html';
       });
     }
@@ -316,6 +402,38 @@ export class SummaryManager {
     if (nextQuestion >= 0 && nextQuestion < this.testResult.questions.length) {
       this.openReviewModal(nextQuestion);
     }
+  }
+
+  private updateTestInfo(): void {
+    if (!this.testResult) return;
+
+    const formattedDate = this.dateFormatter.format(new Date(this.testResult.date));
+    const bankName = this.formatBankName(this.testResult.bank);
+
+    // Update page title
+    document.title = `Test Results - ${bankName} - GPhC Question Bank`;
+
+    // Update header subtitle if it exists
+    const headerSubtitle = document.querySelector('.summary-header-left p');
+    if (headerSubtitle) {
+      headerSubtitle.textContent = `${bankName} • ${formattedDate}`;
+    } else {
+      // Create subtitle if it doesn't exist
+      const headerLeft = document.querySelector('.summary-header-left');
+      if (headerLeft) {
+        const subtitle = document.createElement('p');
+        subtitle.className = 'summary-subtitle';
+        subtitle.textContent = `${bankName} • ${formattedDate}`;
+        headerLeft.appendChild(subtitle);
+      }
+    }
+  }
+
+  private formatBankName(bank: string): string {
+    return bank
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   }
 
   private setupBackButtonHandling(): void {

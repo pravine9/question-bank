@@ -37,6 +37,39 @@
   font-family: 'Nunito', Arial, sans-serif;
 }
 
+.summary-subtitle {
+  margin: 5px 0 0 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 400;
+}
+
+/* Loading state */
+.summary-container.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.summary-container.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  z-index: 1000;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 .score-section {
   text-align: center;
   margin-bottom: 25px;

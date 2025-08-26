@@ -69,76 +69,7 @@
 
         <!-- Statistics Section -->
         <div id="statsArea" class="stats-section">
-          <h2>📊 Question Statistics</h2>
-          <div class="form-group">
-            <label for="statsBankSelect">Select Question Bank:</label>
-            <select id="statsBankSelect" class="form-select">
-              <option value="">-- Choose a question bank --</option>
-            </select>
-          </div>
-          <button id="loadStatsBtn" class="btn btn-primary">Load Statistics</button>
-          
-          <div id="statsContainer" class="stats-container" style="display:none;">
-            <div class="stats-summary">
-              <div class="summary-cards">
-                <div class="summary-card">
-                  <span class="summary-number" id="totalQuestions">0</span>
-                  <span class="summary-label">Total Questions</span>
-                </div>
-                <div class="summary-card">
-                  <span class="summary-number" id="attemptedQuestions">0</span>
-                  <span class="summary-label">Attempted</span>
-                </div>
-                <div class="summary-card">
-                  <span class="summary-number" id="correctAnswers">0</span>
-                  <span class="summary-label">Correct</span>
-                </div>
-                <div class="summary-card">
-                  <span class="summary-number" id="accuracyRate">0%</span>
-                  <span class="summary-label">Accuracy</span>
-                </div>
-              </div>
-            </div>
-            
-            <table id="statsTable" class="stats-table">
-              <thead>
-                <tr>
-                  <th>Question</th>
-                  <th>Attempts</th>
-                  <th>Correct</th>
-                  <th>Wrong</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-          <!-- Modal for displaying a single stats question -->
-          <div id="statsModal" class="stats-modal">
-            <div class="modal-backdrop"></div>
-            <div class="modal-dialog">
-              <div class="modal-header">
-                <h3>Question Details</h3>
-                <button id="sqCloseBtn" class="btn-close">&times;</button>
-              </div>
-              <div class="modal-body">
-                <div id="sqText" class="question-text"></div>
-<div id="sqTitle" class="question-title"></div>
-<img id="sqImg" class="question-image" alt="Question image" style="display:none;">
-<div id="sqOptions" class="question-options"></div>
-                <div class="calculator-section" style="display:none">
-                  <label>Answer:</label>
-                  <input type="number" id="sqCalcInput" class="form-input">
-                  <span class="unit" id="sqAnswerUnit"></span>
-                </div>
-              </div>
-              <div class="modal-footer">
-                <button id="sqRevealBtn" class="btn btn-primary">Show Answer</button>
-                <div id="sqAnswer" class="answer modal"></div>
-<div id="sqExplanation" class="explanation modal"></div>
-              </div>
-            </div>
-          </div>
+          <!-- Statistics content will be rendered by QuestionStatisticsComponent -->
         </div>
       </div>
 

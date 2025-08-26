@@ -11,6 +11,7 @@ import { evaluateAnswer, getCorrectAnswerText, formatExplanation } from '@/utils
 import { PracticeTestTimer, showTimerWarning, type TimerWarning } from '@/utils/timer';
 import { banks } from './banks';
 import { questionRenderer } from './question_renderer';
+import { QuestionStatisticsComponent } from '../src/components/questionStatistics';
 
 // Make utility functions globally available for questionRenderer
 (window as any).evaluateAnswer = evaluateAnswer;
@@ -25,10 +26,12 @@ export class PracticeManager {
   private sessionKey: string = '';
   private timer: PracticeTestTimer | null = null;
   private timerDisplayElement: HTMLElement | null = null;
+  private questionStatsComponent: QuestionStatisticsComponent;
   private timeUpTriggered: boolean = false;
 
   constructor() {
     this.timerDisplayElement = document.getElementById('timerValue');
+    this.questionStatsComponent = new QuestionStatisticsComponent(banks);
   }
 
   init(): void {
@@ -381,6 +384,13 @@ export class PracticeManager {
       questionRenderer.displayAnswer(question, 'hide');
     } else {
       questionRenderer.displayAnswer(question, 'check', userAnswer);
+      
+      // Record statistics when user checks their answer
+      if (userAnswer) {
+        const questionId = this.generateQuestionId(question);
+        const isCorrect = evaluateAnswer(question, userAnswer);
+        this.questionStatsComponent.recordQuestionAttempt(this.state.bank, questionId, isCorrect);
+      }
     }
   }
 
@@ -944,6 +954,14 @@ export class PracticeManager {
       this.timer.destroy();
       this.timer = null;
     }
+  }
+
+  private generateQuestionId(question: Question): string {
+    // Create a consistent ID based on question content (first 50 chars of question text + calculation flag)
+    const questionText = question.question_text || '';
+    const prefix = questionText.substring(0, 50).replace(/[^a-zA-Z0-9]/g, '');
+    const suffix = question.is_calculation ? '_calc' : '_mcq';
+    return `${prefix}${suffix}`;
   }
 }
 

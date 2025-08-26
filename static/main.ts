@@ -3,9 +3,11 @@ import { formatBankName } from '@/utils/bankNames';
 import { evaluateAnswer, getCorrectAnswerText, formatExplanation } from '@/utils/answers';
 import { banks } from './banks';
 import { questionRenderer } from './question_renderer';
+import { QuestionStatisticsComponent } from '../src/components/questionStatistics';
 
 const bankFiles: QuestionBank = banks;
 let banksPopulated = false;
+let questionStatsComponent: QuestionStatisticsComponent | null = null;
 
 // Add event handlers for question buttons
 let currentQuestion: Question | null = null;
@@ -36,10 +38,9 @@ export function init(): void {
     revealBtn.addEventListener('click', toggleReveal);
   }
 
-  const statsModal = document.getElementById('statsModal');
-  if (statsModal) {
-    statsModal.classList.remove('show');
-  }
+  // Initialize question statistics component
+  questionStatsComponent = new QuestionStatisticsComponent(bankFiles);
+  questionStatsComponent.render('statsArea');
 
   const params = new URLSearchParams(window.location.search);
   if (params.get('isStandAlone') === 'true') {
@@ -76,12 +77,9 @@ function populateBankSelects(data: QuestionBank): void {
   const bankSelect = document.getElementById(
     'bankSelect'
   ) as HTMLSelectElement | null;
-  const statsSelect = document.getElementById(
-    'statsBankSelect'
-  ) as HTMLSelectElement | null;
 
-  if (!bankSelect && !statsSelect) {
-    console.warn('Bank select elements not found');
+  if (!bankSelect) {
+    console.warn('Bank select element not found');
     return;
   }
 
@@ -90,18 +88,10 @@ function populateBankSelects(data: QuestionBank): void {
     .sort();
 
   names.forEach(name => {
-    if (bankSelect) {
-      const opt1 = document.createElement('option');
-      opt1.value = name;
-      opt1.textContent = formatBankName(name);
-      bankSelect.appendChild(opt1);
-    }
-    if (statsSelect) {
-      const opt2 = document.createElement('option');
-      opt2.value = name;
-      opt2.textContent = formatBankName(name);
-      statsSelect.appendChild(opt2);
-    }
+    const opt = document.createElement('option');
+    opt.value = name;
+    opt.textContent = formatBankName(name);
+    bankSelect.appendChild(opt);
   });
 
   // Mark as populated to prevent duplicates
@@ -254,6 +244,14 @@ function getUserAnswer(): string {
   }
 }
 
+function generateQuestionId(question: Question): string {
+  // Create a consistent ID based on question content (first 50 chars of question text + calculation flag)
+  const questionText = question.question_text || '';
+  const prefix = questionText.substring(0, 50).replace(/[^a-zA-Z0-9]/g, '');
+  const suffix = question.is_calculation ? '_calc' : '_mcq';
+  return `${prefix}${suffix}`;
+}
+
 function toggleCheck(): void {
   if (!currentQuestion || !questionRenderer) {
     return;
@@ -266,6 +264,18 @@ function toggleCheck(): void {
   } else {
     const userAnswer = getUserAnswer();
     questionRenderer.displayAnswer(currentQuestion, 'check', userAnswer);
+    
+    // Record statistics when user checks their answer
+    if (userAnswer && questionStatsComponent) {
+      const bankSelect = document.getElementById('bankSelect') as HTMLSelectElement;
+      if (bankSelect && bankSelect.value) {
+        const bankName = bankSelect.value;
+        // Generate a question ID based on the question content for consistency
+        const questionId = generateQuestionId(currentQuestion);
+        const isCorrect = evaluateAnswer(currentQuestion, userAnswer);
+        questionStatsComponent.recordQuestionAttempt(bankName, questionId, isCorrect);
+      }
+    }
   }
 }
 
