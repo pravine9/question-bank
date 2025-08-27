@@ -13,7 +13,10 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'templates/index.html'),
         practice: resolve(__dirname, 'templates/practice.html'),
-        summary: resolve(__dirname, 'templates/summary.html')
+        summary: resolve(__dirname, 'templates/summary.html'),
+        'static/main': resolve(__dirname, 'static/main.ts'),
+        'static/practice': resolve(__dirname, 'static/practice.ts'),
+        'static/summary': resolve(__dirname, 'static/summary.ts')
       },
       external: [
         '/question_banks/calculations_questions.js',
