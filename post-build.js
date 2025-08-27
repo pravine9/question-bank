@@ -29,10 +29,18 @@ function replaceImportsInFile(filePath) {
   if (mainAsset) {
     console.log(`Converting ${mainAsset} import`);
     // Replace the built asset reference from .ts to .js
+    const oldPattern = `import('/question-bank/assets/${mainAsset.replace('.js', '.ts')}')`;
+    const newPattern = `import('/question-bank/assets/${mainAsset}')`;
+    console.log(`Looking for pattern: ${oldPattern}`);
+    console.log(`Replacing with: ${newPattern}`);
+    
+    const beforeCount = (content.match(new RegExp(oldPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
     content = content.replace(
-      new RegExp(`import\\('/question-bank/assets/${mainAsset.replace('.js', '.ts')}'\\)`, 'g'),
-      `import('/question-bank/assets/${mainAsset}')`
+      new RegExp(oldPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+      newPattern
     );
+    const afterCount = (content.match(new RegExp(newPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
+    console.log(`Replaced ${beforeCount} occurrences, found ${afterCount} new occurrences`);
   }
   
   if (practiceAsset) {
