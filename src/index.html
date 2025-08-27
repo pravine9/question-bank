@@ -103,26 +103,6 @@
   <script src="/question_banks/clinical_therapeutics_high_questions.js"></script>
   <script src="/question_banks/clinical_therapeutics_low_questions.js"></script>
   <script src="/question_banks/clinical_therapeutics_medium_questions.js"></script>
-  <script>
-    // Initialize after all scripts load (including question banks)
-    window.addEventListener('load', async () => {
-      try {
-        // Import the main JavaScript file (Vite will handle the correct filename)
-        const mainModule = await import('./pages/main.ts');
-        if (mainModule.init) {
-          mainModule.init();
-        }
-        
-        // Import practice history component
-        const practiceHistoryModule = await import('./components/practiceHistory.ts');
-        if (practiceHistoryModule.PracticeHistoryComponent) {
-          const practiceHistory = new practiceHistoryModule.PracticeHistoryComponent();
-          practiceHistory.render('practiceHistory');
-        }
-      } catch (error) {
-        console.error('Error loading modules:', error);
-      }
-    });
-  </script>
+  <script type="module" src="./main.ts"></script>
 </body>
 </html>

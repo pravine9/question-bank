@@ -13,23 +13,16 @@ export default defineConfig({
         main: resolve(__dirname, 'src/index.html'),
         practice: resolve(__dirname, 'src/practice.html'),
         summary: resolve(__dirname, 'src/summary.html')
-      },
-      external: [
-        '../public/question_banks/calculations_questions.js',
-        '../public/question_banks/clinical_mep_low_questions.js',
-        '../public/question_banks/clinical_mixed_high_questions.js',
-        '../public/question_banks/clinical_mixed_low_questions.js',
-        '../public/question_banks/clinical_mixed_medium_questions.js',
-        '../public/question_banks/clinical_otc_low_questions.js',
-        '../public/question_banks/clinical_therapeutics_high_questions.js',
-        '../public/question_banks/clinical_therapeutics_low_questions.js',
-        '../public/question_banks/clinical_therapeutics_medium_questions.js'
-      ]
+      }
     },
     target: 'es2020',
     minify: 'terser',
     sourcemap: true,
-    copyPublicDir: true
+    copyPublicDir: true,
+    // Ensure TypeScript is properly transpiled
+    esbuild: {
+      target: 'es2020'
+    }
   },
   plugins: [
     {
@@ -70,5 +63,9 @@ export default defineConfig({
   },
   preview: {
     port: 4173
+  },
+  // Ensure TypeScript is properly handled
+  esbuild: {
+    target: 'es2020'
   }
 });
