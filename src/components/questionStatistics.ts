@@ -24,6 +24,7 @@ export class QuestionStatisticsComponent {
   private container: HTMLDivElement | null;
   private bankFiles: QuestionBank;
   private currentStats: BankStatistics | null = null;
+  private currentModalQuestion: Question | null = null;
 
   constructor(bankFiles: QuestionBank) {
     this.container = null;
@@ -92,28 +93,25 @@ export class QuestionStatisticsComponent {
         </div>
 
         <!-- Modal for displaying a single stats question -->
-        <div id="statsModal" class="stats-modal">
-          <div class="modal-backdrop"></div>
-          <div class="modal-dialog">
+        <div id="statsModal" class="review-modal" style="display:none">
+          <div class="modal-content">
             <div class="modal-header">
-              <h3>Question Details</h3>
-              <button id="sqCloseBtn" class="btn-close">&times;</button>
+              <h3>Question Review</h3>
+              <button id="sqCloseBtn" class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
               <div id="sqText" class="question-text"></div>
               <div id="sqTitle" class="question-title"></div>
               <img id="sqImg" class="question-image" alt="Question image" style="display:none;">
               <div id="sqOptions" class="question-options"></div>
-              <div class="calculator-section" style="display:none">
-                <label>Answer:</label>
-                <input type="number" id="sqCalcInput" class="form-input">
-                <span class="unit" id="sqAnswerUnit"></span>
+              <div class="review-answers">
+                <div id="sqAnswer" class="answer"></div>
+                <div id="sqExplanation" class="explanation"></div>
               </div>
             </div>
             <div class="modal-footer">
               <button id="sqRevealBtn" class="btn btn-primary">Show Answer</button>
-              <div id="sqAnswer" class="answer modal"></div>
-              <div id="sqExplanation" class="explanation modal"></div>
+              <button id="sqCloseReviewBtn" class="btn btn-secondary">Close</button>
             </div>
           </div>
         </div>
@@ -162,8 +160,8 @@ export class QuestionStatisticsComponent {
       return;
     }
 
-    // Close modal button
-    if (target.id === 'sqCloseBtn') {
+    // Close modal buttons
+    if (target.id === 'sqCloseBtn' || target.id === 'sqCloseReviewBtn') {
       this.closeModal();
       return;
     }
@@ -192,8 +190,8 @@ export class QuestionStatisticsComponent {
       return;
     }
 
-    // Modal backdrop click
-    if (target.classList.contains('modal-backdrop')) {
+    // Modal backdrop click (clicking outside the modal content)
+    if (target.classList.contains('review-modal')) {
       this.closeModal();
       return;
     }
@@ -252,6 +250,7 @@ export class QuestionStatisticsComponent {
     
     let totalQuestions = 0;
     let attemptedQuestions = 0;
+    let totalAttempts = 0;
     let correctAnswers = 0;
 
     // Flatten all questions from all files
@@ -273,6 +272,7 @@ export class QuestionStatisticsComponent {
 
         if (attempts > 0) {
           attemptedQuestions++;
+          totalAttempts += attempts;
           correctAnswers += correct;
         }
 
@@ -287,7 +287,7 @@ export class QuestionStatisticsComponent {
       });
     });
 
-    const overallAccuracy = attemptedQuestions > 0 ? Math.round((correctAnswers / attemptedQuestions) * 100) : 0;
+    const overallAccuracy = totalAttempts > 0 ? Math.round((correctAnswers / totalAttempts) * 100) : 0;
 
     return {
       bank: bankName,
@@ -403,6 +403,9 @@ export class QuestionStatisticsComponent {
       return;
     }
 
+    // Store the current question for the modal
+    this.currentModalQuestion = question;
+
     // Render question using the question renderer
     if (questionRenderer) {
       questionRenderer.renderQuestion(question, {
@@ -410,8 +413,8 @@ export class QuestionStatisticsComponent {
         title: '#sqTitle',
         img: '#sqImg',
         options: '#sqOptions',
-        input: '.calculator-section',
-        unit: '#sqAnswerUnit',
+        answer: '#sqAnswer',
+        explanation: '#sqExplanation',
         showInput: false, // Don't show input in stats mode
         reviewMode: true
       });
@@ -436,7 +439,6 @@ export class QuestionStatisticsComponent {
     }
 
     // Show modal
-    modal.classList.add('show');
     modal.style.display = 'block';
   }
 
@@ -455,21 +457,34 @@ export class QuestionStatisticsComponent {
       
       if (answerEl) {
         answerEl.style.display = 'none';
+        answerEl.innerHTML = '';
       }
       if (explanationEl) {
         explanationEl.style.display = 'none';
+        explanationEl.innerHTML = '';
       }
       
       revealBtn.textContent = 'Show Answer';
       revealBtn.dataset.revealed = 'false';
     } else {
-      // Show answer - we need the current question for this
-      // For now, we'll implement a basic reveal
-      const answerEl = document.getElementById('sqAnswer');
-      
-      if (answerEl) {
-        answerEl.innerHTML = '<p>Answer functionality will be implemented with question context</p>';
-        answerEl.style.display = 'block';
+      // Show answer and explanation
+      if (this.currentModalQuestion) {
+        const answerEl = document.getElementById('sqAnswer');
+        const explanationEl = document.getElementById('sqExplanation');
+        
+        // Show correct answer
+        if (answerEl) {
+          const correctAnswerText = (window as any).getCorrectAnswerText?.(this.currentModalQuestion) ?? 'Unknown';
+          answerEl.innerHTML = `<strong>Correct Answer:</strong> ${correctAnswerText}${this.currentModalQuestion.answer_unit ? ' ' + this.currentModalQuestion.answer_unit : ''}`;
+          answerEl.style.display = 'block';
+        }
+
+        // Show explanation
+        if (explanationEl && this.currentModalQuestion.why) {
+          const formattedExplanation = (window as any).formatExplanation?.(this.currentModalQuestion.why) ?? this.currentModalQuestion.why;
+          explanationEl.innerHTML = `<strong>Explanation:</strong> ${formattedExplanation}`;
+          explanationEl.style.display = 'block';
+        }
       }
       
       revealBtn.textContent = 'Hide Answer';
@@ -508,9 +523,10 @@ export class QuestionStatisticsComponent {
   private closeModal(): void {
     const modal = document.getElementById('statsModal');
     if (modal) {
-      modal.classList.remove('show');
       modal.style.display = 'none';
     }
+    // Clear the current modal question
+    this.currentModalQuestion = null;
   }
 
   private showError(message: string): void {
@@ -614,10 +630,12 @@ export class QuestionStatisticsComponent {
   private isAnswerCorrect(question: Question, userAnswer: string): boolean {
     // Simple answer checking logic (replicated from evaluateAnswer)
     if (question.is_calculation) {
+      // For calculation questions, compare against correct_answer field
       const userNum = parseFloat(userAnswer);
-      const correctNum = question.correct_answer_number;
-      return !isNaN(userNum) && correctNum !== null && correctNum !== undefined && Math.abs(userNum - correctNum) < 0.01;
+      const correctAnswer = parseFloat(question.correct_answer);
+      return !isNaN(userNum) && !isNaN(correctAnswer) && Math.abs(userNum - correctAnswer) < 0.01;
     } else {
+      // For MCQ questions, compare against correct_answer_number
       const correctNum = question.correct_answer_number;
       return correctNum !== null && correctNum !== undefined && parseInt(userAnswer) === correctNum;
     }
