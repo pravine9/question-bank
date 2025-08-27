@@ -19,7 +19,13 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@templates/*": ["templates/*"],
+      "@pages/*": ["src/pages/*"],
+      "@templates/*": ["src/templates/*"],
+      "@components/*": ["src/components/*"],
+      "@utils/*": ["src/utils/*"],
+      "@styles/*": ["src/styles/*"],
+      "@types/*": ["src/types/*"],
+      "@assets/*": ["src/assets/*"],
       "@question-banks/*": ["public/question_banks/*"]
     }
   },

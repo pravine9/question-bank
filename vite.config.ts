@@ -3,16 +3,16 @@ import { resolve } from 'path';
 import { copyFileSync, mkdirSync, existsSync, readdirSync } from 'fs';
 
 export default defineConfig({
-  base: '/question-bank/',
-  root: '.',
-  publicDir: 'public',
+  base: process.env.NODE_ENV === 'production' ? '/question-bank/' : '/',
+  root: 'src',
+  publicDir: '../public',
   build: {
     outDir: 'dist',
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'templates/index.html'),
-        practice: resolve(__dirname, 'templates/practice.html'),
-        summary: resolve(__dirname, 'templates/summary.html')
+        main: resolve(__dirname, 'src/index.html'),
+        practice: resolve(__dirname, 'src/practice.html'),
+        summary: resolve(__dirname, 'src/summary.html')
       },
       external: [
         '/question_banks/calculations_questions.js',
@@ -54,7 +54,13 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
-      '@templates': resolve(__dirname, 'templates'),
+      '@pages': resolve(__dirname, 'src/pages'),
+      '@templates': resolve(__dirname, 'src/templates'),
+      '@components': resolve(__dirname, 'src/components'),
+      '@utils': resolve(__dirname, 'src/utils'),
+      '@styles': resolve(__dirname, 'src/styles'),
+      '@types': resolve(__dirname, 'src/types'),
+      '@assets': resolve(__dirname, 'src/assets'),
       '@question-banks': resolve(__dirname, 'public/question_banks')
     }
   },

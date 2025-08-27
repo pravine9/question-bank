@@ -66,9 +66,9 @@ function replaceImportsInFile(filePath) {
 
 // Process all template files
 const templateFiles = [
-  'dist/templates/index.html',
-  'dist/templates/practice.html',
-  'dist/templates/summary.html'
+  'dist/src/index.html',
+  'dist/src/practice.html',
+  'dist/src/summary.html'
 ];
 
 templateFiles.forEach(file => {

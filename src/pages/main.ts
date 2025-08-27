@@ -3,7 +3,7 @@ import { formatBankName } from '@/utils/bankNames';
 import { evaluateAnswer, getCorrectAnswerText, formatExplanation } from '@/utils/answers';
 import { banks } from './banks';
 import { questionRenderer } from './question_renderer';
-import { QuestionStatisticsComponent } from '../src/components/questionStatistics';
+import { QuestionStatisticsComponent } from '@components/questionStatistics';
 
 const bankFiles: QuestionBank = banks;
 let banksPopulated = false;

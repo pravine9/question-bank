@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Test Summary - GPhC Question Bank</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
-  <link rel="stylesheet" href="/src/styles/consolidated.css">
-  <link rel="stylesheet" href="/src/styles/question.css">
-  <link rel="stylesheet" href="/src/styles/summary.css">
+  <link rel="stylesheet" href="./styles/consolidated.css">
+  <link rel="stylesheet" href="./styles/question.css">
+  <link rel="stylesheet" href="./styles/summary.css">
 </head>
 <body>
   <div class="container">
@@ -103,7 +103,7 @@
     // Initialize after all scripts load (including question banks)
     window.addEventListener('load', async () => {
       try {
-        const { SummaryManager } = await import('/static/summary.ts');
+        const { SummaryManager } = await import('./pages/summary.ts');
         new SummaryManager();
       } catch (error) {
         console.error('Error loading summary module:', error);

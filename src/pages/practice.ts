@@ -11,7 +11,7 @@ import { evaluateAnswer, getCorrectAnswerText, formatExplanation } from '@/utils
 import { PracticeTestTimer, showTimerWarning, type TimerWarning } from '@/utils/timer';
 import { banks } from './banks';
 import { questionRenderer } from './question_renderer';
-import { QuestionStatisticsComponent } from '../src/components/questionStatistics';
+import { QuestionStatisticsComponent } from '@components/questionStatistics';
 
 // Make utility functions globally available for questionRenderer
 (window as any).evaluateAnswer = evaluateAnswer;

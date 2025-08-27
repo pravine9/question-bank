@@ -1,6 +1,6 @@
 import type { Question, QuestionBank } from '@/types/question';
 import { formatBankName } from '@/utils/bankNames';
-import { questionRenderer } from '../../static/question_renderer';
+import { questionRenderer } from '@pages/question_renderer';
 
 interface QuestionStatistics {
   questionId: string;

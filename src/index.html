@@ -15,8 +15,8 @@
   
   <title>GPhC Question Bank - Pharmacy Exam Preparation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
-  <link rel="stylesheet" href="/src/styles/consolidated.css">
-  <link rel="stylesheet" href="/src/styles/question.css">
+  <link rel="stylesheet" href="./styles/consolidated.css">
+  <link rel="stylesheet" href="./styles/question.css">
 </head>
 <body>
   <div class="container">
@@ -108,13 +108,13 @@
     window.addEventListener('load', async () => {
       try {
         // Import the main JavaScript file (Vite will handle the correct filename)
-        const mainModule = await import('/static/main.ts');
+        const mainModule = await import('./pages/main.ts');
         if (mainModule.init) {
           mainModule.init();
         }
         
         // Import practice history component
-        const practiceHistoryModule = await import('/src/components/practiceHistory.ts');
+        const practiceHistoryModule = await import('./components/practiceHistory.ts');
         if (practiceHistoryModule.PracticeHistoryComponent) {
           const practiceHistory = new practiceHistoryModule.PracticeHistoryComponent();
           practiceHistory.render('practiceHistory');
