@@ -108,13 +108,13 @@
     window.addEventListener('load', async () => {
       try {
         // Import the main JavaScript file (Vite will handle the correct filename)
-        const mainModule = await import('/assets/main-Bzh6PzLQ.js');
+        const mainModule = await import('/static/main.ts');
         if (mainModule.init) {
           mainModule.init();
         }
         
         // Import practice history component
-        const practiceHistoryModule = await import('/assets/practiceHistory-Bz7lSwcg.js');
+        const practiceHistoryModule = await import('/src/components/practiceHistory.ts');
         if (practiceHistoryModule.PracticeHistoryComponent) {
           const practiceHistory = new practiceHistoryModule.PracticeHistoryComponent();
           practiceHistory.render('practiceHistory');

@@ -103,7 +103,7 @@
     // Initialize after all scripts load (including question banks)
     window.addEventListener('load', async () => {
       try {
-        const { SummaryManager } = await import('/assets/summary-DtnDCkzv.js');
+        const { SummaryManager } = await import('/static/summary.ts');
         new SummaryManager();
       } catch (error) {
         console.error('Error loading summary module:', error);
