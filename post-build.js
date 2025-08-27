@@ -5,8 +5,14 @@ import { resolve } from 'path';
 function findBuiltAsset(pattern) {
   const assetsDir = resolve('dist/assets');
   const files = readdirSync(assetsDir);
-  // Look for both .js and .ts files since Vite might output .ts files
-  return files.find(file => file.includes(pattern) && (file.endsWith('.js') || file.endsWith('.ts')));
+  // Look for .js files first (after renaming), then fall back to .ts files
+  const jsFile = files.find(file => file.includes(pattern) && file.endsWith('.js'));
+  if (jsFile) return jsFile;
+  
+  const tsFile = files.find(file => file.includes(pattern) && file.endsWith('.ts'));
+  if (tsFile) return tsFile.replace('.ts', '.js');
+  
+  return null;
 }
 
 // Function to replace imports in HTML files
@@ -83,22 +89,7 @@ function replaceImportsInFile(filePath) {
   console.log(`Updated ${filePath}`);
 }
 
-// Process all template files
-const templateFiles = [
-  'dist/index.html',
-  'dist/practice.html',
-  'dist/summary.html'
-];
-
-templateFiles.forEach(file => {
-  try {
-    replaceImportsInFile(file);
-  } catch (error) {
-    console.warn(`Could not process ${file}:`, error.message);
-  }
-});
-
-// Rename .ts files to .js files
+// Rename .ts files to .js files FIRST
 console.log('Renaming .ts files to .js files...');
 const assetsDir = resolve('dist/assets');
 const files = readdirSync(assetsDir);
@@ -111,6 +102,21 @@ tsFiles.forEach(file => {
   if (existsSync(tsPath)) {
     renameSync(tsPath, jsPath);
     console.log(`Renamed ${file} to ${file.replace('.ts', '.js')}`);
+  }
+});
+
+// THEN process all template files
+const templateFiles = [
+  'dist/index.html',
+  'dist/practice.html',
+  'dist/summary.html'
+];
+
+templateFiles.forEach(file => {
+  try {
+    replaceImportsInFile(file);
+  } catch (error) {
+    console.warn(`Could not process ${file}:`, error.message);
   }
 });
 
