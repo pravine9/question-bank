@@ -198,8 +198,9 @@ export class QuestionStatisticsComponent {
     }
 
     // View question button in table
-    if (target.classList.contains('view-question-btn')) {
-      const questionId = target.dataset.questionId;
+    const btn = (event.target as HTMLElement).closest('.view-question-btn') as HTMLElement | null;
+    if (btn) {
+      const questionId = btn.dataset.questionId;
       if (questionId) {
         this.handleViewQuestion(questionId);
       }
