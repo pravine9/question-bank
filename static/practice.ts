@@ -387,9 +387,8 @@ export class PracticeManager {
       
       // Record statistics when user checks their answer
       if (userAnswer) {
-        const questionId = question.id.toString();
         const isCorrect = evaluateAnswer(question, userAnswer);
-        this.questionStatsComponent.recordQuestionAttempt(this.state.bank, questionId, isCorrect);
+        this.questionStatsComponent.recordQuestionAttempt(this.state.bank, question.id.toString(), isCorrect);
       }
     }
   }

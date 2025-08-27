@@ -35,23 +35,40 @@ export class QuestionStatisticsComponent {
 
   private cleanupLegacyStats(): void {
     try {
-      const keysToRemove: string[] = [];
+      const keysToDelete: string[] = [];
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (key && key.startsWith('question_stats_')) {
           const data = localStorage.getItem(key);
+          if (!data) {
+            keysToDelete.push(key);
+            continue;
+          }
+
           try {
-            const parsed = JSON.parse(data || '{}');
-            const allNumeric = Object.keys(parsed).every(id => /^[0-9]+$/.test(id));
-            if (!allNumeric) {
-              keysToRemove.push(key);
+            const parsed = JSON.parse(data);
+            let changed = false;
+
+            Object.keys(parsed).forEach(id => {
+              if (!/^[0-9]+$/.test(id)) {
+                delete parsed[id];
+                changed = true;
+              }
+            });
+
+            const remainingKeys = Object.keys(parsed);
+            if (remainingKeys.length === 0) {
+              keysToDelete.push(key);
+            } else if (changed) {
+              localStorage.setItem(key, JSON.stringify(parsed));
             }
           } catch {
-            keysToRemove.push(key);
+            keysToDelete.push(key);
           }
         }
       }
-      keysToRemove.forEach(k => localStorage.removeItem(k));
+
+      keysToDelete.forEach(k => localStorage.removeItem(k));
     } catch (err) {
       console.warn('Failed to clean up legacy question stats:', err);
     }
