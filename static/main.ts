@@ -271,14 +271,6 @@ function getUserAnswer(): string {
   }
 }
 
-function generateQuestionId(question: Question): string {
-  // Create a consistent ID based on question content (first 50 chars of question text + calculation flag)
-  const questionText = question.text || '';
-  const prefix = questionText.substring(0, 50).replace(/[^a-zA-Z0-9]/g, '');
-  const suffix = question.is_calculation ? '_calc' : '_mcq';
-  return `${prefix}${suffix}`;
-}
-
 function toggleCheck(): void {
   if (!currentQuestion || !questionRenderer) {
     return;
@@ -297,8 +289,8 @@ function toggleCheck(): void {
       const bankSelect = document.getElementById('bankSelect') as HTMLSelectElement;
       if (bankSelect && bankSelect.value) {
         const bankName = bankSelect.value;
-        // Generate a question ID based on the question content for consistency
-        const questionId = generateQuestionId(currentQuestion);
+        // Use the question's id for consistent tracking
+        const questionId = currentQuestion.id.toString();
         const isCorrect = evaluateAnswer(currentQuestion, userAnswer);
         questionStatsComponent.recordQuestionAttempt(bankName, questionId, isCorrect);
       }
