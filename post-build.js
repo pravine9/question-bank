@@ -1,18 +1,13 @@
-import { readFileSync, writeFileSync, readdirSync, renameSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, readdirSync, existsSync } from 'fs';
 import { resolve } from 'path';
 
 // Function to find built asset files
 function findBuiltAsset(pattern) {
   const assetsDir = resolve('dist/assets');
   const files = readdirSync(assetsDir);
-  // Look for .js files first (after renaming), then fall back to .ts files
+  // Look for .js files (Vite should have already compiled TypeScript to JavaScript)
   const jsFile = files.find(file => file.includes(pattern) && file.endsWith('.js'));
-  if (jsFile) return jsFile;
-  
-  const tsFile = files.find(file => file.includes(pattern) && file.endsWith('.ts'));
-  if (tsFile) return tsFile.replace('.ts', '.js');
-  
-  return null;
+  return jsFile;
 }
 
 // Function to replace imports in HTML files
@@ -21,8 +16,6 @@ function replaceImportsInFile(filePath) {
   
   let content = readFileSync(filePath, 'utf8');
   
-
-  
   // Find built assets
   const mainAsset = findBuiltAsset('main');
   const practiceAsset = findBuiltAsset('practice');
@@ -30,42 +23,6 @@ function replaceImportsInFile(filePath) {
   const practiceHistoryAsset = findBuiltAsset('practiceHistory');
   
   console.log('Assets found:', { mainAsset, practiceAsset, summaryAsset, practiceHistoryAsset });
-  
-  // Replace imports - convert .ts to .js and update paths
-  if (mainAsset) {
-    console.log(`Converting ${mainAsset} import`);
-    // Replace the built asset reference from .ts to .js
-    const oldPattern = `import('/question-bank/assets/${mainAsset.replace('.js', '.ts')}')`;
-    const newPattern = `import('/question-bank/assets/${mainAsset}')`;
-    content = content.replace(
-      new RegExp(oldPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
-      newPattern
-    );
-  }
-  
-  if (practiceAsset) {
-    console.log(`Converting ${practiceAsset} import`);
-    content = content.replace(
-      new RegExp(`import\\('/question-bank/assets/${practiceAsset.replace('.js', '.ts')}'\\)`, 'g'),
-      `import('/question-bank/assets/${practiceAsset}')`
-    );
-  }
-  
-  if (summaryAsset) {
-    console.log(`Converting ${summaryAsset} import`);
-    content = content.replace(
-      new RegExp(`import\\('/question-bank/assets/${summaryAsset.replace('.js', '.ts')}'\\)`, 'g'),
-      `import('/question-bank/assets/${summaryAsset}')`
-    );
-  }
-  
-  if (practiceHistoryAsset) {
-    console.log(`Converting ${practiceHistoryAsset} import`);
-    content = content.replace(
-      new RegExp(`import\\('/question-bank/assets/${practiceHistoryAsset.replace('.js', '.ts')}'\\)`, 'g'),
-      `import('/question-bank/assets/${practiceHistoryAsset}')`
-    );
-  }
   
   // Fix question bank script paths for production
   content = content.replace(
@@ -83,23 +40,7 @@ function replaceImportsInFile(filePath) {
   console.log(`Updated ${filePath}`);
 }
 
-// Rename .ts files to .js files FIRST
-console.log('Renaming .ts files to .js files...');
-const assetsDir = resolve('dist/assets');
-const files = readdirSync(assetsDir);
-const tsFiles = files.filter(file => file.endsWith('.ts'));
-
-tsFiles.forEach(file => {
-  const tsPath = resolve(assetsDir, file);
-  const jsPath = resolve(assetsDir, file.replace('.ts', '.js'));
-  
-  if (existsSync(tsPath)) {
-    renameSync(tsPath, jsPath);
-    console.log(`Renamed ${file} to ${file.replace('.ts', '.js')}`);
-  }
-});
-
-// THEN process all template files
+// Process all template files
 const templateFiles = [
   'dist/index.html',
   'dist/practice.html',
