@@ -29,7 +29,7 @@
   "ignorePatterns": [
     "dist/**/*",
     "node_modules/**/*",
-    "question_banks/**/*",
+    "public/question_banks/**/*",
     "*.min.js"
   ]
 }

@@ -8,7 +8,6 @@ interface QuestionStatistics {
   attempts: number;
   correct: number;
   wrong: number;
-  accuracyRate: number;
 }
 
 interface BankStatistics {
@@ -25,6 +24,7 @@ export class QuestionStatisticsComponent {
   private bankFiles: QuestionBank;
   private currentStats: BankStatistics | null = null;
   private currentModalQuestion: Question | null = null;
+  private filteredRows: HTMLTableRowElement[] = [];
 
   constructor(bankFiles: QuestionBank) {
     this.container = null;
@@ -120,10 +120,34 @@ export class QuestionStatisticsComponent {
             </div>
           </div>
           
+          <div class="filter-section">
+            <div class="filter-title">Filter by:</div>
+            <div class="filter-options">
+              <label class="filter-option">
+                <input type="checkbox" id="filterAttempted">
+                <span class="filter-text">Attempted</span>
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" id="filterUnattempted">
+                <span class="filter-text">Unattempted</span>
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" id="filterCorrect">
+                <span class="filter-text">Correct</span>
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" id="filterIncorrect">
+                <span class="filter-text">Incorrect</span>
+              </label>
+            </div>
+            <button type="button" class="clear-filter-btn">Clear</button>
+          </div>
+          
           <table id="statsTable" class="stats-table">
             <thead>
               <tr>
                 <th>Question</th>
+                <th>ID</th>
                 <th>Attempts</th>
                 <th>Correct</th>
                 <th>Wrong</th>
@@ -191,6 +215,9 @@ export class QuestionStatisticsComponent {
     // Use event delegation for better performance
     this.container.addEventListener('click', this.handleClick.bind(this));
     this.container.addEventListener('keydown', this.handleKeydown.bind(this));
+    
+    // Setup filter functionality
+    this.setupFilterHandlers();
   }
 
   private handleClick(event: Event): void {
@@ -224,14 +251,7 @@ export class QuestionStatisticsComponent {
       return;
     }
 
-    // Reset question stats button
-    if (target.classList.contains('reset-question-btn')) {
-      const questionId = target.dataset.questionId;
-      if (questionId) {
-        this.handleResetQuestionStats(questionId);
-      }
-      return;
-    }
+
 
     // Modal backdrop click (clicking outside the modal content)
     if (target.classList.contains('review-modal')) {
@@ -311,7 +331,6 @@ export class QuestionStatisticsComponent {
         const attempts = individualData.attempts + practiceData.attempts;
         const correct = individualData.correct + practiceData.correct;
         const wrong = individualData.wrong + practiceData.wrong;
-        const accuracyRate = attempts > 0 ? Math.round((correct / attempts) * 100) : 0;
 
         if (attempts > 0) {
           attemptedQuestions++;
@@ -324,8 +343,7 @@ export class QuestionStatisticsComponent {
           question,
           attempts,
           correct,
-          wrong,
-          accuracyRate
+          wrong
         });
       });
     });
@@ -390,13 +408,20 @@ export class QuestionStatisticsComponent {
     }
 
     tbody.innerHTML = '';
+    this.filteredRows = [];
 
     questionStats.forEach((stat, index) => {
       const row = tbody.insertRow();
+      this.filteredRows.push(row);
       
       // Question number
       const questionCell = row.insertCell();
       questionCell.textContent = `Question ${index + 1}`;
+      
+      // Question ID
+      const idCell = row.insertCell();
+      idCell.textContent = stat.questionId;
+      idCell.className = 'question-id';
       
       // Attempts
       const attemptsCell = row.insertCell();
@@ -418,13 +443,11 @@ export class QuestionStatisticsComponent {
         <button class="btn btn-sm btn-secondary view-question-btn" data-question-id="${stat.questionId}">
           View
         </button>
-        ${stat.attempts > 0 ? `
-          <button class="btn btn-sm btn-danger reset-question-btn" data-question-id="${stat.questionId}" title="Reset statistics for this question">
-            Reset
-          </button>
-        ` : ''}
       `;
     });
+
+    // Apply initial filter (show all questions by default)
+    this.applyFilters();
   }
 
   private handleViewQuestion(questionId: string): void {
@@ -535,33 +558,7 @@ export class QuestionStatisticsComponent {
     }
   }
 
-  private handleResetQuestionStats(questionId: string): void {
-    if (!this.currentStats) {
-      return;
-    }
 
-    const confirmReset = confirm('Are you sure you want to reset the statistics for this question? This cannot be undone.');
-    if (!confirmReset) {
-      return;
-    }
-
-    try {
-      const key = `question_stats_${this.currentStats.bank}`;
-      const userData = this.getQuestionUserData(this.currentStats.bank);
-      
-      // Remove the specific question data
-      delete userData[questionId];
-      
-      // Save updated data
-      localStorage.setItem(key, JSON.stringify(userData));
-      
-      // Reload statistics
-      this.loadBankStatistics(this.currentStats.bank);
-    } catch (error) {
-      console.error('Failed to reset question statistics:', error);
-      this.showError('Failed to reset statistics. Please try again.');
-    }
-  }
 
   private closeModal(): void {
     const modal = document.getElementById('statsModal');
@@ -570,6 +567,85 @@ export class QuestionStatisticsComponent {
     }
     // Clear the current modal question
     this.currentModalQuestion = null;
+  }
+
+  private setupFilterHandlers(): void {
+    const clearFilterBtn = document.querySelector('.clear-filter-btn');
+    if (clearFilterBtn) {
+      clearFilterBtn.addEventListener('click', () => this.clearFilters());
+    }
+
+    // Filter event listeners
+    const filterAttempted = document.getElementById('filterAttempted') as HTMLInputElement;
+    const filterUnattempted = document.getElementById('filterUnattempted') as HTMLInputElement;
+    const filterCorrect = document.getElementById('filterCorrect') as HTMLInputElement;
+    const filterIncorrect = document.getElementById('filterIncorrect') as HTMLInputElement;
+
+    if (filterAttempted) {
+      filterAttempted.addEventListener('change', () => this.applyFilters());
+    }
+    if (filterUnattempted) {
+      filterUnattempted.addEventListener('change', () => this.applyFilters());
+    }
+    if (filterCorrect) {
+      filterCorrect.addEventListener('change', () => this.applyFilters());
+    }
+    if (filterIncorrect) {
+      filterIncorrect.addEventListener('change', () => this.applyFilters());
+    }
+  }
+
+  private applyFilters(): void {
+    const filterAttempted = document.getElementById('filterAttempted') as HTMLInputElement;
+    const filterUnattempted = document.getElementById('filterUnattempted') as HTMLInputElement;
+    const filterCorrect = document.getElementById('filterCorrect') as HTMLInputElement;
+    const filterIncorrect = document.getElementById('filterIncorrect') as HTMLInputElement;
+
+    if (!this.currentStats) return;
+
+    // If no filters are selected, show all questions
+    const hasActiveFilters = (filterAttempted?.checked || filterUnattempted?.checked || filterCorrect?.checked || filterIncorrect?.checked);
+
+    this.filteredRows.forEach((row, index) => {
+      const questionStat = this.currentStats!.questionStats[index];
+      const attempts = questionStat.attempts;
+      const correct = questionStat.correct;
+      const wrong = questionStat.wrong;
+      
+      let shouldShow = false;
+      
+      if (!hasActiveFilters) {
+        // If no filters are selected, show all questions
+        shouldShow = true;
+      } else {
+        // Apply selected filters
+        if (attempts > 0 && filterAttempted?.checked) {
+          shouldShow = true;
+        } else if (attempts === 0 && filterUnattempted?.checked) {
+          shouldShow = true;
+        } else if (correct > 0 && filterCorrect?.checked) {
+          shouldShow = true;
+        } else if (wrong > 0 && filterIncorrect?.checked) {
+          shouldShow = true;
+        }
+      }
+      
+      row.style.display = shouldShow ? '' : 'none';
+    });
+  }
+
+  private clearFilters(): void {
+    const filterAttempted = document.getElementById('filterAttempted') as HTMLInputElement;
+    const filterUnattempted = document.getElementById('filterUnattempted') as HTMLInputElement;
+    const filterCorrect = document.getElementById('filterCorrect') as HTMLInputElement;
+    const filterIncorrect = document.getElementById('filterIncorrect') as HTMLInputElement;
+
+    if (filterAttempted) filterAttempted.checked = false;
+    if (filterUnattempted) filterUnattempted.checked = false;
+    if (filterCorrect) filterCorrect.checked = false;
+    if (filterIncorrect) filterIncorrect.checked = false;
+
+    this.applyFilters();
   }
 
   private showError(message: string): void {
@@ -610,6 +686,7 @@ export class QuestionStatisticsComponent {
     try {
       const history = localStorage.getItem('practice_history');
       if (!history) {
+        console.log(`No practice history found for bank: ${bankName}`);
         return {};
       }
 
@@ -629,6 +706,7 @@ export class QuestionStatisticsComponent {
 
         // Process each question in the test
         result.questions.forEach((question: Question, index: number) => {
+          // Answers are stored by question index, not question ID
           const userAnswer = result.answers[index];
           if (!userAnswer) {
             return; // Skip unanswered questions

@@ -1,4 +1,5 @@
 import { EMPTY_HISTORY } from '../utils/history';
+import { formatTimeFromMinutes, formatTestDuration } from '../utils/timeFormat';
 import type { PracticeHistory, PracticeResult } from '@/types/question';
 
 export class PracticeHistoryComponent {
@@ -72,8 +73,8 @@ export class PracticeHistoryComponent {
             <div class="stat-label">Best Score</div>
           </div>
           <div class="stat-card">
-            <div class="stat-number">${Math.round(this.history.totalTime)}m</div>
-            <div class="stat-label">Total Time</div>
+            <div class="stat-number">${formatTimeFromMinutes(this.history.totalTime)}</div>
+            <div class="stat-label">Total Time Spent</div>
           </div>
         </div>
 
@@ -90,6 +91,7 @@ export class PracticeHistoryComponent {
   private generateTestResultHTML(result: PracticeResult): string {
     const formattedDate = this.dateFormatter.format(new Date(result.date));
     const duration = Math.round(result.duration);
+    const formattedDuration = formatTestDuration(duration);
     const scorePercentage = Math.round(result.score); // Score is already a percentage (0-100)
     const scoreClass = this.getScoreClass(scorePercentage);
     const scoreDescription = this.getScoreDescription(scorePercentage);
@@ -101,7 +103,7 @@ export class PracticeHistoryComponent {
             <div class="test-bank">${this.formatBankName(result.bank)}</div>
             <div class="test-meta">
               <span class="test-date" aria-label="Test taken on ${formattedDate}">${formattedDate}</span>
-              <span class="test-duration" aria-label="Duration: ${duration} minutes">${duration}m</span>
+              <span class="test-duration" aria-label="Duration: ${formattedDuration}">${formattedDuration}</span>
             </div>
           </div>
           <div class="test-header-actions">
@@ -280,6 +282,7 @@ export class PracticeHistoryComponent {
     const totalScore = results.reduce((sum, result) => sum + result.score, 0);
     const averageScore = totalTests > 0 ? Math.round(totalScore / totalTests) : 0; // Score is already a percentage
     const bestScore = results.length > 0 ? Math.max(...results.map(r => r.score)) : 0;
+    // Calculate total actual time spent across all tests (not time limits)
     const totalTime = results.reduce((sum, result) => sum + result.duration, 0);
 
     const stats = {

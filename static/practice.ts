@@ -640,7 +640,21 @@ export class PracticeManager {
     if (!this.state) {return;}
 
     let correctCount = 0;
-    const duration = Math.floor((Date.now() - this.state.startTime) / 60000); // Calculate elapsed minutes
+    const duration = Math.floor((Date.now() - this.state.startTime) / 60000); // Calculate actual time spent in minutes
+    
+    // Validate duration - ensure it's reasonable (not negative or excessively large)
+    const maxReasonableDuration = this.state.totalQuestions * 10; // Max 10 minutes per question as a sanity check
+    const validatedDuration = Math.max(0, Math.min(duration, maxReasonableDuration));
+    
+    // Log duration calculation for debugging
+    console.log(`Test duration calculation:`, {
+      startTime: new Date(this.state.startTime).toISOString(),
+      endTime: new Date().toISOString(),
+      rawDuration: duration,
+      validatedDuration: validatedDuration,
+      totalQuestions: this.state.totalQuestions,
+      maxReasonableDuration: maxReasonableDuration
+    });
 
     // Check answers
     for (let i = 0; i < this.state.questions.length; i++) {
@@ -662,7 +676,7 @@ export class PracticeManager {
       totalQuestions: this.state.totalQuestions,
       correctAnswers: correctCount,
       score,
-      duration,
+      duration: validatedDuration,
       date: new Date().toISOString(),
       flaggedQuestions: this.state.flagged.size,
       questions: this.state.questions,

@@ -20,7 +20,7 @@
       "@/*": ["src/*"],
 
       "@templates/*": ["templates/*"],
-      "@question-banks/*": ["question_banks/*"]
+      "@question-banks/*": ["public/question_banks/*"]
     }
   },
   "include": [
@@ -32,6 +32,6 @@
     "node_modules",
     "dist",
     "templates",
-    "question_banks"
+    "public/question_banks"
   ]
 }

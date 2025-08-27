@@ -16,15 +16,15 @@ export default defineConfig({
         summary: resolve(__dirname, 'templates/summary.html')
       },
       external: [
-        './question_banks/calculations_questions.js',
-        './question_banks/clinical_mep_low_questions.js',
-        './question_banks/clinical_mixed_high_questions.js',
-        './question_banks/clinical_mixed_low_questions.js',
-        './question_banks/clinical_mixed_medium_questions.js',
-        './question_banks/clinical_otc_low_questions.js',
-        './question_banks/clinical_therapeutics_high_questions.js',
-        './question_banks/clinical_therapeutics_low_questions.js',
-        './question_banks/clinical_therapeutics_medium_questions.js'
+        '/question_banks/calculations_questions.js',
+        '/question_banks/clinical_mep_low_questions.js',
+        '/question_banks/clinical_mixed_high_questions.js',
+        '/question_banks/clinical_mixed_low_questions.js',
+        '/question_banks/clinical_mixed_medium_questions.js',
+        '/question_banks/clinical_otc_low_questions.js',
+        '/question_banks/clinical_therapeutics_high_questions.js',
+        '/question_banks/clinical_therapeutics_low_questions.js',
+        '/question_banks/clinical_therapeutics_medium_questions.js'
       ]
     },
     target: 'es2015',
@@ -46,9 +46,9 @@ export default defineConfig({
           if (!existsSync(distQuestionBanks)) {
             mkdirSync(distQuestionBanks, { recursive: true });
           }
-          const questionBankFiles = readdirSync('question_banks').filter(f => f.endsWith('.js'));
+          const questionBankFiles = readdirSync('public/question_banks').filter(f => f.endsWith('.js'));
           questionBankFiles.forEach(file => {
-            copyFileSync(`question_banks/${file}`, `${distQuestionBanks}/${file}`);
+            copyFileSync(`public/question_banks/${file}`, `${distQuestionBanks}/${file}`);
           });
 
           // Copy static files
@@ -83,7 +83,7 @@ export default defineConfig({
       '@': resolve(__dirname, 'src'),
 
       '@templates': resolve(__dirname, 'templates'),
-      '@question-banks': resolve(__dirname, 'question_banks')
+      '@question-banks': resolve(__dirname, 'public/question_banks')
     }
   },
   server: {
