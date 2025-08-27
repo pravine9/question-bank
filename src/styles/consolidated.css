@@ -587,9 +587,7 @@ body {
   flex: 1;
 }
 
-/* ===== PRACTICE SECTION STYLES ===== */
-.practice-section,
-.stats-section {
+.practice-section {
   background-color: var(--color-white);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-md);
@@ -598,7 +596,6 @@ body {
   border: 1px solid var(--color-gray-200);
 }
 
-/* ===== STATISTICS SECTION STYLES ===== */
 .question-statistics {
   background-color: var(--color-white);
   border-radius: var(--radius-xl);
@@ -913,8 +910,7 @@ body {
 
 
 
-.practice-section h2,
-.stats-section h2 {
+.practice-section h2 {
   margin: 0 0 var(--space-6) 0;
   color: var(--color-gray-900);
   font-size: var(--font-size-xl);
@@ -1387,8 +1383,11 @@ body {
     padding: var(--space-6) var(--space-4);
   }
   
-  .practice-section,
-  .stats-section {
+  .practice-section {
+    padding: var(--space-6);
+  }
+  
+  .question-statistics {
     padding: var(--space-6);
   }
   
