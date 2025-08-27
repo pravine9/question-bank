@@ -133,12 +133,12 @@ export class SummaryManager {
   }
 
   private populateSummary(): void {
-    if (!this.testResult) return;
+    if (!this.testResult) {return;}
 
     const tbody = document.querySelector('.summary-table tbody') as HTMLTableSectionElement;
     const scoreText = document.getElementById('scoreText') as HTMLElement;
 
-    if (!tbody) return;
+    if (!tbody) {return;}
 
     // Update page title and header with test info
     this.updateTestInfo();
@@ -186,7 +186,7 @@ export class SummaryManager {
     const score = Math.round((correctCount / this.testResult.totalQuestions) * 100);
 
     // Update score display
-    if (scoreText) scoreText.textContent = `You scored ${correctCount}/${this.testResult.totalQuestions} (${score}%)`;
+    if (scoreText) {scoreText.textContent = `You scored ${correctCount}/${this.testResult.totalQuestions} (${score}%)`;}
 
     // Add review handlers
     tbody.addEventListener('click', (e) => {
@@ -269,7 +269,7 @@ export class SummaryManager {
     const filterIncorrect = document.getElementById('filterIncorrect') as HTMLInputElement;
     const filterUnanswered = document.getElementById('filterUnanswered') as HTMLInputElement;
 
-    if (!this.testResult) return;
+    if (!this.testResult) {return;}
 
     // If no filters are selected, show all questions
     const hasActiveFilters = (filterCorrect?.checked || filterIncorrect?.checked || filterUnanswered?.checked);
@@ -304,9 +304,9 @@ export class SummaryManager {
     const filterIncorrect = document.getElementById('filterIncorrect') as HTMLInputElement;
     const filterUnanswered = document.getElementById('filterUnanswered') as HTMLInputElement;
 
-    if (filterCorrect) filterCorrect.checked = false;
-    if (filterIncorrect) filterIncorrect.checked = false;
-    if (filterUnanswered) filterUnanswered.checked = false;
+    if (filterCorrect) {filterCorrect.checked = false;}
+    if (filterIncorrect) {filterIncorrect.checked = false;}
+    if (filterUnanswered) {filterUnanswered.checked = false;}
 
     this.applyFilters();
   }
@@ -314,7 +314,7 @@ export class SummaryManager {
 
 
   private openReviewModal(questionNum: number): void {
-    if (!this.testResult || questionNum < 0 || questionNum >= this.testResult.questions.length) return;
+    if (!this.testResult || questionNum < 0 || questionNum >= this.testResult.questions.length) {return;}
 
     this.currentReviewQuestion = questionNum;
     const question = this.testResult.questions[questionNum];
@@ -364,7 +364,7 @@ export class SummaryManager {
   }
 
   private updateReviewNavigation(): void {
-    if (!this.testResult) return;
+    if (!this.testResult) {return;}
 
     const prevQuestionBtn = document.getElementById('prevQuestionBtn') as HTMLButtonElement;
     const nextQuestionBtn = document.getElementById('nextQuestionBtn') as HTMLButtonElement;
@@ -378,7 +378,7 @@ export class SummaryManager {
   }
 
   private navigateReviewQuestion(direction: number): void {
-    if (!this.testResult) return;
+    if (!this.testResult) {return;}
 
     let nextQuestion = this.currentReviewQuestion + direction;
     
@@ -407,7 +407,7 @@ export class SummaryManager {
   }
 
   private updateTestInfo(): void {
-    if (!this.testResult) return;
+    if (!this.testResult) {return;}
 
     const formattedDate = this.dateFormatter.format(new Date(this.testResult.date));
     const bankName = this.formatBankName(this.testResult.bank);

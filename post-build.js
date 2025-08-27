@@ -6,10 +6,7 @@ function findBuiltAsset(pattern) {
   const assetsDir = resolve('dist/assets');
   const files = readdirSync(assetsDir);
   // Look for both .js and .ts files since Vite might output .ts files
-  const found = files.find(file => file.includes(pattern) && (file.endsWith('.js') || file.endsWith('.ts')));
-  console.log(`Looking for pattern "${pattern}":`, files.filter(f => f.includes(pattern)));
-  console.log(`Found:`, found);
-  return found;
+  return files.find(file => file.includes(pattern) && (file.endsWith('.js') || file.endsWith('.ts')));
 }
 
 // Function to replace imports in HTML files

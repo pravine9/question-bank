@@ -138,14 +138,14 @@ export class PracticeHistoryComponent {
   }
 
   private getScoreClass(scorePercentage: number): string {
-    if (scorePercentage >= 70) return 'score-good';
-    if (scorePercentage >= 50) return 'score-average';
+    if (scorePercentage >= 70) {return 'score-good';}
+    if (scorePercentage >= 50) {return 'score-average';}
     return 'score-poor';
   }
 
   private getScoreDescription(scorePercentage: number): string {
-    if (scorePercentage >= 70) return 'Good performance';
-    if (scorePercentage >= 50) return 'Average performance';
+    if (scorePercentage >= 70) {return 'Good performance';}
+    if (scorePercentage >= 50) {return 'Average performance';}
     return 'Needs improvement';
   }
 

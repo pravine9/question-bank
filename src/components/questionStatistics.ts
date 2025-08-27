@@ -601,7 +601,7 @@ export class QuestionStatisticsComponent {
     const filterCorrect = document.getElementById('filterCorrect') as HTMLInputElement;
     const filterIncorrect = document.getElementById('filterIncorrect') as HTMLInputElement;
 
-    if (!this.currentStats) return;
+    if (!this.currentStats) {return;}
 
     // If no filters are selected, show all questions
     const hasActiveFilters = (filterAttempted?.checked || filterUnattempted?.checked || filterCorrect?.checked || filterIncorrect?.checked);
@@ -640,10 +640,10 @@ export class QuestionStatisticsComponent {
     const filterCorrect = document.getElementById('filterCorrect') as HTMLInputElement;
     const filterIncorrect = document.getElementById('filterIncorrect') as HTMLInputElement;
 
-    if (filterAttempted) filterAttempted.checked = false;
-    if (filterUnattempted) filterUnattempted.checked = false;
-    if (filterCorrect) filterCorrect.checked = false;
-    if (filterIncorrect) filterIncorrect.checked = false;
+    if (filterAttempted) {filterAttempted.checked = false;}
+    if (filterUnattempted) {filterUnattempted.checked = false;}
+    if (filterCorrect) {filterCorrect.checked = false;}
+    if (filterIncorrect) {filterIncorrect.checked = false;}
 
     this.applyFilters();
   }

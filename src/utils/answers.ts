@@ -51,7 +51,7 @@ export function getCorrectAnswerText(question: Question): string {
 }
 
 export function formatExplanation(explanation: string): string {
-  if (!explanation) return '';
+  if (!explanation) {return '';}
   
   // Convert \r\n\r\n to double line breaks and \r\n to single line breaks
   return explanation
