@@ -44,10 +44,11 @@ Front End:
 
 ### Practice Mode
 1. Select bank and question count
-2. Click "Start Practice"
+2. Click "Start Practice" (opens in new tab)
 3. Navigate through questions
 4. Flag questions for review
 5. Click "Finish Test" for results
+6. Click "Back to Home" to return to index tab with updated statistics
 
 ### Test Summary
 After completing a practice test, users are redirected to a dedicated summary page (`summary.html`) that provides:
@@ -60,6 +61,11 @@ After completing a practice test, users are redirected to a dedicated summary pa
 - **Simple actions** to review wrong answers or go home
 
 The summary page loads test results from localStorage and provides a read-only review experience without the ability to change answers.
+
+### Tab Management
+- Practice tests open in new tabs to preserve the main index page
+- When returning from test summary, the index tab is automatically refreshed with updated statistics
+- Practice history and question statistics are automatically updated when returning to the index page
 
 ## Adding Questions
 

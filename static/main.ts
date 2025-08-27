@@ -93,6 +93,29 @@ export function init(): void {
   }
 
   questionRenderer.initPdfViewer();
+
+  // Add page visibility change listener to refresh data when returning to the page
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      // Page became visible again, refresh components
+      refreshPageData();
+    }
+  });
+
+  // Also refresh when the page is focused (for better reliability)
+  window.addEventListener('focus', () => {
+    refreshPageData();
+  });
+}
+
+function refreshPageData(): void {
+  // Refresh question statistics if component exists
+  if (questionStatsComponent) {
+    questionStatsComponent.render('statsArea');
+  }
+  
+  // Trigger a custom event that the practice history component can listen to
+  window.dispatchEvent(new CustomEvent('refreshPracticeHistory'));
 }
 
 function populateBankSelects(data: QuestionBank): void {
@@ -236,7 +259,8 @@ function startPractice(): void {
       'You have an unfinished practice session for this bank. Would you like to resume where you left off?'
     );
     if (confirmResume) {
-      window.location.href = `practice.html?bank=${encodeURIComponent(data.bank)}&num=${numQuestions}&resume=true`;
+      const practiceUrl = `practice.html?bank=${encodeURIComponent(data.bank)}&num=${numQuestions}&resume=true`;
+      window.open(practiceUrl, '_blank');
       return;
     } else {
       // User wants to start fresh, clear the old session
@@ -251,8 +275,9 @@ function startPractice(): void {
     console.warn('Failed to save lastBank', e);
   }
 
-  // Redirect to practice page with bank and number parameters
-  window.location.href = `practice.html?bank=${encodeURIComponent(data.bank)}&num=${numQuestions}`;
+  // Open practice page in a new tab with bank and number parameters
+  const practiceUrl = `practice.html?bank=${encodeURIComponent(data.bank)}&num=${numQuestions}`;
+  window.open(practiceUrl, '_blank');
 }
 
 function getUserAnswer(): string {

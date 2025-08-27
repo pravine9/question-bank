@@ -119,7 +119,16 @@ export class SummaryManager {
 
   private redirectToHome(): void {
     setTimeout(() => {
-      window.location.href = 'index.html';
+      // Check if this window was opened from the index tab
+      if (window.opener && !window.opener.closed) {
+        // Navigate the opener (index tab) back to index.html and refresh it
+        window.opener.location.href = 'index.html';
+        // Close the current tab
+        window.close();
+      } else {
+        // Fallback: navigate in current window
+        window.location.href = 'index.html';
+      }
     }, 1000);
   }
 
@@ -201,7 +210,16 @@ export class SummaryManager {
     const clearFilterBtn = document.querySelector('.clear-filter-btn');
     if (backToHistoryBtn) {
       backToHistoryBtn.addEventListener('click', () => {
-        window.location.href = 'index.html';
+        // Check if this window was opened from the index tab
+        if (window.opener && !window.opener.closed) {
+          // Navigate the opener (index tab) back to index.html and refresh it
+          window.opener.location.href = 'index.html';
+          // Close the current tab
+          window.close();
+        } else {
+          // Fallback: navigate in current window
+          window.location.href = 'index.html';
+        }
       });
     }
     if (modalClose) {
@@ -432,7 +450,15 @@ export class SummaryManager {
       
       if (confirmNavigation) {
         // User confirmed, navigate to home
-        window.location.href = 'index.html';
+        if (window.opener && !window.opener.closed) {
+          // Navigate the opener (index tab) back to index.html and refresh it
+          window.opener.location.href = 'index.html';
+          // Close the current tab
+          window.close();
+        } else {
+          // Fallback: navigate in current window
+          window.location.href = 'index.html';
+        }
       } else {
         // User cancelled, prevent navigation and restore state
         window.history.pushState(null, '', window.location.href);

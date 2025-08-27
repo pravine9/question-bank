@@ -686,7 +686,7 @@ export class PracticeManager {
 
     this.isFinished = true;
     
-    // Redirect to summary page
+    // Redirect to summary page (will open in same tab since practice was opened in new tab)
     window.location.href = `summary.html?resultId=${resultId}`;
   }
 

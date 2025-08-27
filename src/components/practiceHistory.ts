@@ -20,6 +20,11 @@ export class PracticeHistoryComponent {
       hour: '2-digit',
       minute: '2-digit'
     });
+
+    // Listen for refresh events from the main page
+    window.addEventListener('refreshPracticeHistory', () => {
+      this.refresh();
+    });
   }
 
   render(containerId: string): void {
@@ -223,7 +228,9 @@ export class PracticeHistoryComponent {
   }
 
   private handleReviewTest(testId: string): void {
-    window.location.href = `summary.html?resultId=${testId}`;
+    // Open summary in a new tab to avoid losing the index page
+    const summaryUrl = `summary.html?resultId=${testId}`;
+    window.open(summaryUrl, '_blank');
   }
 
   private handleDeleteTest(testId: string): void {
