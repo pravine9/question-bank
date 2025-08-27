@@ -26,8 +26,13 @@ function replaceImportsInFile(filePath) {
   // Replace imports - convert .ts to .js and update paths
   if (mainAsset) {
     console.log(`Converting ${mainAsset} import`);
+    // Replace both the built asset reference and the source .ts reference
     content = content.replace(
       new RegExp(`import\\('/question-bank/assets/${mainAsset.replace('.js', '.ts')}'\\)`, 'g'),
+      `import('/question-bank/assets/${mainAsset}')`
+    );
+    content = content.replace(
+      new RegExp(`import\\('\\./pages/main\\.ts'\\)`, 'g'),
       `import('/question-bank/assets/${mainAsset}')`
     );
   }
@@ -38,6 +43,10 @@ function replaceImportsInFile(filePath) {
       new RegExp(`import\\('/question-bank/assets/${practiceAsset.replace('.js', '.ts')}'\\)`, 'g'),
       `import('/question-bank/assets/${practiceAsset}')`
     );
+    content = content.replace(
+      new RegExp(`import\\('\\./pages/practice\\.ts'\\)`, 'g'),
+      `import('/question-bank/assets/${practiceAsset}')`
+    );
   }
   
   if (summaryAsset) {
@@ -46,12 +55,20 @@ function replaceImportsInFile(filePath) {
       new RegExp(`import\\('/question-bank/assets/${summaryAsset.replace('.js', '.ts')}'\\)`, 'g'),
       `import('/question-bank/assets/${summaryAsset}')`
     );
+    content = content.replace(
+      new RegExp(`import\\('\\./pages/summary\\.ts'\\)`, 'g'),
+      `import('/question-bank/assets/${summaryAsset}')`
+    );
   }
   
   if (practiceHistoryAsset) {
     console.log(`Converting ${practiceHistoryAsset} import`);
     content = content.replace(
       new RegExp(`import\\('/question-bank/assets/${practiceHistoryAsset.replace('.js', '.ts')}'\\)`, 'g'),
+      `import('/question-bank/assets/${practiceHistoryAsset}')`
+    );
+    content = content.replace(
+      new RegExp(`import\\('\\./components/practiceHistory\\.ts'\\)`, 'g'),
       `import('/question-bank/assets/${practiceHistoryAsset}')`
     );
   }
