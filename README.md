@@ -2,6 +2,8 @@
 
 A question bank application for GPhC exam preparation. Built with TypeScript and Vite.
 
+[![Deploy to GitHub Pages](https://github.com/pravine9/question-bank/actions/workflows/deploy.yml/badge.svg)](https://github.com/pravine9/question-bank/actions/workflows/deploy.yml)
+
 All changes/improvements should be aim to keep code base lean and code lines minimal and avoid overcomplicating/overengineering things or removing large features/functionality unless clear functional and fundamental errors or improvments are identified.
 
 ## Features
@@ -91,6 +93,44 @@ Calculation questions are in different format supporting answer entries, all oth
 
 ## GitHub Pages Deployment
 
+This project is configured for automatic deployment to GitHub Pages using GitHub Actions.
+
+### Deployment Setup
+
+1. **Repository Configuration**:
+   - Ensure GitHub Pages is enabled in your repository settings
+   - Set the source to "GitHub Actions" in Pages settings
+   - The site will be available at: `https://pravine9.github.io/question-bank`
+
+2. **Automatic Deployment**:
+   - Every push to `main` or `master` branch triggers automatic deployment
+   - Pull requests create preview deployments
+   - Manual deployment can be triggered via GitHub Actions tab
+
+3. **Build Process**:
+   - Uses Node.js 18
+   - Installs dependencies with `npm ci`
+   - Builds the project with `npm run build`
+   - Deploys the `dist/` folder to GitHub Pages
+
+### Local Development
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+### Repository Structure
+
 - **Development**: `question-bank` (private) - main development work
-- **Deployment**: `questionbank` (public) - GitHub Pages hosting
+- **Deployment**: Automatically deployed to GitHub Pages via Actions
 

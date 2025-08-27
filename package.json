@@ -2,6 +2,7 @@
   "name": "gphc-question-bank",
   "version": "2.0.0",
   "description": "A modern, offline-capable question bank application for GPhC exam preparation with enhanced UI/UX and performance optimizations.",
+  "homepage": "https://pravine9.github.io/question-bank",
   "main": "dist/index.html",
   "scripts": {
     "dev": "vite",
@@ -46,6 +47,6 @@
     "marked": "^12.0.0"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.19.0"
   }
 }
