@@ -38,10 +38,10 @@ export default defineConfig({
       modernPolyfills: true
     }),
     {
-      name: 'copy-assets',
+      name: 'copy-question-banks',
       writeBundle() {
         try {
-          // Copy question banks
+          // Copy question banks (these are already JavaScript files)
           const distQuestionBanks = 'dist/question_banks';
           if (!existsSync(distQuestionBanks)) {
             mkdirSync(distQuestionBanks, { recursive: true });
@@ -50,30 +50,8 @@ export default defineConfig({
           questionBankFiles.forEach(file => {
             copyFileSync(`public/question_banks/${file}`, `${distQuestionBanks}/${file}`);
           });
-
-          // Copy static files
-          const distStatic = 'dist/static';
-          if (!existsSync(distStatic)) {
-            mkdirSync(distStatic, { recursive: true });
-          }
-          const staticFiles = readdirSync('static').filter(f => f.endsWith('.js') || f.endsWith('.ts'));
-          staticFiles.forEach(file => {
-            copyFileSync(`static/${file}`, `${distStatic}/${file}`);
-          });
-
-          // Copy src components
-          const distSrcComponents = 'dist/src/components';
-          if (!existsSync(distSrcComponents)) {
-            mkdirSync(distSrcComponents, { recursive: true });
-          }
-          if (existsSync('src/components')) {
-            const componentFiles = readdirSync('src/components').filter(f => f.endsWith('.js') || f.endsWith('.ts'));
-            componentFiles.forEach(file => {
-              copyFileSync(`src/components/${file}`, `${distSrcComponents}/${file}`);
-            });
-          }
         } catch (error) {
-          console.warn('Failed to copy assets:', error);
+          console.warn('Failed to copy question banks:', error);
         }
       }
     }
@@ -81,7 +59,6 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
-
       '@templates': resolve(__dirname, 'templates'),
       '@question-banks': resolve(__dirname, 'public/question_banks')
     }
