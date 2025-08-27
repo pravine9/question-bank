@@ -15,15 +15,15 @@ export default defineConfig({
         summary: resolve(__dirname, 'src/summary.html')
       },
       external: [
-        '/question_banks/calculations_questions.js',
-        '/question_banks/clinical_mep_low_questions.js',
-        '/question_banks/clinical_mixed_high_questions.js',
-        '/question_banks/clinical_mixed_low_questions.js',
-        '/question_banks/clinical_mixed_medium_questions.js',
-        '/question_banks/clinical_otc_low_questions.js',
-        '/question_banks/clinical_therapeutics_high_questions.js',
-        '/question_banks/clinical_therapeutics_low_questions.js',
-        '/question_banks/clinical_therapeutics_medium_questions.js'
+        '../public/question_banks/calculations_questions.js',
+        '../public/question_banks/clinical_mep_low_questions.js',
+        '../public/question_banks/clinical_mixed_high_questions.js',
+        '../public/question_banks/clinical_mixed_low_questions.js',
+        '../public/question_banks/clinical_mixed_medium_questions.js',
+        '../public/question_banks/clinical_otc_low_questions.js',
+        '../public/question_banks/clinical_therapeutics_high_questions.js',
+        '../public/question_banks/clinical_therapeutics_low_questions.js',
+        '../public/question_banks/clinical_therapeutics_medium_questions.js'
       ]
     },
     target: 'es2020',

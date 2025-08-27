@@ -16,49 +16,57 @@ function replaceImportsInFile(filePath) {
   let content = readFileSync(filePath, 'utf8');
   
   // Find built assets
-  const mainAsset = findBuiltAsset('main-Bzh6PzLQ');
-  const practiceAsset = findBuiltAsset('practice-BTCbHsDM');
-  const summaryAsset = findBuiltAsset('summary-DtnDCkzv');
-  const practiceHistoryAsset = findBuiltAsset('practiceHistory-Bz7lSwcg');
+  const mainAsset = findBuiltAsset('main');
+  const practiceAsset = findBuiltAsset('practice');
+  const summaryAsset = findBuiltAsset('summary');
+  const practiceHistoryAsset = findBuiltAsset('practiceHistory');
   
   console.log('Assets found:', { mainAsset, practiceAsset, summaryAsset, practiceHistoryAsset });
   
   // Replace imports - convert .ts to .js and update paths
   if (mainAsset) {
-    const jsAsset = mainAsset.replace('.ts', '.js');
-    console.log(`Converting ${mainAsset} to ${jsAsset}`);
+    console.log(`Converting ${mainAsset} import`);
     content = content.replace(
-      new RegExp(`import\\('/question-bank/assets/${mainAsset.replace('.', '\\.')}'\\)`, 'g'),
-      `import('/question-bank/assets/${jsAsset}')`
+      new RegExp(`import\\('/question-bank/assets/${mainAsset.replace('.js', '.ts')}'\\)`, 'g'),
+      `import('/question-bank/assets/${mainAsset}')`
     );
   }
   
   if (practiceAsset) {
-    const jsAsset = practiceAsset.replace('.ts', '.js');
-    console.log(`Converting ${practiceAsset} to ${jsAsset}`);
+    console.log(`Converting ${practiceAsset} import`);
     content = content.replace(
-      new RegExp(`import\\('/question-bank/assets/${practiceAsset.replace('.', '\\.')}'\\)`, 'g'),
-      `import('/question-bank/assets/${jsAsset}')`
+      new RegExp(`import\\('/question-bank/assets/${practiceAsset.replace('.js', '.ts')}'\\)`, 'g'),
+      `import('/question-bank/assets/${practiceAsset}')`
     );
   }
   
   if (summaryAsset) {
-    const jsAsset = summaryAsset.replace('.ts', '.js');
-    console.log(`Converting ${summaryAsset} to ${jsAsset}`);
+    console.log(`Converting ${summaryAsset} import`);
     content = content.replace(
-      new RegExp(`import\\('/question-bank/assets/${summaryAsset.replace('.', '\\.')}'\\)`, 'g'),
-      `import('/question-bank/assets/${jsAsset}')`
+      new RegExp(`import\\('/question-bank/assets/${summaryAsset.replace('.js', '.ts')}'\\)`, 'g'),
+      `import('/question-bank/assets/${summaryAsset}')`
     );
   }
   
   if (practiceHistoryAsset) {
-    const jsAsset = practiceHistoryAsset.replace('.ts', '.js');
-    console.log(`Converting ${practiceHistoryAsset} to ${jsAsset}`);
+    console.log(`Converting ${practiceHistoryAsset} import`);
     content = content.replace(
-      new RegExp(`import\\('/question-bank/assets/${practiceHistoryAsset.replace('.', '\\.')}'\\)`, 'g'),
-      `import('/question-bank/assets/${jsAsset}')`
+      new RegExp(`import\\('/question-bank/assets/${practiceHistoryAsset.replace('.js', '.ts')}'\\)`, 'g'),
+      `import('/question-bank/assets/${practiceHistoryAsset}')`
     );
   }
+  
+  // Fix question bank script paths for production
+  content = content.replace(
+    /src="\.\.\/public\/question_banks\//g,
+    'src="/question-bank/question_banks/'
+  );
+  
+  // Remove type="module" from question bank scripts for production
+  content = content.replace(
+    /<script type="module" src="\/question-bank\/question_banks\//g,
+    '<script src="/question-bank/question_banks/'
+  );
   
   writeFileSync(filePath, content);
   console.log(`Updated ${filePath}`);
