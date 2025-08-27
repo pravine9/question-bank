@@ -91,6 +91,6 @@ Calculation questions are in different format supporting answer entries, all oth
 
 ## GitHub Pages Deployment
 
-- **Development**: `gphc-scraper` or `question-bank` (private) - main development work
+- **Development**: `question-bank` (private) - main development work
 - **Deployment**: `questionbank` (public) - GitHub Pages hosting
 
