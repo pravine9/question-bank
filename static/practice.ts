@@ -420,7 +420,6 @@ export class PracticeManager {
 
     this.calculateResults();
     this.clearSession(); // Clear session when test is completed
-    this.showSummary();
   }
 
   private initializeTimer(remainingSeconds?: number): void {
@@ -690,10 +689,7 @@ export class PracticeManager {
     window.location.href = `summary.html?resultId=${resultId}`;
   }
 
-  private showSummary(): void {
-    // This method is no longer needed as we redirect to a separate summary page
-    // The summary functionality is now handled by summary.ts
-  }
+
 
 
   private showReviewModal(): void {
