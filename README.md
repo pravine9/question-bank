@@ -93,25 +93,22 @@ Calculation questions are in different format supporting answer entries, all oth
 
 ## GitHub Pages Deployment
 
-This project is configured for automatic deployment to GitHub Pages using GitHub Actions.
+This project is configured for automatic deployment to GitHub Pages using GitHub Actions. The deployment is streamlined and unified with the main repository.
 
-### Deployment Setup
+### Deployment Process
 
-1. **Repository Configuration**:
-   - Ensure GitHub Pages is enabled in your repository settings
-   - Set the source to "GitHub Actions" in Pages settings
-   - The site will be available at: `https://pravine9.github.io/question-bank`
+✅ **Automatic Deployment**: Every push to the `main` branch triggers automatic deployment  
+✅ **Unified Repository**: No separate gh-pages branch needed  
+✅ **GitHub Actions**: Builds and deploys automatically  
+✅ **Live Site**: Available at `https://pravine9.github.io/question-bank/`
 
-2. **Automatic Deployment**:
-   - Every push to `main` or `master` branch triggers automatic deployment
-   - Pull requests create preview deployments
-   - Manual deployment can be triggered via GitHub Actions tab
+### How It Works
 
-3. **Build Process**:
-   - Uses Node.js 18
-   - Installs dependencies with `npm ci`
-   - Builds the project with `npm run build`
-   - Deploys the `dist/` folder to GitHub Pages
+1. **Push to Main**: Any commit to the main branch triggers the deployment workflow
+2. **Build Process**: GitHub Actions runs `npm run build` to create production files
+3. **Asset Processing**: Post-build script converts TypeScript imports to JavaScript
+4. **Deployment**: Files are automatically deployed to GitHub Pages
+5. **Live Update**: Site is updated within 2-5 minutes of push
 
 ### Local Development
 
@@ -128,9 +125,4 @@ npm run build
 # Preview production build
 npm run preview
 ```
-
-### Repository Structure
-
-- **Development**: `question-bank` (private) - main development work
-- **Deployment**: Automatically deployed to GitHub Pages via Actions
 
