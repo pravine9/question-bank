@@ -289,10 +289,8 @@ function toggleCheck(): void {
       const bankSelect = document.getElementById('bankSelect') as HTMLSelectElement;
       if (bankSelect && bankSelect.value) {
         const bankName = bankSelect.value;
-        // Use the question's id for consistent tracking
-        const questionId = currentQuestion.id.toString();
         const isCorrect = evaluateAnswer(currentQuestion, userAnswer);
-        questionStatsComponent.recordQuestionAttempt(bankName, questionId, isCorrect);
+        questionStatsComponent.recordQuestionAttempt(bankName, currentQuestion.id.toString(), isCorrect);
       }
     }
   }
