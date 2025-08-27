@@ -38,9 +38,35 @@ export function init(): void {
     revealBtn.addEventListener('click', toggleReveal);
   }
 
-  // Initialize question statistics component
-  questionStatsComponent = new QuestionStatisticsComponent(bankFiles);
-  questionStatsComponent.render('statsArea');
+  // Wait for question banks to be loaded before initializing components
+  setTimeout(() => {
+    // Re-import banks to get the latest data after scripts are loaded
+    const updatedBanks = {
+      calculations: [ (window as any).calculations || [] ],
+      clinical_mep: [ (window as any).clinicalMepLow || [] ],
+      clinical_mixed: [
+        (window as any).clinicalMixedHigh || [],
+        (window as any).clinicalMixedLow || [],
+        (window as any).clinicalMixedMedium || [],
+      ],
+      clinical_otc: [ (window as any).clinicalOtcLow || [] ],
+      clinical_therapeutics: [
+        (window as any).clinicalTherapeuticsHigh || [],
+        (window as any).clinicalTherapeuticsLow || [],
+        (window as any).clinicalTherapeuticsMedium || [],
+      ],
+    };
+
+    // Initialize question statistics component with updated data
+    questionStatsComponent = new QuestionStatisticsComponent(updatedBanks);
+    questionStatsComponent.render('statsArea');
+
+    // Update the global bankFiles reference
+    Object.assign(bankFiles, updatedBanks);
+
+    // Populate bank selects with updated data
+    populateBankSelects(updatedBanks);
+  }, 100);
 
   const params = new URLSearchParams(window.location.search);
   if (params.get('isStandAlone') === 'true') {
@@ -51,6 +77,7 @@ export function init(): void {
     }
   }
 
+  // Initial population with existing data (will be updated after timeout)
   populateBankSelects(bankFiles);
 
   try {

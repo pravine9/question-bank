@@ -193,18 +193,12 @@ export class SummaryManager {
   }
 
   private setupEventListeners(): void {
-    const goHomeBtn = document.getElementById('goHomeBtn');
     const backToHistoryBtn = document.getElementById('backToHistoryBtn');
     const modalClose = document.querySelector('.modal-close');
     const closeReviewBtn = document.getElementById('closeReviewBtn');
     const prevQuestionBtn = document.getElementById('prevQuestionBtn');
     const nextQuestionBtn = document.getElementById('nextQuestionBtn');
     const clearFilterBtn = document.querySelector('.clear-filter-btn');
-    if (goHomeBtn) {
-      goHomeBtn.addEventListener('click', () => {
-        window.location.href = 'index.html';
-      });
-    }
     if (backToHistoryBtn) {
       backToHistoryBtn.addEventListener('click', () => {
         window.location.href = 'index.html';

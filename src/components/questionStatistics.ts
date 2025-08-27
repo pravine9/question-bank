@@ -228,6 +228,7 @@ export class QuestionStatisticsComponent {
   private loadBankStatistics(bankName: string): void {
     try {
       const bankData = this.bankFiles[bankName];
+      
       if (!bankData || !Array.isArray(bankData)) {
         this.showError('Invalid bank data');
         return;
@@ -548,7 +549,7 @@ export class QuestionStatisticsComponent {
 
   private generateQuestionId(question: Question): string {
     // Create a consistent ID based on question content (first 50 chars of question text + calculation flag)
-    const questionText = (question as any).question_text || '';
+    const questionText = question.text || '';
     const prefix = questionText.substring(0, 50).replace(/[^a-zA-Z0-9]/g, '');
     const suffix = question.is_calculation ? '_calc' : '_mcq';
     return `${prefix}${suffix}`;
