@@ -30,6 +30,31 @@ export class QuestionStatisticsComponent {
     this.container = null;
     this.bankFiles = bankFiles;
     this.currentStats = null;
+    this.cleanupLegacyStats();
+  }
+
+  private cleanupLegacyStats(): void {
+    try {
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('question_stats_')) {
+          const data = localStorage.getItem(key);
+          try {
+            const parsed = JSON.parse(data || '{}');
+            const allNumeric = Object.keys(parsed).every(id => /^[0-9]+$/.test(id));
+            if (!allNumeric) {
+              keysToRemove.push(key);
+            }
+          } catch {
+            keysToRemove.push(key);
+          }
+        }
+      }
+      keysToRemove.forEach(k => localStorage.removeItem(k));
+    } catch (err) {
+      console.warn('Failed to clean up legacy question stats:', err);
+    }
   }
 
   render(containerId: string): void {
@@ -258,8 +283,8 @@ export class QuestionStatisticsComponent {
       file.forEach((question) => {
         totalQuestions++;
         
-        // Generate consistent question ID based on content
-        const questionId = this.generateQuestionId(question);
+        // Use question.id for consistent identification
+        const questionId = question.id.toString();
         
         // Combine data from both individual attempts and practice history
         const individualData = questionUserData[questionId] || { attempts: 0, correct: 0, wrong: 0 };
@@ -563,14 +588,6 @@ export class QuestionStatisticsComponent {
     }
   }
 
-  private generateQuestionId(question: Question): string {
-    // Create a consistent ID based on question content (first 50 chars of question text + calculation flag)
-    const questionText = question.text || '';
-    const prefix = questionText.substring(0, 50).replace(/[^a-zA-Z0-9]/g, '');
-    const suffix = question.is_calculation ? '_calc' : '_mcq';
-    return `${prefix}${suffix}`;
-  }
-
   private extractFromPracticeHistory(bankName: string): Record<string, { attempts: number; correct: number; wrong: number }> {
     try {
       const history = localStorage.getItem('practice_history');
@@ -599,7 +616,7 @@ export class QuestionStatisticsComponent {
             return; // Skip unanswered questions
           }
 
-          const questionId = this.generateQuestionId(question);
+          const questionId = question.id.toString();
           
           // Initialize if not exists
           if (!aggregatedData[questionId]) {
