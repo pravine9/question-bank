@@ -57,7 +57,8 @@ export default defineConfig({
           console.warn('Failed to copy question banks:', error);
         }
       }
-    }
+    },
+
   ],
   resolve: {
     alias: {
