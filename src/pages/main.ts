@@ -94,6 +94,9 @@ export function init(): void {
 
   questionRenderer.initPdfViewer();
 
+  // Set last updated timestamp
+  setLastUpdatedTimestamp();
+
   // Add page visibility change listener to refresh data when returning to the page
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) {
@@ -335,4 +338,19 @@ function toggleReveal(): void {
   }
 }
 
-
+function setLastUpdatedTimestamp(): void {
+  const lastUpdatedElement = document.getElementById('lastUpdated');
+  if (lastUpdatedElement) {
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+    const formattedTime = now.toLocaleTimeString('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    lastUpdatedElement.textContent = `Last updated: ${formattedDate} at ${formattedTime}`;
+  }
+}
