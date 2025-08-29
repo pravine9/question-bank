@@ -43,6 +43,13 @@ export class PracticeManager {
   constructor() {
     this.timerDisplayElement = document.getElementById('timerValue');
     this.questionStatsComponent = new QuestionStatisticsComponent(banks);
+    
+    // Set up periodic backup to localStorage every 30 seconds
+    setInterval(() => {
+      if (this.state && !this.isFinished) {
+        this.saveSessionToLocalStorage();
+      }
+    }, 30000);
   }
 
   init(): void {
@@ -70,8 +77,19 @@ export class PracticeManager {
     this.renderCurrentQuestion();
     
     // Add auto-save and cleanup on page unload
-    window.addEventListener('beforeunload', () => {
+    window.addEventListener('beforeunload', (event) => {
+      // Save session to both sessionStorage and localStorage as backup
       this.saveSession();
+      this.saveSessionToLocalStorage();
+      
+      // Show warning if user has unsaved progress
+      if (this.state && Object.keys(this.state.answers).length > 0) {
+        const message = 'You have unsaved progress. Are you sure you want to leave?';
+        event.preventDefault();
+        event.returnValue = message;
+        return message;
+      }
+      
       if (this.timer) {
         this.timer.destroy();
       }
@@ -250,6 +268,7 @@ export class PracticeManager {
     this.updateNavigation();
     this.updateProgress();
     this.saveSession(); // Auto-save on question change
+    this.saveSessionToLocalStorage(); // Backup to localStorage
   }
 
   private saveAnswer(): void {
@@ -271,12 +290,14 @@ export class PracticeManager {
       this.updateNavigation();
       this.updateProgress();
       this.saveSession(); // Auto-save when answer changes
+      this.saveSessionToLocalStorage(); // Backup to localStorage
     } else {
       // If answer is empty, remove it from answers
       delete this.state.answers[this.state.currentQuestion];
       this.updateNavigation();
       this.updateProgress();
       this.saveSession(); // Auto-save when answer changes
+      this.saveSessionToLocalStorage(); // Backup to localStorage
     }
     
     // Reset feedback and buttons when answer changes (only if currently showing feedback)
@@ -380,6 +401,7 @@ export class PracticeManager {
 
     this.updateNavigation();
     this.saveSession(); // Auto-save when flag changes
+    this.saveSessionToLocalStorage(); // Backup to localStorage
   }
 
   private toggleCheck(): void {
@@ -890,9 +912,79 @@ export class PracticeManager {
     }
   }
 
+  private saveSessionToLocalStorage(): void {
+    if (!this.state || this.isFinished) {
+      return;
+    }
+    
+    try {
+      // Show save indicator
+      this.showSaveIndicator();
+      
+      // Calculate remaining time for timer persistence
+      let remainingSeconds = 0;
+      if (this.timer && this.timer.isRunning()) {
+        remainingSeconds = this.timer.getTotalRemainingSeconds();
+      } else {
+        // Fallback calculation if timer is not running
+        const elapsedMs = Date.now() - this.state.startTime;
+        const totalTimeMs = this.state.totalQuestions * 3 * 60 * 1000; // 3 minutes per question
+        remainingSeconds = Math.max(0, Math.floor((totalTimeMs - elapsedMs) / 1000));
+      }
+
+      const sessionData = {
+        currentQuestion: this.state.currentQuestion,
+        answers: this.state.answers,
+        flagged: Array.from(this.state.flagged),
+        startTime: this.state.startTime,
+        bank: this.state.bank,
+        totalQuestions: this.state.totalQuestions,
+        questions: this.state.questions.map((q: Question) => q.id), // Store only IDs to save space
+        timestamp: Date.now(),
+        remainingSeconds: remainingSeconds, // Save timer state
+        timerActive: this.timer ? this.timer.isRunning() : true
+      };
+      
+      localStorage.setItem(this.sessionKey, JSON.stringify(sessionData));
+      console.log('Session backup saved to localStorage:', this.sessionKey);
+      
+      // Hide save indicator after a short delay
+      setTimeout(() => this.hideSaveIndicator(), 1000);
+    } catch (error) {
+      console.warn('Failed to save session backup to localStorage:', error);
+      this.hideSaveIndicator();
+    }
+  }
+
+  private showSaveIndicator(): void {
+    const saveStatus = document.getElementById('saveStatus');
+    const saveStatusText = document.getElementById('saveStatusText');
+    if (saveStatus && saveStatusText) {
+      saveStatusText.textContent = 'Saving...';
+      saveStatus.style.display = 'block';
+    }
+  }
+
+  private hideSaveIndicator(): void {
+    const saveStatus = document.getElementById('saveStatus');
+    if (saveStatus) {
+      saveStatus.style.display = 'none';
+    }
+  }
+
   private loadExistingSession(): boolean {
     try {
-      const sessionData = sessionStorage.getItem(this.sessionKey);
+      // First try to load from sessionStorage
+      let sessionData = sessionStorage.getItem(this.sessionKey);
+      
+      // If not found in sessionStorage, try localStorage as fallback
+      if (!sessionData) {
+        sessionData = localStorage.getItem(this.sessionKey);
+        if (sessionData) {
+          console.log('Recovered session from localStorage backup');
+        }
+      }
+      
       if (!sessionData) {
         return false;
       }
@@ -964,7 +1056,8 @@ export class PracticeManager {
   private clearSession(): void {
     try {
       sessionStorage.removeItem(this.sessionKey);
-      console.log('Session cleared:', this.sessionKey);
+      localStorage.removeItem(this.sessionKey);
+      console.log('Session cleared from both storage locations:', this.sessionKey);
     } catch (error) {
       console.warn('Failed to clear session:', error);
     }
