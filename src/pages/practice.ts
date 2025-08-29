@@ -52,6 +52,13 @@ export class PracticeManager {
     }, 30000);
   }
 
+  private ensureTimerDisplayElement(): HTMLElement | null {
+    if (!this.timerDisplayElement) {
+      this.timerDisplayElement = document.getElementById('timerValue');
+    }
+    return this.timerDisplayElement;
+  }
+
   init(): void {
     const params = new URLSearchParams(window.location.search);
     const bank = params.get('bank');
@@ -68,7 +75,7 @@ export class PracticeManager {
     
     // Try to resume existing session
     if (resume || this.loadExistingSession()) {
-      console.log('Resuming existing practice session');
+      // Session resumed successfully
     } else {
       this.setupPracticeSession(bank, numQuestions);
     }
@@ -76,25 +83,45 @@ export class PracticeManager {
     this.setupEventListeners();
     this.renderCurrentQuestion();
     
-    // Add auto-save and cleanup on page unload
-    window.addEventListener('beforeunload', (event) => {
-      // Save session to both sessionStorage and localStorage as backup
+    // Set up page unload handlers for progress protection
+    this.setupUnloadHandlers();
+  }
+  
+  private setupUnloadHandlers(): void {
+    const beforeUnloadHandler = (event: BeforeUnloadEvent) => {
+      // Auto-save progress before page unload
       this.saveSession();
       this.saveSessionToLocalStorage();
       
       // Show warning if user has unsaved progress
-      if (this.state && Object.keys(this.state.answers).length > 0) {
+      const hasAnswers = this.state && Object.keys(this.state.answers).length > 0;
+      
+      if (hasAnswers) {
         const message = 'You have unsaved progress. Are you sure you want to leave?';
         event.preventDefault();
-        event.returnValue = message;
         return message;
       }
       
       if (this.timer) {
         this.timer.destroy();
       }
-    });
+    };
+
+    const unloadHandler = () => {
+      this.saveSession();
+      this.saveSessionToLocalStorage();
+    };
+
+    // Remove any existing listeners first
+    window.removeEventListener('beforeunload', beforeUnloadHandler);
+    window.removeEventListener('unload', unloadHandler);
+    
+    // Add new listeners
+    window.addEventListener('beforeunload', beforeUnloadHandler);
+    window.addEventListener('unload', unloadHandler);
   }
+
+
 
   private setupPracticeSession(bank: string, numQuestions: number): void {
     const bankData = banks[bank];
@@ -507,13 +534,14 @@ export class PracticeManager {
   }
 
   private updateTimerDisplay(): void {
-    if (!this.timerDisplayElement || !this.timer) {
+    const timerElement = this.ensureTimerDisplayElement();
+    if (!timerElement || !this.timer) {
       return;
     }
 
     try {
       const formattedTime = this.timer.getFormattedTime();
-      this.timerDisplayElement.textContent = formattedTime;
+      timerElement.textContent = formattedTime;
 
       // Update timer display styling based on remaining time
       const remainingSeconds = this.timer.getTotalRemainingSeconds();
@@ -540,8 +568,41 @@ export class PracticeManager {
     } catch (error) {
       console.error('Error updating timer display:', error);
       // Failsafe: Show a generic timer display if specific formatting fails
-      if (this.timerDisplayElement) {
-        this.timerDisplayElement.textContent = '00:00';
+      if (timerElement) {
+        timerElement.textContent = '00:00';
+      }
+    }
+  }
+
+  private updateTimerDisplayImmediate(remainingSeconds: number): void {
+    const timerElement = this.ensureTimerDisplayElement();
+    if (!timerElement) {
+      return;
+    }
+
+    try {
+      // Format the time immediately without relying on timer instance
+      const formattedTime = PracticeTestTimer.formatSeconds(remainingSeconds);
+      timerElement.textContent = formattedTime;
+
+      // Update timer display styling based on remaining time
+      const timerDisplay = document.getElementById('timerDisplay');
+      
+      if (timerDisplay) {
+        // Remove existing warning classes
+        timerDisplay.classList.remove('warning', 'critical');
+        
+        // Add appropriate warning class
+        if (remainingSeconds <= 60) { // Last minute
+          timerDisplay.classList.add('critical');
+        } else if (remainingSeconds <= 300) { // Last 5 minutes
+          timerDisplay.classList.add('warning');
+        }
+      }
+    } catch (error) {
+      console.error('Error updating timer display immediately:', error);
+      if (timerElement) {
+        timerElement.textContent = '00:00';
       }
     }
   }
@@ -678,15 +739,7 @@ export class PracticeManager {
     const maxReasonableDuration = this.state.totalQuestions * 10; // Max 10 minutes per question as a sanity check
     const validatedDuration = Math.max(0, Math.min(duration, maxReasonableDuration));
     
-    // Log duration calculation for debugging
-    console.log(`Test duration calculation:`, {
-      startTime: new Date(this.state.startTime).toISOString(),
-      endTime: new Date().toISOString(),
-      rawDuration: duration,
-      validatedDuration: validatedDuration,
-      totalQuestions: this.state.totalQuestions,
-      maxReasonableDuration: maxReasonableDuration
-    });
+
 
     // Check answers
     for (let i = 0; i < this.state.questions.length; i++) {
@@ -875,22 +928,23 @@ export class PracticeManager {
     }
   }
 
+  private calculateRemainingSeconds(): number {
+    if (this.timer && this.timer.isRunning()) {
+      return this.timer.getTotalRemainingSeconds();
+    }
+    // Fallback calculation if timer is not running
+    const elapsedMs = Date.now() - this.state!.startTime;
+    const totalTimeMs = this.state!.totalQuestions * 3 * 60 * 1000; // 3 minutes per question
+    return Math.max(0, Math.floor((totalTimeMs - elapsedMs) / 1000));
+  }
+
   private saveSession(): void {
     if (!this.state || this.isFinished) {
       return;
     }
     
     try {
-      // Calculate remaining time for timer persistence
-      let remainingSeconds = 0;
-      if (this.timer && this.timer.isRunning()) {
-        remainingSeconds = this.timer.getTotalRemainingSeconds();
-      } else {
-        // Fallback calculation if timer is not running
-        const elapsedMs = Date.now() - this.state.startTime;
-        const totalTimeMs = this.state.totalQuestions * 3 * 60 * 1000; // 3 minutes per question
-        remainingSeconds = Math.max(0, Math.floor((totalTimeMs - elapsedMs) / 1000));
-      }
+      const remainingSeconds = this.calculateRemainingSeconds();
 
       const sessionData = {
         currentQuestion: this.state.currentQuestion,
@@ -899,16 +953,26 @@ export class PracticeManager {
         startTime: this.state.startTime,
         bank: this.state.bank,
         totalQuestions: this.state.totalQuestions,
-        questions: this.state.questions.map((q: Question) => q.id), // Store only IDs to save space
+        questions: this.state.questions.map((q: Question) => q.id),
         timestamp: Date.now(),
-        remainingSeconds: remainingSeconds, // Save timer state
+        remainingSeconds: remainingSeconds,
         timerActive: this.timer ? this.timer.isRunning() : true
       };
       
       sessionStorage.setItem(this.sessionKey, JSON.stringify(sessionData));
-      console.log('Session saved:', this.sessionKey);
     } catch (error) {
       console.warn('Failed to save session:', error);
+    }
+  }
+
+  private canSaveToStorage(): boolean {
+    try {
+      const testKey = '__storage_test__';
+      localStorage.setItem(testKey, 'test');
+      localStorage.removeItem(testKey);
+      return true;
+    } catch {
+      return false;
     }
   }
 
@@ -917,20 +981,15 @@ export class PracticeManager {
       return;
     }
     
+    // Check if storage is available before attempting to save
+    if (!this.canSaveToStorage()) {
+      return;
+    }
+    
     try {
-      // Show save indicator
       this.showSaveIndicator();
       
-      // Calculate remaining time for timer persistence
-      let remainingSeconds = 0;
-      if (this.timer && this.timer.isRunning()) {
-        remainingSeconds = this.timer.getTotalRemainingSeconds();
-      } else {
-        // Fallback calculation if timer is not running
-        const elapsedMs = Date.now() - this.state.startTime;
-        const totalTimeMs = this.state.totalQuestions * 3 * 60 * 1000; // 3 minutes per question
-        remainingSeconds = Math.max(0, Math.floor((totalTimeMs - elapsedMs) / 1000));
-      }
+      const remainingSeconds = this.calculateRemainingSeconds();
 
       const sessionData = {
         currentQuestion: this.state.currentQuestion,
@@ -939,14 +998,13 @@ export class PracticeManager {
         startTime: this.state.startTime,
         bank: this.state.bank,
         totalQuestions: this.state.totalQuestions,
-        questions: this.state.questions.map((q: Question) => q.id), // Store only IDs to save space
+        questions: this.state.questions.map((q: Question) => q.id),
         timestamp: Date.now(),
-        remainingSeconds: remainingSeconds, // Save timer state
+        remainingSeconds: remainingSeconds,
         timerActive: this.timer ? this.timer.isRunning() : true
       };
       
       localStorage.setItem(this.sessionKey, JSON.stringify(sessionData));
-      console.log('Session backup saved to localStorage:', this.sessionKey);
       
       // Hide save indicator after a short delay
       setTimeout(() => this.hideSaveIndicator(), 1000);
@@ -980,9 +1038,6 @@ export class PracticeManager {
       // If not found in sessionStorage, try localStorage as fallback
       if (!sessionData) {
         sessionData = localStorage.getItem(this.sessionKey);
-        if (sessionData) {
-          console.log('Recovered session from localStorage backup');
-        }
       }
       
       if (!sessionData) {
@@ -1009,7 +1064,6 @@ export class PracticeManager {
           .filter((q: Question | undefined): q is Question => q !== undefined);
       
       if (questions.length !== data.totalQuestions) {
-        console.warn('Question mismatch, starting new session');
         return false;
       }
       
@@ -1031,21 +1085,16 @@ export class PracticeManager {
       
       this.setupNavigation();
       
-      // Restore timer with saved remaining time
+      // Immediately update timer display with saved time to prevent 00:00 flash
       const savedRemainingSeconds = data.remainingSeconds;
-      const timerWasActive = data.timerActive !== false; // Default to true if not saved
-      
-      if (timerWasActive && savedRemainingSeconds > 0) {
-        this.initializeTimer(savedRemainingSeconds);
-      } else if (savedRemainingSeconds <= 0) {
-        // Timer had expired, trigger time up immediately
-        this.handleTimeUp();
-      } else {
-        // Initialize fresh timer as fallback
-        this.initializeTimer();
+      if (savedRemainingSeconds > 0) {
+        this.updateTimerDisplayImmediate(savedRemainingSeconds);
       }
       
-      console.log('Session loaded successfully');
+      // Restore timer with saved remaining time
+      const timerWasActive = data.timerActive !== false;
+      this.restoreTimer(savedRemainingSeconds, timerWasActive);
+      
       return true;
     } catch (error) {
       console.warn('Failed to load session:', error);
@@ -1053,16 +1102,27 @@ export class PracticeManager {
     }
   }
 
-  private clearSession(): void {
+  private restoreTimer(savedRemainingSeconds: number, timerWasActive: boolean): void {
+    if (savedRemainingSeconds <= 0) {
+      // Timer had expired, trigger time up immediately
+      this.handleTimeUp();
+    } else if (timerWasActive) {
+      // Restore timer with exact remaining time
+      this.initializeTimer(savedRemainingSeconds);
+    } else {
+      // Initialize fresh timer as fallback
+      this.initializeTimer();
+    }
+  }
+
+    private clearSession(): void {
     try {
       sessionStorage.removeItem(this.sessionKey);
       localStorage.removeItem(this.sessionKey);
-      console.log('Session cleared from both storage locations:', this.sessionKey);
     } catch (error) {
       console.warn('Failed to clear session:', error);
     }
     
-    // Clean up timer
     if (this.timer) {
       this.timer.destroy();
       this.timer = null;
