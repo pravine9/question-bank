@@ -50,11 +50,22 @@ function enhanceLinksAndImages(element: HTMLElement): void {
     imgEl.onclick = () => window.open(imgEl.src, '_blank');
   });
 
-  // Handle links that should open PDFs
-  const links = element.querySelectorAll('a[href$=".pdf"]');
+  // Handle all external links to open in new tab
+  const links = element.querySelectorAll('a[href^="http"]');
   links.forEach((link) => {
     const linkEl = link as HTMLAnchorElement;
     linkEl.target = '_blank';
+    linkEl.rel = 'noopener noreferrer'; // Security best practice
+  });
+
+  // Handle PDF links (fallback for non-http PDFs)
+  const pdfLinks = element.querySelectorAll('a[href$=".pdf"]');
+  pdfLinks.forEach((link) => {
+    const linkEl = link as HTMLAnchorElement;
+    if (!linkEl.target) { // Only set if not already set by above rule
+      linkEl.target = '_blank';
+      linkEl.rel = 'noopener noreferrer';
+    }
   });
 }
 

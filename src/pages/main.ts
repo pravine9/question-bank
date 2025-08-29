@@ -17,6 +17,17 @@ let currentQuestion: Question | null = null;
 (window as any).getCorrectAnswerText = getCorrectAnswerText;
 (window as any).formatExplanation = formatExplanation;
 
+// Global link handler for external links to open in new tab
+document.addEventListener('click', (e) => {
+  const target = e.target as HTMLElement;
+  const link = target.closest('a[href^="http"]') as HTMLAnchorElement;
+  
+  if (link && !link.target) {
+    e.preventDefault();
+    window.open(link.href, '_blank', 'noopener,noreferrer');
+  }
+});
+
 export function init(): void {
   const loadBtn = document.getElementById('loadBtn') as HTMLButtonElement | null;
   if (loadBtn) {
