@@ -341,16 +341,8 @@ function toggleReveal(): void {
 function setLastUpdatedTimestamp(): void {
   const lastUpdatedElement = document.getElementById('lastUpdated');
   if (lastUpdatedElement) {
-    const now = new Date();
-    const formattedDate = now.toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-    const formattedTime = now.toLocaleTimeString('en-GB', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-    lastUpdatedElement.textContent = `Last updated: ${formattedDate} at ${formattedTime}`;
+    // Show git commit hash for version tracking
+    const commitHash = 'b38db1a'; // This will be updated by build process
+    lastUpdatedElement.textContent = `v${commitHash}`;
   }
 }
